@@ -1,19 +1,13 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.Financial-Planner</groupId>
-	<artifactId>FPFL-API-JDK</artifactId>
+    <groupId>com.Financial-Planner</groupId>
+    <artifactId>FPFL-V2-Microservice</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
-	<name>FPFL-API-JDK</name>
-	<description>Financial Planner Forecasted Ledger - Main</description>
-
-	<licenses>
-		<license/>
-	</licenses>
 
     <modules>
 <!--        <module>items-bc</module>-->
@@ -21,12 +15,10 @@
         <module>module-api</module>
     </modules>
 
-
     <properties>
         <java.version>25</java.version>
         <spring.boot.version>4.0.1</spring.boot.version>
     </properties>
-
 
     <dependencyManagement>
         <dependencies>
@@ -39,6 +31,5 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
 
 </project>
