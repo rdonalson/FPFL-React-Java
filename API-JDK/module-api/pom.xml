@@ -18,14 +18,17 @@
         <dependency>
             <groupId>com.Financial-Planner</groupId>
             <artifactId>module-items-bc</artifactId>
+            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>com.Financial-Planner</groupId>
             <artifactId>module-display-bc</artifactId>
+            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>com.Financial-Planner</groupId>
             <artifactId>module-common-bc</artifactId>
+            <version>1.0.0</version>
         </dependency>
 
         <!--Spring Boot-->
@@ -88,6 +91,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webmvc-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
 

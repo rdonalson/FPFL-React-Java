@@ -16,6 +16,7 @@
         </processorPath>
         <module name="module-items-bc" />
         <module name="module-api" />
+        <module name="module-common-bc" />
         <module name="module-display-bc" />
       </profile>
     </annotationProcessing>

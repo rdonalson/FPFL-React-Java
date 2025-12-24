@@ -18,12 +18,13 @@
         <dependency>
             <groupId>com.Financial-Planner</groupId>
             <artifactId>module-common-bc</artifactId>
+            <version>1.0.0</version>
         </dependency>
 
         <!--Spring Boot-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
+            <artifactId>spring-boot-starter-webmvc</artifactId>
         </dependency>
 
         <!--DB-->
