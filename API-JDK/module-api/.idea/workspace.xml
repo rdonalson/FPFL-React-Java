@@ -4,38 +4,29 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="87904ee7-a5d8-4ef5-844a-d9472e00c0e9" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../.gitattributes" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitattributes" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mvnw" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mvnw.cmd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" />
+    <list default="true" id="d16b24fa-9778-4b31-bfef-7c7a5fb7dd77" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/../.idea/API-JDK.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/aws.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/compiler.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/dataSources.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/jarRepositories.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/Financial_Planner/module_api/ModuleApiApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.yaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/assets/java-1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/assets/java-2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/assets/java-3.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/assets/java-4.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/java/com/Financial_Planner/module_api/ModuleApiApplicationTests.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../mvnw" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../mvnw.cmd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="Class" />
-      </list>
-    </option>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="30" />
+    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
@@ -51,10 +42,14 @@
       </MavenGeneralSettings>
     </option>
   </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
   <component name="ProjectColorInfo">{
-  &quot;associatedIndex&quot;: 7
+  &quot;associatedIndex&quot;: 6
 }</component>
-  <component name="ProjectId" id="37AeKCoB4zn2SyxbdlAOSMWlNcY" />
+  <component name="ProjectId" id="37IJoBkcZYxxueAhTmraiAZR0Uw" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -66,39 +61,37 @@
     &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
     &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
     &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
     &quot;Spring Boot.ModuleApiApplication.executor&quot;: &quot;Run&quot;,
     &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/rickd/source/repos/FPFL-React-Java/API-JDK/module-api&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;project.propCompiler&quot;,
     &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
-  <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\rickd\source\repos\FPFL-React-Java\API-JDK\module-api\src\main\resources\static" />
-    </key>
-  </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Spring Boot.ModuleApiApplication">
+    <configuration name="ItemsModuleApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="module-items-bc" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.financialplanner.moduleitemsbc.ItemsModuleApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="ModuleApiApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
       <module name="module-api" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="com.Financial_Planner.module_api.ModuleApiApplication" />
-      <extension name="software.aws.toolkits.jetbrains.core.execution.JavaAwsConnectionExtension">
-        <option name="credential" />
-        <option name="region" />
-        <option name="useCurrentConnection" value="false" />
-      </extension>
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.financialplanner.moduleapi.ModuleApiApplication" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -107,24 +100,22 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.28539.13" />
-        <option value="bundled-js-predefined-d6986cc7102b-a71380e98a7c-JavaScript-IU-252.28539.13" />
+        <option value="bundled-jdk-30f59d01ecdd-26cb7f24e5b0-intellij.indexing.shared.core-IU-253.29346.138" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.29346.138" />
       </set>
     </attachedChunks>
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="87904ee7-a5d8-4ef5-844a-d9472e00c0e9" name="Changes" comment="" />
-      <created>1766350236271</created>
+      <changelist id="d16b24fa-9778-4b31-bfef-7c7a5fb7dd77" name="Changes" comment="" />
+      <created>1766584824656</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1766350236271</updated>
-      <workItem from="1766350237345" duration="1923000" />
-      <workItem from="1766358791636" duration="2155000" />
-      <workItem from="1766361063368" duration="285000" />
-      <workItem from="1766424483308" duration="1184000" />
-      <workItem from="1766425871671" duration="8208000" />
-      <workItem from="1766435707368" duration="619000" />
+      <updated>1766584824656</updated>
+      <workItem from="1766584828700" duration="6102000" />
+      <workItem from="1766598801689" duration="58000" />
+      <workItem from="1766599119775" duration="465000" />
+      <workItem from="1766599629688" duration="672000" />
     </task>
     <servers />
   </component>

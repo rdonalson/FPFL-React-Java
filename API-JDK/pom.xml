@@ -8,10 +8,11 @@
     <artifactId>FPFL-V2-Microservice</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
+    <description>FPFL-V2-Microservice Main</description>
 
     <modules>
-<!--        <module>items-bc</module>-->
-<!--        <module>display-bc</module>-->
+        <module>module-items-bc</module>
+        <module>module-display-bc</module>
         <module>module-api</module>
     </modules>
 
