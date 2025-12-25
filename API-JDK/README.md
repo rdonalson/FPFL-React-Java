@@ -123,4 +123,5 @@ The API module is the only runnable entrypoint.
 
 ## 📄 License
 
-Internal project — not licensed for external distribution.
+This project is licensed under the [MIT License](../LICENSE).
+
