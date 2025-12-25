@@ -1,0 +1,36 @@
+# -------------------------------------------------------
+# Normalize line endings for all text files
+# -------------------------------------------------------
+* text=auto eol=lf
+
+# -------------------------------------------------------
+# Mark binary files
+# -------------------------------------------------------
+*.jar binary
+*.war binary
+*.zip binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+
+# -------------------------------------------------------
+# Improve diffs for specific file types
+# -------------------------------------------------------
+*.md text
+*.yml text
+*.yaml text
+*.json text
+*.xml text
+*.java text
+*.properties text
+
+# -------------------------------------------------------
+# GitHub linguist overrides (optional)
+# Helps GitHub detect languages correctly
+# -------------------------------------------------------
+*.md linguist-language=Markdown
+*.yml linguist-language=YAML
+*.yaml linguist-language=YAML

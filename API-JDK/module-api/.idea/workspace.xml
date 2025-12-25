@@ -5,12 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d16b24fa-9778-4b31-bfef-7c7a5fb7dd77" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/financialplanner/moduleapi/config/WebConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/compiler.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.editorconfig" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.gitattributes" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../module-display-bc/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../module-display-bc/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../module-items-bc/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../module-items-bc/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -74,6 +73,9 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
+  <component name="RecapUselessUpdatesCounter">
+    <option name="suspendCountdown" value="9" />
+  </component>
   <component name="RunManager" selected="Spring Boot.ModuleApiApplication">
     <configuration name="ItemsModuleApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="module-items-bc" />
@@ -113,6 +115,7 @@
       <workItem from="1766614868494" duration="791000" />
       <workItem from="1766616025848" duration="51000" />
       <workItem from="1766617013251" duration="72000" />
+      <workItem from="1766617095903" duration="965000" />
     </task>
     <servers />
   </component>

@@ -1,0 +1,58 @@
+# -------------------------
+# Maven / Java
+# -------------------------
+target/
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/timing.properties
+
+# -------------------------
+# Eclipse / IntelliJ / VSCode
+# -------------------------
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.classpath
+.project
+.settings/
+out/
+
+# -------------------------
+# OS files
+# -------------------------
+.DS_Store
+Thumbs.db
+
+# -------------------------
+# Spring Boot
+# -------------------------
+*.env
+.env
+.env.*
+application-local.yml
+application-local.properties
+
+# -------------------------
+# Logs
+# -------------------------
+*.log
+logs/
+log/
+
+# -------------------------
+# Build / Cache
+# -------------------------
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+
+# -------------------------
+# Test output
+# -------------------------
+surefire-reports/
+failsafe-reports/
+test-output/
