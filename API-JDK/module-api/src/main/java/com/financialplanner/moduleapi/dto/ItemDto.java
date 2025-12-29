@@ -27,7 +27,6 @@ public class ItemDto {
     private UUID UserId;
     @NotNull
     private String Name;
-
     private Double Amount;
     private Integer FkItemType;
     private Integer FkPeriod;
