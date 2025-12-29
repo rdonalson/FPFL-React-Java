@@ -7,9 +7,8 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 @lombok.Data
-@Entity
-@Table(name = "items", schema = "fpfl")
-public class Item {
+@Entity @Table(name = "items", schema = "fpfl")
+public class ItemEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @NotNull @Column(name = "id", nullable = false)
     private Long id;
@@ -22,11 +21,11 @@ public class Item {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "fk_item_type", nullable = false)
-    private ItemType ItemType;
+    private ItemTypeEntity ItemType;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "fk_time_period", nullable = false)
-    private TimePeriod TimePeriod;
+    private TimePeriodEntity TimePeriod;
 
     @Column(name = "begin_date")
     private LocalDate BeginDate;

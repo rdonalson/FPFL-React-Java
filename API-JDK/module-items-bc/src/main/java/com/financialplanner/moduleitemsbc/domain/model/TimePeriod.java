@@ -27,12 +27,12 @@ public class TimePeriod {
     private String Name;
 
     /**
-     * Default constructor for the TimePeriod class.
-     * Initializes a new instance of the TimePeriod class with default or uninitialized property values.
+     * Default constructor for the TimePeriodEntity class.
+     * Initializes a new instance of the TimePeriodEntity class with default or uninitialized property values.
      */
     public TimePeriod() {}
     /**
-     * Constructs a new TimePeriod instance with the specified ID and name.
+     * Constructs a new TimePeriodEntity instance with the specified ID and name.
      *
      * @param id   the unique identifier for the time period; must not be null
      * @param name the name of the time period; must not be null

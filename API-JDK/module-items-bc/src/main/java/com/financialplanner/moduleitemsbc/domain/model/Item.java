@@ -54,8 +54,8 @@ public class Item {
     private Boolean DateRangeReq = false;
 
     /**
-     * Default constructor for the Item class.
-     * Initializes a new instance of the Item class with default or uninitialized property values.
+     * Default constructor for the ItemEntity class.
+     * Initializes a new instance of the ItemEntity class with default or uninitialized property values.
      */
     public Item() { }
 

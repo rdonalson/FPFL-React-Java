@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 
 /**
  * Represents a type or category of an item.
- * The ItemType class is used to define attributes that uniquely identify and describe
+ * The ItemTypeEntity class is used to define attributes that uniquely identify and describe
  * a particular type of item within the system. It acts as a classification mechanism
  * for items, enabling better organization and management of item data.
  */
@@ -25,12 +25,12 @@ public class ItemType {
     private String Name;
 
     /**
-     * Default constructor for the ItemType class.
-     * Initializes an instance of ItemType with default or uninitialized property values.
+     * Default constructor for the ItemTypeEntity class.
+     * Initializes an instance of ItemTypeEntity with default or uninitialized property values.
      */
     public ItemType() {}
     /**
-     * Constructs a new instance of the ItemType class with the specified ID and name.
+     * Constructs a new instance of the ItemTypeEntity class with the specified ID and name.
      *
      * @param id   the unique identifier for the item type; must not be null
      * @param name the name of the item type; must not be null
