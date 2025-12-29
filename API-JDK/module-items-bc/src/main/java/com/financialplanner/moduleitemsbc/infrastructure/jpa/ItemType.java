@@ -7,8 +7,7 @@ import jakarta.validation.constraints.NotNull;
 @Entity
 @Table(name = "item_types", schema = "fpfl")
 public class ItemType {
-    @Id
-    @NotNull @Column(name = "id", nullable = false)
+    @Id @NotNull @Column(name = "id", nullable = false)
     private Long Id;
     @NotNull  @Column(name = "name", nullable = false)
     private String Name;

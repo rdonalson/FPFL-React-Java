@@ -4,15 +4,13 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
-import java.time.Period;
 import java.util.UUID;
 
 @lombok.Data
 @Entity
 @Table(name = "items", schema = "fpfl")
 public class Item {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @NotNull @Column(name = "id", nullable = false)
     private Long id;
     @NotNull @Column(name = "user_id", nullable = false)
