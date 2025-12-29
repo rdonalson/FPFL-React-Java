@@ -1,4 +1,4 @@
-package com.financialplanner.moduleitemsbc.infrastructure.jpa;
+package com.financialplanner.moduleitemsbc.domain.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
