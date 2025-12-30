@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.UUID;
 
-
 /**
  * Represents a data transfer object (DTO) for an item with various attributes
  * including identification, user association, financial details, and date-related
@@ -55,8 +54,13 @@ public class ItemDto {
     private Boolean DateRangeReq;
 
     /**
+     * Default constructor for the ItemDto class.
+     * Initializes a new instance of the ItemDto class without setting any values for the fields.
+     */
+    public ItemDto() { }
+
+    /**
      * Constructs an instance of the ItemDto class with the specified parameters.
-     *
      * @param id               the identifier of the item
      * @param userId           the unique identifier of the user associated with the item
      * @param name             the name of the item

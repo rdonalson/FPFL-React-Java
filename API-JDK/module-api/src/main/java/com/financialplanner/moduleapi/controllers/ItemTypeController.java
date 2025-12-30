@@ -1,10 +1,10 @@
 package com.financialplanner.moduleapi.controllers;
 
-import com.financialplanner.moduleapi.dto.CreateItemTypeRequest;
+import com.financialplanner.moduleapi.dto.ItemTypeDto;
+import com.financialplanner.moduleapi.mapper.ItemTypeDtoMapper;
 import com.financialplanner.moduleitemsbc.application.service.ItemTypeService;
 import com.financialplanner.moduleitemsbc.domain.entity.ItemTypeEntity;
 import com.financialplanner.moduleitemsbc.domain.model.ItemType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,19 +13,12 @@ import java.util.List;
 @RequestMapping("/item-types")
 public class ItemTypeController {
 
-    @Autowired
     private final ItemTypeService service;
+    private final ItemTypeDtoMapper mapper;
 
-    public ItemTypeController(ItemTypeService service) {
+    public ItemTypeController(ItemTypeService service, ItemTypeDtoMapper mapper) {
         this.service = service;
-    }
-
-    @PostMapping
-    public ItemType create(@RequestBody CreateItemTypeRequest request) {
-        ItemTypeEntity entity = new ItemTypeEntity();
-        entity.setId(request.getId());
-        entity.setName(request.getName());
-        return service.create(entity);
+        this.mapper = mapper;
     }
 
     @GetMapping
@@ -34,20 +27,26 @@ public class ItemTypeController {
     }
 
     @GetMapping("/{id}")
-    public ItemType get(@PathVariable Long id) {
+    public ItemType get(@PathVariable("id") Long id) {
         return service.get(id);
     }
 
-    @PutMapping("/{id}")
-    public ItemType update(@PathVariable Long id, @RequestBody CreateItemTypeRequest request) {
+    @PostMapping
+    public ItemType create(@RequestBody ItemTypeDto request) {
+        ItemTypeEntity entity = mapper.toEntity(request);;
+        return service.create(entity);
+    }
+
+    @PutMapping("/{id}/{name}")
+    public ItemType update(@PathVariable("id") Long id, @PathVariable("name") String name) {
         ItemTypeEntity entity = new ItemTypeEntity();
-        entity.setId(request.getId());
-        entity.setName(request.getName());
+        entity.setId(id);
+        entity.setName(name);
         return service.update(entity);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    public void delete(@PathVariable("id") Long id) {
         service.delete(id);
     }
 }
