@@ -1,9 +1,11 @@
 package com.financialplanner.moduleitemsbc.infrastructure.repository;
 
 import com.financialplanner.moduleitemsbc.domain.entity.ItemTypeEntity;
+import com.financialplanner.moduleitemsbc.domain.exception.RepositoryException;
 import com.financialplanner.moduleitemsbc.domain.model.ItemType;
 import com.financialplanner.moduleitemsbc.domain.repository.ItemTypeRepository;
 import com.financialplanner.moduleitemsbc.infrastructure.mapper.ItemTypeMapper;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -83,8 +85,11 @@ public class ItemTypeRepositoryImpl implements ItemTypeRepository {
      */
     @Override
     public Optional<ItemType> findById(Long id) {
-        return jpa.findById(id)
-            .map(mapper::toDomain);
+        try {
+            return jpa.findById(id).map(mapper::toDomain);
+        } catch (DataAccessException ex) {
+            throw new RepositoryException("Database failure while fetching item " + id, ex);
+        }
     }
 
     /**

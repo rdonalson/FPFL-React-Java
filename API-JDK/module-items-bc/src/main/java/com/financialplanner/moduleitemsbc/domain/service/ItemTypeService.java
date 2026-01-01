@@ -1,9 +1,10 @@
-package com.financialplanner.moduleitemsbc.application.service;
+package com.financialplanner.moduleitemsbc.domain.service;
 
 import com.financialplanner.moduleitemsbc.domain.entity.ItemTypeEntity;
+import com.financialplanner.moduleitemsbc.domain.exception.InvalidRequestException;
+import com.financialplanner.moduleitemsbc.domain.exception.ItemNotFoundException;
 import com.financialplanner.moduleitemsbc.domain.model.ItemType;
 import com.financialplanner.moduleitemsbc.domain.repository.ItemTypeRepository;
-import lombok.var;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -60,7 +61,7 @@ public class ItemTypeService {
      * @throws RuntimeException if the entity with the provided ID does not exist in the repository.
      */
     public ItemType update(ItemTypeEntity entity) {
-        var e = repo.findById(entity.getId()).orElseThrow(() -> new RuntimeException("ItemType not found"));
+        ItemType e = repo.findById(entity.getId()).orElseThrow(() -> new RuntimeException("ItemType not found"));
         return repo.save(entity);
     }
 
@@ -82,7 +83,11 @@ public class ItemTypeService {
      * @throws RuntimeException if no ItemType is found with the specified ID
      */
     public ItemType get(Long id) {
-        return repo.findById(id).orElseThrow(() -> new RuntimeException("ItemType not found"));
+        if (id == 0) {
+            throw new InvalidRequestException("Item ID cannot be empty");
+        }
+        return repo.findById(id)
+            .orElseThrow(() -> new ItemNotFoundException("Item " + id + " not found"));
     }
 
     /**
@@ -93,6 +98,8 @@ public class ItemTypeService {
      * @param id the unique identifier of the ItemType entity to be deleted; must not be null.
      */
     public void delete(Long id) {
+
+
         repo.deleteById(id);
     }
 }

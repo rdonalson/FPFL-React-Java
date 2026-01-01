@@ -2,9 +2,11 @@ package com.financialplanner.moduleapi.controllers;
 
 import com.financialplanner.moduleapi.dto.ItemTypeDto;
 import com.financialplanner.moduleapi.mapper.ItemTypeDtoMapper;
-import com.financialplanner.moduleitemsbc.application.service.ItemTypeService;
+import com.financialplanner.moduleapi.response.ApiResponse;
 import com.financialplanner.moduleitemsbc.domain.entity.ItemTypeEntity;
 import com.financialplanner.moduleitemsbc.domain.model.ItemType;
+import com.financialplanner.moduleitemsbc.domain.service.ItemTypeService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -70,8 +72,15 @@ public class ItemTypeController {
      * @return the ItemType associated with the given ID
      */
     @GetMapping("/{id}")
-    public ItemType get(@PathVariable("id") Long id) {
-        return service.get(id);
+    public ResponseEntity<ApiResponse<ItemType>> get(@PathVariable("id") Long id) {
+        ItemType item = service.get(id);
+        return ResponseEntity.ok(
+            new ApiResponse<>(
+                200,
+                "Success",
+                item
+            )
+        );
     }
 
     /**
