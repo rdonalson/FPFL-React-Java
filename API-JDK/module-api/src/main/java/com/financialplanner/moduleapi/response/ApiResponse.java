@@ -9,21 +9,23 @@ public class ApiResponse<T> {
     private String message;
     private T data;
     private Instant timestamp;
+    private String correlationId; // optional, for debugging
 
     public ApiResponse() {
         // Required for Jackson
         this.timestamp = Instant.now();
     }
 
-    public ApiResponse(int status, String message, T data) {
+    public ApiResponse(int status, String message, T data, String correlationId) {
         this.status = status;
         this.message = message;
         this.data = data;
+        this.correlationId = correlationId;
         this.timestamp = Instant.now();
     }
 
     // Convenience constructor for responses without data
-    public ApiResponse(int status, String message) {
-        this(status, message, null);
+    public ApiResponse(int status, String message, String correlationId) {
+        this(status, message, null, correlationId);
     }
 }

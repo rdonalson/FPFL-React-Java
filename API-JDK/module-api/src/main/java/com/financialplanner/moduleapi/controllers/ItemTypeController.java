@@ -1,6 +1,7 @@
 package com.financialplanner.moduleapi.controllers;
 
 import com.financialplanner.moduleapi.dto.ItemTypeDto;
+import com.financialplanner.moduleapi.logging.ErrorLogger;
 import com.financialplanner.moduleapi.mapper.ItemTypeDtoMapper;
 import com.financialplanner.moduleapi.response.ApiResponse;
 import com.financialplanner.moduleitemsbc.domain.entity.ItemTypeEntity;
@@ -78,7 +79,8 @@ public class ItemTypeController {
             new ApiResponse<>(
                 200,
                 "Success",
-                item
+                item,
+                null
             )
         );
     }

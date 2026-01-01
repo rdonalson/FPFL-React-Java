@@ -1,5 +1,6 @@
 package com.financialplanner.moduleapi.exception;
 
+import com.financialplanner.moduleapi.logging.ErrorLogger;
 import com.financialplanner.moduleapi.response.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,9 +33,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGeneric(Exception ex) {
+        String correlationId = ErrorLogger.logException(ex);
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(new ApiResponse<>(500, "Unexpected error.", null));
+            .body(new ApiResponse<>(
+                500,
+                "Unexpected error.",
+                null,
+                correlationId));
     }
 }
 
