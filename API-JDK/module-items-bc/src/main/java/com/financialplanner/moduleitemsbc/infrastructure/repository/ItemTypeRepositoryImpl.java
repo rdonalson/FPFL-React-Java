@@ -86,11 +86,6 @@ public class ItemTypeRepositoryImpl implements ItemTypeRepository {
     @Override
     public Optional<ItemType> findById(Long id) {
         try {
-
-//        int x = 10;
-//        int y = 0;
-//        int result = x / y;
-
             return jpa.findById(id).map(mapper::toDomain);
         } catch (DataAccessException ex) {
             throw new RepositoryException("Database failure while fetching item " + id, ex);
