@@ -11,12 +11,12 @@ public class ItemTypeDto {
      * Represents the unique identifier for an instance of the entity.
      * This field is used to differentiate between different instances of the same entity class.
      */
-    private Long Id;
+    private Long id;
     /**
      * Represents the name of the item type.
      * This field is typically used to describe or identify an item type in human-readable form.
      */
-    private String Name;
+    private String name;
 
     /**
      * Default constructor for the ItemTypeDto class.
@@ -30,7 +30,7 @@ public class ItemTypeDto {
      * @param name the name of the item type
      */
     public ItemTypeDto(Long id, String name) {
-        this.Id = id;
-        this.Name = name;
+        this.id = id;
+        this.name = name;
     }
 }

@@ -78,7 +78,7 @@ public class ItemTypeController {
         return ResponseEntity.ok(
             new ApiResponse<>(
                 200,
-                "Success",
+                "ItemType retrieved successfully",
                 item,
                 null
             )
@@ -92,9 +92,17 @@ public class ItemTypeController {
      * @return the created item type
      */
     @PostMapping
-    public ItemType create(@RequestBody ItemTypeDto request) {
-        ItemTypeEntity entity = mapper.toEntity(request);;
-        return service.create(entity);
+    public ResponseEntity<ApiResponse<ItemType>> create(@RequestBody ItemTypeDto request) {
+        ItemTypeEntity entity = mapper.toEntity(request);
+        ItemType item = service.create(entity);
+        return ResponseEntity.ok(
+            new ApiResponse<>(
+                201,
+                "ItemType created successfully",
+                item,
+                null
+            )
+        );
     }
 
     /**

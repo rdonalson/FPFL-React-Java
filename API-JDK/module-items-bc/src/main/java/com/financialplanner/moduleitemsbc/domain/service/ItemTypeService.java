@@ -1,6 +1,7 @@
 package com.financialplanner.moduleitemsbc.domain.service;
 
 import com.financialplanner.moduleitemsbc.domain.entity.ItemTypeEntity;
+import com.financialplanner.moduleitemsbc.domain.exception.DuplicateItemException;
 import com.financialplanner.moduleitemsbc.domain.exception.InvalidRequestException;
 import com.financialplanner.moduleitemsbc.domain.exception.ItemNotFoundException;
 import com.financialplanner.moduleitemsbc.domain.model.ItemType;
@@ -47,6 +48,10 @@ public class ItemTypeService {
      * @return the saved ItemType object after successful persistence
      */
     public ItemType create(ItemTypeEntity entity) {
+        if (repo.findById(entity.getId()).isPresent()) {
+            throw new DuplicateItemException("ItemType already exists: " + entity.getId());
+        }
+        // Return the new domain model
         return repo.save(entity);
     }
 
@@ -61,7 +66,9 @@ public class ItemTypeService {
      * @throws RuntimeException if the entity with the provided ID does not exist in the repository.
      */
     public ItemType update(ItemTypeEntity entity) {
-        ItemType e = repo.findById(entity.getId()).orElseThrow(() -> new RuntimeException("ItemType not found"));
+        ItemType e = repo.findById(entity.getId())
+            .orElseThrow(() -> new ItemNotFoundException("ItemType not found"));
+        // Return the updated domain model
         return repo.save(entity);
     }
 

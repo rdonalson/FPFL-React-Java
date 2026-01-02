@@ -1,11 +1,13 @@
 package com.financialplanner.moduleitemsbc.infrastructure.repository;
 
 import com.financialplanner.moduleitemsbc.domain.entity.ItemTypeEntity;
+import com.financialplanner.moduleitemsbc.domain.exception.DuplicateItemException;
 import com.financialplanner.moduleitemsbc.domain.exception.RepositoryException;
 import com.financialplanner.moduleitemsbc.domain.model.ItemType;
 import com.financialplanner.moduleitemsbc.domain.repository.ItemTypeRepository;
 import com.financialplanner.moduleitemsbc.infrastructure.mapper.ItemTypeMapper;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -17,7 +19,7 @@ import java.util.Optional;
  * {@link ItemTypeEntity} objects. This class serves as a bridge between the
  * persistence layer and the domain layer, enabling CRUD operations while
  * adhering to the repository abstraction.
- *
+ * <p>
  * The {@link ItemTypeRepositoryImpl} utilizes a JPA-based repository
  * to perform database interactions and a mapping layer to convert
  * between domain models and persistence entities.
@@ -28,7 +30,7 @@ public class ItemTypeRepositoryImpl implements ItemTypeRepository {
     /**
      * Reference to the JPA repository used for performing CRUD operations
      * on {@link ItemTypeEntity} instances in the underlying data store.
-     *
+     * <p>
      * This repository is based on Spring Data JPA and leverages its built-in
      * functionality to simplify database access for the {@link ItemTypeEntity}
      * entity class. The {@code jpa} variable is used as the primary entry point
@@ -39,7 +41,7 @@ public class ItemTypeRepositoryImpl implements ItemTypeRepository {
      * Mapper responsible for converting between {@link ItemTypeEntity} and {@link ItemType} objects.
      * This field is used to encapsulate the logic for transforming persistence layer entities
      * into domain models and vice versa.
-     *
+     * <p>
      * Its primary purpose is to abstract away the mapping logic, ensuring that the repository
      * implementations remain focused on persistence concerns and use domain models for
      * business operations.
@@ -70,8 +72,14 @@ public class ItemTypeRepositoryImpl implements ItemTypeRepository {
      */
     @Override
     public ItemType save(ItemTypeEntity itemType) {
-        ItemTypeEntity saved = jpa.save(itemType);
-        return mapper.toDomain(saved);
+        try {
+            ItemTypeEntity saved = jpa.save(itemType);
+            return mapper.toDomain(saved);
+        } catch (DataIntegrityViolationException ex) {
+            throw new DuplicateItemException("Item already exists: " + itemType.getId(), ex);
+        } catch (DataAccessException ex) {
+            throw new RepositoryException("Database failure while saving item " + itemType.getId(), ex);
+        }
     }
 
     /**
