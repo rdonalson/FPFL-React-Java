@@ -57,7 +57,8 @@ public class Item {
      * Default constructor for the ItemEntity class.
      * Initializes a new instance of the ItemEntity class with default or uninitialized property values.
      */
-    public Item() { }
+    public Item() {
+    }
 
     /**
      * Constructs an instance of the ItemDto class with the specified parameters.
@@ -91,34 +92,62 @@ public class Item {
      * @param annualDom        the day of the month for annual recurrence
      * @param dateRangeReq     indicates whether the date range is required for the item
      */
-    public Item(Integer id, UUID userId, String name, Double amount, Integer fkItemType, Integer fkPeriod, LocalDate beginDate, LocalDate endDate, Integer weeklyDow, Integer everOtherWeekDow, Integer biMonthlyDay1, Integer biMonthlyDay2, Integer monthlyDom, Integer quarterly1Month, Integer quarterly1Day, Integer quarterly2Month, Integer quarterly2Day, Integer quarterly3Month, Integer quarterly3Day, Integer quarterly4Month, Integer quarterly4Day, Integer semiAnnual1Month, Integer semiAnnual1Day, Integer semiAnnual2Month, Integer semiAnnual2Day, Integer annualMoy, Integer annualDom, Boolean dateRangeReq) {
-        Id = id;
-        UserId = userId;
-        Name = name;
-        Amount = amount;
-        FkItemType = fkItemType;
-        FkPeriod = fkPeriod;
-        BeginDate = beginDate;
-        EndDate = endDate;
-        WeeklyDow = weeklyDow;
+    public Item(Integer id,
+                UUID userId,
+                String name,
+                Double amount,
+                Integer fkItemType,
+                Integer fkPeriod,
+                LocalDate beginDate,
+                LocalDate endDate,
+                Integer weeklyDow,
+                Integer everOtherWeekDow,
+                Integer biMonthlyDay1,
+                Integer biMonthlyDay2,
+                Integer monthlyDom,
+                Integer quarterly1Month,
+                Integer quarterly1Day,
+                Integer quarterly2Month,
+                Integer quarterly2Day,
+                Integer quarterly3Month,
+                Integer quarterly3Day,
+                Integer quarterly4Month,
+                Integer quarterly4Day,
+                Integer semiAnnual1Month,
+                Integer semiAnnual1Day,
+                Integer semiAnnual2Month,
+                Integer semiAnnual2Day,
+                Integer annualMoy,
+                Integer annualDom,
+                Boolean dateRangeReq
+               ) {
+        Id               = id;
+        UserId           = userId;
+        Name             = name;
+        Amount           = amount;
+        FkItemType       = fkItemType;
+        FkPeriod         = fkPeriod;
+        BeginDate        = beginDate;
+        EndDate          = endDate;
+        WeeklyDow        = weeklyDow;
         EverOtherWeekDow = everOtherWeekDow;
-        BiMonthlyDay1 = biMonthlyDay1;
-        BiMonthlyDay2 = biMonthlyDay2;
-        MonthlyDom = monthlyDom;
-        Quarterly1Month = quarterly1Month;
-        Quarterly1Day = quarterly1Day;
-        Quarterly2Month = quarterly2Month;
-        Quarterly2Day = quarterly2Day;
-        Quarterly3Month = quarterly3Month;
-        Quarterly3Day = quarterly3Day;
-        Quarterly4Month = quarterly4Month;
-        Quarterly4Day = quarterly4Day;
+        BiMonthlyDay1    = biMonthlyDay1;
+        BiMonthlyDay2    = biMonthlyDay2;
+        MonthlyDom       = monthlyDom;
+        Quarterly1Month  = quarterly1Month;
+        Quarterly1Day    = quarterly1Day;
+        Quarterly2Month  = quarterly2Month;
+        Quarterly2Day    = quarterly2Day;
+        Quarterly3Month  = quarterly3Month;
+        Quarterly3Day    = quarterly3Day;
+        Quarterly4Month  = quarterly4Month;
+        Quarterly4Day    = quarterly4Day;
         SemiAnnual1Month = semiAnnual1Month;
-        SemiAnnual1Day = semiAnnual1Day;
+        SemiAnnual1Day   = semiAnnual1Day;
         SemiAnnual2Month = semiAnnual2Month;
-        SemiAnnual2Day = semiAnnual2Day;
-        AnnualMoy = annualMoy;
-        AnnualDom = annualDom;
-        DateRangeReq = dateRangeReq;
+        SemiAnnual2Day   = semiAnnual2Day;
+        AnnualMoy        = annualMoy;
+        AnnualDom        = annualDom;
+        DateRangeReq     = dateRangeReq;
     }
 }

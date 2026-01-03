@@ -1,6 +1,9 @@
-package com.financialplanner.moduleitemsbc.domain.entity;
+package com.financialplanner.moduleitemsbc.infrastructure.persistence.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 
 /**
@@ -15,7 +18,8 @@ import jakarta.validation.constraints.NotNull;
  * to associate specific items with their respective types.
  */
 @lombok.Data
-@Entity @Table(name = "item_types", schema = "fpfl")
+@Entity
+@Table(name = "item_types", schema = "fpfl")
 public class ItemTypeEntity {
     /**
      * Represents the unique identifier for the {@code ItemTypeEntity}.
@@ -25,7 +29,9 @@ public class ItemTypeEntity {
      * - It is a non-nullable field, enforced by {@code @NotNull} and the {@code nullable = false} attribute.
      * - Mapped to the "id" column in the database table through the {@code @Column} annotation.
      */
-    @Id @NotNull @Column(name = "id", nullable = false)
+    @Id
+    @NotNull
+    @Column(name = "id", nullable = false)
     private Long Id;
     /**
      * Represents the name of the item type.
@@ -33,7 +39,8 @@ public class ItemTypeEntity {
      * It holds the descriptive name of the item type and is used to categorize specific items.
      * The value of this field must not be null and adheres to validation constraints.
      */
-    @NotNull  @Column(name = "name", nullable = false)
+    @NotNull
+    @Column(name = "name", nullable = false)
     private String Name;
 
     /**
@@ -42,16 +49,19 @@ public class ItemTypeEntity {
      * This constructor is typically used by frameworks or libraries (such as JPA)
      * that require a no-argument constructor to create instances of the entity.
      */
-    public ItemTypeEntity() { }
+    public ItemTypeEntity() {
+    }
 
     /**
      * Constructs an instance of {@code ItemTypeEntity} with the specified ID and name.
      *
-     * @param id the unique identifier for the item type, must not be null
+     * @param id   the unique identifier for the item type, must not be null
      * @param name the name of the item type, must not be null
      */
-    public ItemTypeEntity(Long id, String name) {
-        this.Id = id;
+    public ItemTypeEntity(Long id,
+                          String name
+                         ) {
+        this.Id   = id;
         this.Name = name;
     }
 }

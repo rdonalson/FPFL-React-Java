@@ -1,4 +1,4 @@
-package com.financialplanner.moduleitemsbc.domain.entity;
+package com.financialplanner.moduleitemsbc.infrastructure.persistence.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -9,7 +9,7 @@ import java.util.UUID;
 /**
  * Represents an item entity with various attributes and details related to
  * scheduling, monetary value, and associations with other entities.
- * ---
+ * <p>
  * The ItemEntity class is used to encapsulate data for an item, including
  * scheduling attributes for different frequencies (e.g., weekly, bi-monthly,
  * quarterly, annual), monetary amounts, date ranges, and associations with
@@ -17,28 +17,33 @@ import java.util.UUID;
  * mechanisms to store identifiers for both the item itself and the associated user.
  */
 @lombok.Data
-@Entity @Table(name = "items", schema = "fpfl")
+@Entity
+@Table(name = "items", schema = "fpfl")
 public class ItemEntity {
     /**
      * Represents the unique identifier for the {@code ItemEntity}.
      * This field is automatically generated using the {@code GenerationType.IDENTITY} strategy.
      * It is a non-nullable column in the database represented by the name "id".
      */
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @NotNull @Column(name = "id", nullable = false)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @NotNull
+    @Column(name = "id", nullable = false)
     private Long id;
     /**
      * Represents the unique identifier for the user associated with the item entity.
      * This field is mandatory and corresponds to the "user_id" column in the database.
      */
-    @NotNull @Column(name = "user_id", nullable = false)
+    @NotNull
+    @Column(name = "user_id", nullable = false)
     private UUID UserId;
     /**
      * Represents the name of the item associated with this entity.
      * This field is mandatory and cannot be null.
      * It maps to the "name" column in the "items" table within the "fpfl" schema.
      */
-    @NotNull  @Column(name = "name", nullable = false)
+    @NotNull
+    @Column(name = "name", nullable = false)
     private String Name;
     /**
      * Represents the monetary amount associated with the item.
@@ -52,17 +57,17 @@ public class ItemEntity {
      * Represents the relationship between the ItemEntity and the ItemTypeEntity.
      * This field establishes a many-to-one association with the ItemTypeEntity,
      * which represents the type or category of the item.
-     * ---
+     * <p>
      * Constraints:
      * - This association is mandatory (cannot be null).
      * - Fetch type is configured as lazy, meaning the related ItemTypeEntity will be
-     *   loaded only when explicitly accessed.
+     * loaded only when explicitly accessed.
      * - The foreign key column name in the database is 'fk_item_type', and it does not allow null values.
-     * ---
+     * <p>
      * Mapping Details:
      * - Many-to-One relationship: An item can belong to one item type, but an item type can have multiple items.
      * - Foreign Key: The 'fk_item_type' column maps this relationship to the appropriate
-     *   ItemTypeEntity record in the database schema.
+     * ItemTypeEntity record in the database schema.
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "fk_item_type", nullable = false)
@@ -71,14 +76,14 @@ public class ItemEntity {
     /**
      * Represents the association to a specific time period for the {@link ItemEntity}.
      * The reference is made to the {@link TimePeriodEntity} table.
-     * ---
+     * <p>
      * This field establishes a many-to-one relationship, indicating that multiple
      * {@link ItemEntity} instances can reference the same {@link TimePeriodEntity}.
-     * ---
+     * <p>
      * Constraints:
      * - The relationship is mandatory (non-null).
      * - Fetch type is set to LAZY to optimize data loading.
-     * ---
+     * <p>
      * Database Mapping:
      * - Mapped to the "fk_time_period" column in the "items" table.
      * - This column cannot hold null values.
@@ -103,11 +108,11 @@ public class ItemEntity {
     private LocalDate EndDate;
     /**
      * Represents the day of the week for a recurring weekly schedule.
-     * ---
+     * <p>
      * The value is stored as an integer where 1 corresponds to Monday, 2 corresponds to Tuesday,
      * and so on until 7, which corresponds to Sunday. This field is used to identify the specific day in a week
      * when an activity or event recurs.
-     * ---
+     * <p>
      * Mapped to the "weekly_dow" column in the database.
      */
     @Column(name = "weekly_dow")
@@ -124,11 +129,11 @@ public class ItemEntity {
      * Represents the first day in a bi-monthly schedule configuration.
      * This value determines one of the two specific days within a month
      * when an action or event is scheduled to occur as part of a bi-monthly cadence.
-     *
+     * <p>
      * Constraints/Usage:
      * 1. Must be a valid day of the month, ranging from 1 to 31, depending on the month.
      * 2. Works in conjunction with {@link BiMonthlyDay2} to define the two days within the bi-monthly cycle.
-     *
+     * <p>
      * Database Mapping:
      * Mapped to the "bi_monthly_day_1" column in the database.
      */
@@ -138,7 +143,7 @@ public class ItemEntity {
      * Represents the second day of a bi-monthly recurring time period.
      * This field is used to specify the second selected day in cases where
      * an event or item occurs twice within a calendar month.
-     *
+     * <p>
      * The value of this field is stored in the database column `bi_monthly_day_2`.
      * It is expected to hold an integer value corresponding to a day of the month,
      * with valid values ranging from 1 to 31, depending on the use case.
@@ -163,7 +168,7 @@ public class ItemEntity {
      * Represents the day of the month associated with the first quarterly occurrence
      * for a specific item. This value is used in conjunction with {@code Quarterly1Month}
      * to define a scheduled date within the first quarter.
-     *
+     * <p>
      * Mapped to the database column "quarterly_1_day".
      */
     @Column(name = "quarterly_1_day")
@@ -181,7 +186,7 @@ public class ItemEntity {
      * corresponding to the second month defined in the schedule.
      * This value can be used to specify a particular day within the second quarter month
      * for scheduling or financial planning purposes.
-     *
+     * <p>
      * This field is mapped to the "quarterly_2_day" column in the database.
      */
     @Column(name = "quarterly_2_day")
@@ -198,7 +203,7 @@ public class ItemEntity {
      * Represents the day of the third occurrence within a quarterly time period.
      * This value is used for scheduling or defining specific dates in a recurring
      * quarterly pattern.
-     *
+     * <p>
      * The field maps to the database column "quarterly_3_day".
      */
     @Column(name = "quarterly_3_day")
@@ -215,7 +220,7 @@ public class ItemEntity {
      * Represents the day component of the fourth quarterly occurrence for a financial item.
      * This field stores an integer value indicating the specific day of the month
      * associated with the fourth quarter's recurrence schedule.
-     *
+     * <p>
      * Column: `quarterly_4_day`
      * Mapped to the corresponding database column in the "items" table of the "fpfl" schema.
      */
@@ -249,7 +254,7 @@ public class ItemEntity {
      * Represents the day component of the second semi-annual time period configuration
      * for an item. This field is used to specify on which day of the month the second
      * semi-annual recurrence should occur.
-     *
+     * <p>
      * The value is stored as an Integer in the database column "semi_annual_2_day".
      */
     @Column(name = "semi_annual_2_day")
@@ -258,7 +263,7 @@ public class ItemEntity {
      * Represents the numeric value corresponding to a specific month of the year
      * for annual occurrences. This field is used to denote the month when
      * an annual event or transaction takes place.
-     *
+     * <p>
      * Constraints:
      * - Stored in the column "annual_moy" in the database.
      * - Values typically range from 1 (January) to 12 (December).
@@ -275,78 +280,109 @@ public class ItemEntity {
     private Integer AnnualDom;
     /**
      * Indicates whether a date range is required for the associated item.
-     *
+     * <p>
      * This field is stored as a non-nullable column in the database with a default value of {@code false}.
      * It is used to denote if specific date range values (e.g., BeginDate and EndDate) are mandatory for the item.
      */
-    @NotNull @Column(name = "date_range_req", nullable = false, columnDefinition = "BIT DEFAULT B'0'")
+    @NotNull
+    @Column(name = "date_range_req", nullable = false, columnDefinition = "BIT DEFAULT B'0'")
     private Boolean DateRangeReq = false;
 
     /**
      * Default constructor for the ItemEntity class.
      * Initializes an instance of ItemEntity with default values.
      */
-    public ItemEntity() { }
+    public ItemEntity() {
+    }
+
     /**
      * Constructs an instance of ItemEntity with the provided parameters.
      *
-     * @param id The unique identifier of the item.
-     * @param userId The unique identifier of the user associated with this item.
-     * @param name The name of the item.
-     * @param amount The monetary amount associated with the item.
-     * @param itemType The type of the item (reference to ItemTypeEntity).
-     * @param timePeriod The time period associated with the item (reference to TimePeriodEntity).
-     * @param beginDate The beginning date for the item.
-     * @param endDate The ending date for the item.
-     * @param weeklyDow The day of the week for weekly occurrences.
+     * @param id               The unique identifier of the item.
+     * @param userId           The unique identifier of the user associated with this item.
+     * @param name             The name of the item.
+     * @param amount           The monetary amount associated with the item.
+     * @param itemType         The type of the item (reference to ItemTypeEntity).
+     * @param timePeriod       The time period associated with the item (reference to TimePeriodEntity).
+     * @param beginDate        The beginning date for the item.
+     * @param endDate          The ending date for the item.
+     * @param weeklyDow        The day of the week for weekly occurrences.
      * @param everOtherWeekDow The day of the week for every other week occurrences.
-     * @param biMonthlyDay1 The first day of the period for bi-monthly occurrences.
-     * @param biMonthlyDay2 The second day of the period for bi-monthly occurrences.
-     * @param monthlyDom The day of the month for monthly occurrences.
-     * @param quarterly1Month The first month for quarterly occurrences.
-     * @param quarterly1Day The first day for quarterly occurrences.
-     * @param quarterly2Month The second month for quarterly occurrences.
-     * @param quarterly2Day The second day for quarterly occurrences.
-     * @param quarterly3Month The third month for quarterly occurrences.
-     * @param quarterly3Day The third day for quarterly occurrences.
-     * @param quarterly4Month The fourth month for quarterly occurrences.
-     * @param quarterly4Day The fourth day for quarterly occurrences.
+     * @param biMonthlyDay1    The first day of the period for bi-monthly occurrences.
+     * @param biMonthlyDay2    The second day of the period for bi-monthly occurrences.
+     * @param monthlyDom       The day of the month for monthly occurrences.
+     * @param quarterly1Month  The first month for quarterly occurrences.
+     * @param quarterly1Day    The first day for quarterly occurrences.
+     * @param quarterly2Month  The second month for quarterly occurrences.
+     * @param quarterly2Day    The second day for quarterly occurrences.
+     * @param quarterly3Month  The third month for quarterly occurrences.
+     * @param quarterly3Day    The third day for quarterly occurrences.
+     * @param quarterly4Month  The fourth month for quarterly occurrences.
+     * @param quarterly4Day    The fourth day for quarterly occurrences.
      * @param semiAnnual1Month The first month for semi-annual occurrences.
-     * @param semiAnnual1Day The first day for semi-annual occurrences.
+     * @param semiAnnual1Day   The first day for semi-annual occurrences.
      * @param semiAnnual2Month The second month for semi-annual occurrences.
-     * @param semiAnnual2Day The second day for semi-annual occurrences.
-     * @param annualMoy The month of the year for annual occurrences.
-     * @param annualDom The day of the month for annual occurrences.
-     * @param dateRangeReq Indicates whether a date range is required for the item (true/false).
+     * @param semiAnnual2Day   The second day for semi-annual occurrences.
+     * @param annualMoy        The month of the year for annual occurrences.
+     * @param annualDom        The day of the month for annual occurrences.
+     * @param dateRangeReq     Indicates whether a date range is required for the item (true/false).
      */
-    public ItemEntity(Long id, UUID userId, String name, Double amount, ItemTypeEntity itemType, TimePeriodEntity timePeriod, LocalDate beginDate, LocalDate endDate, Integer weeklyDow, Integer everOtherWeekDow, Integer biMonthlyDay1, Integer biMonthlyDay2, Integer monthlyDom, Integer quarterly1Month, Integer quarterly1Day, Integer quarterly2Month, Integer quarterly2Day, Integer quarterly3Month, Integer quarterly3Day, Integer quarterly4Month, Integer quarterly4Day, Integer semiAnnual1Month, Integer semiAnnual1Day, Integer semiAnnual2Month, Integer semiAnnual2Day, Integer annualMoy, Integer annualDom, Boolean dateRangeReq) {
-        this.id = id;
-        UserId = userId;
-        Name = name;
-        Amount = amount;
-        ItemType = itemType;
-        TimePeriod = timePeriod;
-        BeginDate = beginDate;
-        EndDate = endDate;
-        WeeklyDow = weeklyDow;
+    public ItemEntity(Long id,
+                      UUID userId,
+                      String name,
+                      Double amount,
+                      ItemTypeEntity itemType,
+                      TimePeriodEntity timePeriod,
+                      LocalDate beginDate,
+                      LocalDate endDate,
+                      Integer weeklyDow,
+                      Integer everOtherWeekDow,
+                      Integer biMonthlyDay1,
+                      Integer biMonthlyDay2,
+                      Integer monthlyDom,
+                      Integer quarterly1Month,
+                      Integer quarterly1Day,
+                      Integer quarterly2Month,
+                      Integer quarterly2Day,
+                      Integer quarterly3Month,
+                      Integer quarterly3Day,
+                      Integer quarterly4Month,
+                      Integer quarterly4Day,
+                      Integer semiAnnual1Month,
+                      Integer semiAnnual1Day,
+                      Integer semiAnnual2Month,
+                      Integer semiAnnual2Day,
+                      Integer annualMoy,
+                      Integer annualDom,
+                      Boolean dateRangeReq
+                     ) {
+        this.id          = id;
+        UserId           = userId;
+        Name             = name;
+        Amount           = amount;
+        ItemType         = itemType;
+        TimePeriod       = timePeriod;
+        BeginDate        = beginDate;
+        EndDate          = endDate;
+        WeeklyDow        = weeklyDow;
         EverOtherWeekDow = everOtherWeekDow;
-        BiMonthlyDay1 = biMonthlyDay1;
-        BiMonthlyDay2 = biMonthlyDay2;
-        MonthlyDom = monthlyDom;
-        Quarterly1Month = quarterly1Month;
-        Quarterly1Day = quarterly1Day;
-        Quarterly2Month = quarterly2Month;
-        Quarterly2Day = quarterly2Day;
-        Quarterly3Month = quarterly3Month;
-        Quarterly3Day = quarterly3Day;
-        Quarterly4Month = quarterly4Month;
-        Quarterly4Day = quarterly4Day;
+        BiMonthlyDay1    = biMonthlyDay1;
+        BiMonthlyDay2    = biMonthlyDay2;
+        MonthlyDom       = monthlyDom;
+        Quarterly1Month  = quarterly1Month;
+        Quarterly1Day    = quarterly1Day;
+        Quarterly2Month  = quarterly2Month;
+        Quarterly2Day    = quarterly2Day;
+        Quarterly3Month  = quarterly3Month;
+        Quarterly3Day    = quarterly3Day;
+        Quarterly4Month  = quarterly4Month;
+        Quarterly4Day    = quarterly4Day;
         SemiAnnual1Month = semiAnnual1Month;
-        SemiAnnual1Day = semiAnnual1Day;
+        SemiAnnual1Day   = semiAnnual1Day;
         SemiAnnual2Month = semiAnnual2Month;
-        SemiAnnual2Day = semiAnnual2Day;
-        AnnualMoy = annualMoy;
-        AnnualDom = annualDom;
-        DateRangeReq = dateRangeReq;
+        SemiAnnual2Day   = semiAnnual2Day;
+        AnnualMoy        = annualMoy;
+        AnnualDom        = annualDom;
+        DateRangeReq     = dateRangeReq;
     }
 }

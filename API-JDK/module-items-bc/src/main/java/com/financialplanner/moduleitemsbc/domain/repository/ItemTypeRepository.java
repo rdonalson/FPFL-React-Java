@@ -1,15 +1,16 @@
 package com.financialplanner.moduleitemsbc.domain.repository;
 
+import com.financialplanner.moduleitemsbc.domain.model.ItemType;
+import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.ItemTypeEntity;
+
 import java.util.List;
 import java.util.Optional;
-import com.financialplanner.moduleitemsbc.domain.entity.ItemTypeEntity;
-import com.financialplanner.moduleitemsbc.domain.model.ItemType;
 
 /**
  * Interface representing the repository for managing {@link ItemTypeEntity} instances.
  * Provides CRUD operations for persisting and retrieving item type-related data
  * from the underlying data source.
- *
+ * <p>
  * This interface defines the contract for managing ItemType entities and transforms
  * them into domain models. The abstraction enables a clean separation between
  * business logic and persistence details.
@@ -25,6 +26,7 @@ public interface ItemTypeRepository {
      * @return the resulting {@link ItemType} object after the entity has been saved
      */
     ItemType save(ItemTypeEntity entity);
+
     /**
      * Retrieves an optional {@link ItemType} instance by its unique identifier.
      * If an entity with the specified ID exists, it is returned wrapped in an {@link Optional}.
@@ -34,6 +36,7 @@ public interface ItemTypeRepository {
      * @return an {@link Optional} containing the {@link ItemType} if found, or an empty {@link Optional} if not found
      */
     Optional<ItemType> findById(Long id);
+
     /**
      * Retrieves a list of all available ItemType instances from the underlying data store.
      * This method queries the repository for all item type records and returns them
@@ -42,6 +45,7 @@ public interface ItemTypeRepository {
      * @return a list of ItemType objects representing all item types present in the data source
      */
     List<ItemType> findAll();
+
     /**
      * Deletes the entity with the specified unique identifier from the underlying data store.
      * This method removes the record corresponding to the given ID if it exists.

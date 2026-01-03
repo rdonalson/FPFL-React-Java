@@ -30,15 +30,19 @@ public class TimePeriod {
      * Default constructor for the TimePeriodEntity class.
      * Initializes a new instance of the TimePeriodEntity class with default or uninitialized property values.
      */
-    public TimePeriod() {}
+    public TimePeriod() {
+    }
+
     /**
      * Constructs a new TimePeriodEntity instance with the specified ID and name.
      *
      * @param id   the unique identifier for the time period; must not be null
      * @param name the name of the time period; must not be null
      */
-    public TimePeriod(Long id, String name) {
-        this.Id = id;
+    public TimePeriod(Long id,
+                      String name
+                     ) {
+        this.Id   = id;
         this.Name = name;
     }
 }

@@ -28,15 +28,19 @@ public class ItemType {
      * Default constructor for the ItemTypeEntity class.
      * Initializes an instance of ItemTypeEntity with default or uninitialized property values.
      */
-    public ItemType() {}
+    public ItemType() {
+    }
+
     /**
      * Constructs a new instance of the ItemTypeEntity class with the specified ID and name.
      *
      * @param id   the unique identifier for the item type; must not be null
      * @param name the name of the item type; must not be null
      */
-    public ItemType(Long id, String name) {
-        this.Id = id;
+    public ItemType(Long id,
+                    String name
+                   ) {
+        this.Id   = id;
         this.Name = name;
     }
 

@@ -1,7 +1,7 @@
 package com.financialplanner.moduleapi.mapper;
 
 import com.financialplanner.moduleapi.dto.ItemTypeDto;
-import com.financialplanner.moduleitemsbc.domain.entity.ItemTypeEntity;
+import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.ItemTypeEntity;
 import org.springframework.stereotype.Component;
 
 /**
@@ -19,12 +19,15 @@ public class ItemTypeDtoMapper {
      * Converts an {@code ItemTypeEntity} instance to an {@code ItemTypeDto} instance.
      * This method extracts the ID and name from the given entity and maps them
      * to a new DTO object.
+     * -----------
      *
      * @param entity the {@code ItemTypeEntity} instance to be converted; must not be null
      * @return an {@code ItemTypeDto} instance populated with data from the given entity
      */
     public ItemTypeDto toDomain(ItemTypeEntity entity) {
-        return new ItemTypeDto(entity.getId(), entity.getName());
+        return new ItemTypeDto(entity.getId(),
+                               entity.getName()
+        );
     }
 
     /**
@@ -34,10 +37,12 @@ public class ItemTypeDtoMapper {
      * across system boundaries, to the entity format used within the persistence layer.
      *
      * @param domain the {@code ItemTypeDto} instance to be converted; must not be null.
-     *               The {@code domain} parameter contains the ID and name of the item type.
+     *               -----------            The {@code domain} parameter contains the ID and name of the item type.
      * @return an {@code ItemTypeEntity} object representing the same data as the provided {@code ItemTypeDto}.
      */
     public ItemTypeEntity toEntity(ItemTypeDto domain) {
-        return new ItemTypeEntity(domain.getId(), domain.getName());
+        return new ItemTypeEntity(domain.getId(),
+                                  domain.getName()
+        );
     }
 }

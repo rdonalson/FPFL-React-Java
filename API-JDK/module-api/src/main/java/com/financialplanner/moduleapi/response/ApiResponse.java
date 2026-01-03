@@ -16,16 +16,27 @@ public class ApiResponse<T> {
         this.timestamp = Instant.now();
     }
 
-    public ApiResponse(int status, String message, T data, String correlationId) {
-        this.status = status;
-        this.message = message;
-        this.data = data;
+    public ApiResponse(int status,
+                       String message,
+                       T data,
+                       String correlationId
+                      ) {
+        this.status        = status;
+        this.message       = message;
+        this.data          = data;
         this.correlationId = correlationId;
-        this.timestamp = Instant.now();
+        this.timestamp     = Instant.now();
     }
 
     // Convenience constructor for responses without data
-    public ApiResponse(int status, String message, String correlationId) {
-        this(status, message, null, correlationId);
+    public ApiResponse(int status,
+                       String message,
+                       String correlationId
+                      ) {
+        this(status,
+             message,
+             null,
+             correlationId
+            );
     }
 }

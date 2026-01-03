@@ -1,68 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="128"
-        height="128"
-        viewBox="0 0 64 64"
+    xmlns="http://www.w3.org/2000/svg"
+    width="128"
+    height="128"
+    viewBox="0 0 64 64"
 >
     <!-- Background (optional, remove if you want transparent) -->
     <rect x="0" y="0" width="64" height="64" fill="#0f172a"/>
 
     <!-- Steam lines -->
     <path
-            d="M24 14
+        d="M24 14
            C22 10, 24 8, 26 6
            M30 16
            C28 12, 30 10, 32 8
            M36 18
            C34 14, 36 12, 38 10"
-            fill="none"
-            stroke="#f97316"
-            stroke-width="2"
-            stroke-linecap="round"
+        fill="none"
+        stroke="#f97316"
+        stroke-width="2"
+        stroke-linecap="round"
     />
 
     <!-- Cup -->
     <rect
-            x="18"
-            y="24"
-            width="22"
-            height="14"
-            rx="3"
-            ry="3"
-            fill="#e5e7eb"
+        x="18"
+        y="24"
+        width="22"
+        height="14"
+        rx="3"
+        ry="3"
+        fill="#e5e7eb"
     />
 
     <!-- Cup inner shadow -->
     <rect
-            x="20"
-            y="26"
-            width="18"
-            height="10"
-            rx="2"
-            ry="2"
-            fill="#d1d5db"
+        x="20"
+        y="26"
+        width="18"
+        height="10"
+        rx="2"
+        ry="2"
+        fill="#d1d5db"
     />
 
     <!-- Cup handle -->
     <path
-            d="M40 27
+        d="M40 27
            h4
            a4 4 0 0 1 0 8
            h-4"
-            fill="none"
-            stroke="#e5e7eb"
-            stroke-width="2"
-            stroke-linecap="round"
+        fill="none"
+        stroke="#e5e7eb"
+        stroke-width="2"
+        stroke-linecap="round"
     />
 
     <!-- Saucer -->
     <ellipse
-            cx="29"
-            cy="40"
-            rx="16"
-            ry="3"
-            fill="#9ca3af"
-            opacity="0.8"
+        cx="29"
+        cy="40"
+        rx="16"
+        ry="3"
+        fill="#9ca3af"
+        opacity="0.8"
     />
 </svg>

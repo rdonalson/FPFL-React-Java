@@ -7,7 +7,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class ModuleCommonBcApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(ModuleCommonBcApplication.class, args);
+        SpringApplication.run(ModuleCommonBcApplication.class,
+                              args
+                             );
     }
 
 }

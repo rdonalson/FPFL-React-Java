@@ -22,15 +22,20 @@ public class ItemTypeDto {
      * Default constructor for the ItemTypeDto class.
      * Initializes a new instance of the ItemTypeDto class without setting any values for its fields.
      */
-    public ItemTypeDto() {}
+    public ItemTypeDto() {
+    }
 
     /**
      * Constructs an instance of the ItemTypeDto class with the specified parameters.
+     * -----------
+     *
      * @param id   the unique identifier of the item type
      * @param name the name of the item type
      */
-    public ItemTypeDto(Long id, String name) {
-        this.id = id;
+    public ItemTypeDto(Long id,
+                       String name
+                      ) {
+        this.id   = id;
         this.name = name;
     }
 }

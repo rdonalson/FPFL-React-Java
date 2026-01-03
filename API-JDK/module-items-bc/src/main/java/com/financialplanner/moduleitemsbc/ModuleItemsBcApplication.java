@@ -13,10 +13,12 @@ public class ModuleItemsBcApplication {
     /**
      * The main method serves as the entry point for the Spring Boot application.
      * It bootstraps the application by invoking the SpringApplication.run method.
-     * ---
+     *
      * @param args an array of command-line arguments passed during the application startup
      */
     public static void main(String[] args) {
-        SpringApplication.run(ModuleItemsBcApplication.class, args);
+        SpringApplication.run(ModuleItemsBcApplication.class,
+                              args
+                             );
     }
 }

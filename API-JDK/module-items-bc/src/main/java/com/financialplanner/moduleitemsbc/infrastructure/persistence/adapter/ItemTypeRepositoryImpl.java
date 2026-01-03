@@ -1,11 +1,12 @@
-package com.financialplanner.moduleitemsbc.infrastructure.repository;
+package com.financialplanner.moduleitemsbc.infrastructure.persistence.adapter;
 
-import com.financialplanner.moduleitemsbc.domain.entity.ItemTypeEntity;
 import com.financialplanner.moduleitemsbc.domain.exception.DuplicateItemException;
 import com.financialplanner.moduleitemsbc.domain.exception.RepositoryException;
 import com.financialplanner.moduleitemsbc.domain.model.ItemType;
 import com.financialplanner.moduleitemsbc.domain.repository.ItemTypeRepository;
-import com.financialplanner.moduleitemsbc.infrastructure.mapper.ItemTypeMapper;
+import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.ItemTypeEntity;
+import com.financialplanner.moduleitemsbc.infrastructure.persistence.mapper.ItemTypeMapper;
+import com.financialplanner.moduleitemsbc.infrastructure.persistence.repository.JpaItemTypeRepository;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
@@ -54,11 +55,15 @@ public class ItemTypeRepositoryImpl implements ItemTypeRepository {
      * This implementation relies on a JPA repository for data persistence and a mapper
      * for converting between domain objects and entity objects.
      *
-     * @param jpa    the JPA repository used for accessing and managing {@link ItemTypeEntity} instances; must not be null
-     * @param mapper the mapper used for transforming between {@link ItemTypeEntity} and {@link ItemType} instances; must not be null
+     * @param jpa    the JPA repository used for accessing and managing {@link ItemTypeEntity} instances; must not be
+     *               null
+     * @param mapper the mapper used for transforming between {@link ItemTypeEntity} and {@link ItemType} instances;
+     *               must not be null
      */
-    public ItemTypeRepositoryImpl(JpaItemTypeRepository jpa, ItemTypeMapper mapper) {
-        this.jpa = jpa;
+    public ItemTypeRepositoryImpl(JpaItemTypeRepository jpa,
+                                  ItemTypeMapper mapper
+                                 ) {
+        this.jpa    = jpa;
         this.mapper = mapper;
     }
 
@@ -76,9 +81,13 @@ public class ItemTypeRepositoryImpl implements ItemTypeRepository {
             ItemTypeEntity saved = jpa.save(itemType);
             return mapper.toDomain(saved);
         } catch (DataIntegrityViolationException ex) {
-            throw new DuplicateItemException("Item already exists: " + itemType.getId(), ex);
+            throw new DuplicateItemException("Item already exists: " + itemType.getId(),
+                                             ex
+            );
         } catch (DataAccessException ex) {
-            throw new RepositoryException("Database failure while saving item " + itemType.getId(), ex);
+            throw new RepositoryException("Database failure while saving item " + itemType.getId(),
+                                          ex
+            );
         }
     }
 
@@ -94,9 +103,12 @@ public class ItemTypeRepositoryImpl implements ItemTypeRepository {
     @Override
     public Optional<ItemType> findById(Long id) {
         try {
-            return jpa.findById(id).map(mapper::toDomain);
+            return jpa.findById(id)
+                      .map(mapper::toDomain);
         } catch (DataAccessException ex) {
-            throw new RepositoryException("Database failure while fetching item " + id, ex);
+            throw new RepositoryException("Database failure while fetching item " + id,
+                                          ex
+            );
         }
     }
 

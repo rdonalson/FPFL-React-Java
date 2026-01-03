@@ -17,15 +17,15 @@ public class WebConfig {
      * Configures Cross-Origin Resource Sharing (CORS) settings for the application,
      * allowing all origins and enabling specific HTTP methods such as GET, PUT, POST,
      * PATCH, and DELETE.
-     * ---
+     * -----------
+     *
      * @return A {@code WebMvcConfigurer} instance that defines the CORS configuration for the application.
      */
-    @Bean
-    public WebMvcConfigurer corsConfigure() {
+    @Bean public WebMvcConfigurer corsConfigure() {
         return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(@NonNull CorsRegistry registry) {
-                registry.addMapping("/**").allowedOrigins("*")
+            @Override public void addCorsMappings(@NonNull CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedOrigins("*")
                         .allowedMethods("GET", "PUT", "POST", "PATCH", "DELETE");
             }
         };

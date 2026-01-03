@@ -57,10 +57,12 @@ public class ItemDto {
      * Default constructor for the ItemDto class.
      * Initializes a new instance of the ItemDto class without setting any values for the fields.
      */
-    public ItemDto() { }
+    public ItemDto() {
+    }
 
     /**
      * Constructs an instance of the ItemDto class with the specified parameters.
+     *
      * @param id               the identifier of the item
      * @param userId           the unique identifier of the user associated with the item
      * @param name             the name of the item
@@ -90,68 +92,96 @@ public class ItemDto {
      * @param annualDom        the day of the month for annual recurrence
      * @param dateRangeReq     indicates whether the date range is required for the item
      */
-    public ItemDto(Integer id, UUID userId, String name, Double amount, Integer fkItemType, Integer fkPeriod, LocalDate beginDate, LocalDate endDate, Integer weeklyDow, Integer everOtherWeekDow, Integer biMonthlyDay1, Integer biMonthlyDay2, Integer monthlyDom, Integer quarterly1Month, Integer quarterly1Day, Integer quarterly2Month, Integer quarterly2Day, Integer quarterly3Month, Integer quarterly3Day, Integer quarterly4Month, Integer quarterly4Day, Integer semiAnnual1Month, Integer semiAnnual1Day, Integer semiAnnual2Month, Integer semiAnnual2Day, Integer annualMoy, Integer annualDom, Boolean dateRangeReq) {
-        Id = id;
-        UserId = userId;
-        Name = name;
-        Amount = amount;
-        FkItemType = fkItemType;
-        FkPeriod = fkPeriod;
-        BeginDate = beginDate;
-        EndDate = endDate;
-        WeeklyDow = weeklyDow;
+    public ItemDto(Integer id,
+                   UUID userId,
+                   String name,
+                   Double amount,
+                   Integer fkItemType,
+                   Integer fkPeriod,
+                   LocalDate beginDate,
+                   LocalDate endDate,
+                   Integer weeklyDow,
+                   Integer everOtherWeekDow,
+                   Integer biMonthlyDay1,
+                   Integer biMonthlyDay2,
+                   Integer monthlyDom,
+                   Integer quarterly1Month,
+                   Integer quarterly1Day,
+                   Integer quarterly2Month,
+                   Integer quarterly2Day,
+                   Integer quarterly3Month,
+                   Integer quarterly3Day,
+                   Integer quarterly4Month,
+                   Integer quarterly4Day,
+                   Integer semiAnnual1Month,
+                   Integer semiAnnual1Day,
+                   Integer semiAnnual2Month,
+                   Integer semiAnnual2Day,
+                   Integer annualMoy,
+                   Integer annualDom,
+                   Boolean dateRangeReq
+                  ) {
+        Id               = id;
+        UserId           = userId;
+        Name             = name;
+        Amount           = amount;
+        FkItemType       = fkItemType;
+        FkPeriod         = fkPeriod;
+        BeginDate        = beginDate;
+        EndDate          = endDate;
+        WeeklyDow        = weeklyDow;
         EverOtherWeekDow = everOtherWeekDow;
-        BiMonthlyDay1 = biMonthlyDay1;
-        BiMonthlyDay2 = biMonthlyDay2;
-        MonthlyDom = monthlyDom;
-        Quarterly1Month = quarterly1Month;
-        Quarterly1Day = quarterly1Day;
-        Quarterly2Month = quarterly2Month;
-        Quarterly2Day = quarterly2Day;
-        Quarterly3Month = quarterly3Month;
-        Quarterly3Day = quarterly3Day;
-        Quarterly4Month = quarterly4Month;
-        Quarterly4Day = quarterly4Day;
+        BiMonthlyDay1    = biMonthlyDay1;
+        BiMonthlyDay2    = biMonthlyDay2;
+        MonthlyDom       = monthlyDom;
+        Quarterly1Month  = quarterly1Month;
+        Quarterly1Day    = quarterly1Day;
+        Quarterly2Month  = quarterly2Month;
+        Quarterly2Day    = quarterly2Day;
+        Quarterly3Month  = quarterly3Month;
+        Quarterly3Day    = quarterly3Day;
+        Quarterly4Month  = quarterly4Month;
+        Quarterly4Day    = quarterly4Day;
         SemiAnnual1Month = semiAnnual1Month;
-        SemiAnnual1Day = semiAnnual1Day;
+        SemiAnnual1Day   = semiAnnual1Day;
         SemiAnnual2Month = semiAnnual2Month;
-        SemiAnnual2Day = semiAnnual2Day;
-        AnnualMoy = annualMoy;
-        AnnualDom = annualDom;
-        DateRangeReq = dateRangeReq;
+        SemiAnnual2Day   = semiAnnual2Day;
+        AnnualMoy        = annualMoy;
+        AnnualDom        = annualDom;
+        DateRangeReq     = dateRangeReq;
     }
 
     /**
      * Creates defensive copy of ItemDto instance
      */
     public ItemDto(ItemDto itemDto) {
-        this.Id = itemDto.getId();
-        this.UserId = itemDto.getUserId();
-        this.Name = itemDto.getName();
-        this.Amount = itemDto.getAmount();
-        this.FkItemType = itemDto.getFkItemType();
-        this.FkPeriod = itemDto.getFkPeriod();
-        this.BeginDate = itemDto.getBeginDate();
-        this.EndDate = itemDto.getEndDate();
-        this.WeeklyDow = itemDto.getWeeklyDow();
+        this.Id               = itemDto.getId();
+        this.UserId           = itemDto.getUserId();
+        this.Name             = itemDto.getName();
+        this.Amount           = itemDto.getAmount();
+        this.FkItemType       = itemDto.getFkItemType();
+        this.FkPeriod         = itemDto.getFkPeriod();
+        this.BeginDate        = itemDto.getBeginDate();
+        this.EndDate          = itemDto.getEndDate();
+        this.WeeklyDow        = itemDto.getWeeklyDow();
         this.EverOtherWeekDow = itemDto.getEverOtherWeekDow();
-        this.BiMonthlyDay1 = itemDto.getBiMonthlyDay1();
-        this.BiMonthlyDay2 = itemDto.getBiMonthlyDay2();
-        this.MonthlyDom = itemDto.getMonthlyDom();
-        this.Quarterly1Month = itemDto.getQuarterly1Month();
-        this.Quarterly1Day = itemDto.getQuarterly1Day();
-        this.Quarterly2Month = itemDto.getQuarterly2Month();
-        this.Quarterly2Day = itemDto.getQuarterly2Day();
-        this.Quarterly3Month = itemDto.getQuarterly3Month();
-        this.Quarterly3Day = itemDto.getQuarterly3Day();
-        this.Quarterly4Month = itemDto.getQuarterly4Month();
-        this.Quarterly4Day = itemDto.getQuarterly4Day();
+        this.BiMonthlyDay1    = itemDto.getBiMonthlyDay1();
+        this.BiMonthlyDay2    = itemDto.getBiMonthlyDay2();
+        this.MonthlyDom       = itemDto.getMonthlyDom();
+        this.Quarterly1Month  = itemDto.getQuarterly1Month();
+        this.Quarterly1Day    = itemDto.getQuarterly1Day();
+        this.Quarterly2Month  = itemDto.getQuarterly2Month();
+        this.Quarterly2Day    = itemDto.getQuarterly2Day();
+        this.Quarterly3Month  = itemDto.getQuarterly3Month();
+        this.Quarterly3Day    = itemDto.getQuarterly3Day();
+        this.Quarterly4Month  = itemDto.getQuarterly4Month();
+        this.Quarterly4Day    = itemDto.getQuarterly4Day();
         this.SemiAnnual1Month = itemDto.getSemiAnnual1Month();
-        this.SemiAnnual1Day = itemDto.getSemiAnnual1Day();
+        this.SemiAnnual1Day   = itemDto.getSemiAnnual1Day();
         this.SemiAnnual2Month = itemDto.getSemiAnnual2Month();
-        this.SemiAnnual2Day = itemDto.getSemiAnnual2Day();
-        this.AnnualMoy = itemDto.getAnnualMoy();
-        this.AnnualDom = itemDto.getAnnualDom();
-        this.DateRangeReq = itemDto.getDateRangeReq();
+        this.SemiAnnual2Day   = itemDto.getSemiAnnual2Day();
+        this.AnnualMoy        = itemDto.getAnnualMoy();
+        this.AnnualDom        = itemDto.getAnnualDom();
+        this.DateRangeReq     = itemDto.getDateRangeReq();
     }
 }

@@ -1,12 +1,11 @@
 package com.financialplanner.moduleapi.controllers;
 
 import com.financialplanner.moduleapi.dto.ItemTypeDto;
-import com.financialplanner.moduleapi.logging.ErrorLogger;
 import com.financialplanner.moduleapi.mapper.ItemTypeDtoMapper;
 import com.financialplanner.moduleapi.response.ApiResponse;
-import com.financialplanner.moduleitemsbc.domain.entity.ItemTypeEntity;
 import com.financialplanner.moduleitemsbc.domain.model.ItemType;
 import com.financialplanner.moduleitemsbc.domain.service.ItemTypeService;
+import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.ItemTypeEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,7 +32,7 @@ public class ItemTypeController {
      * A mapper used to translate between {@code ItemTypeDto} objects, which are
      * used for data transfer between application layers, and corresponding domain
      * entities (e.g., {@code ItemTypeEntity}).
-     * ---
+     * <p>
      * This field is typically utilized in the controller layer to delegate
      * mapping responsibilities to a separate component, thus ensuring clean
      * and maintainable separation of concerns. It enables seamless conversion
@@ -46,18 +45,20 @@ public class ItemTypeController {
      * This controller is responsible for handling HTTP requests related to item types,
      * such as retrieving, creating, updating, and deleting item types.
      * It uses the provided service and mapper for delegating business logic and object mapping, respectively.
-     * ---
+     *
      * @param service the ItemTypeService instance used to manage business logic; must not be null
-     * @param mapper the ItemTypeDtoMapper instance used to convert between DTOs and entities; must not be null
+     * @param mapper  the ItemTypeDtoMapper instance used to convert between DTOs and entities; must not be null
      */
-    public ItemTypeController(ItemTypeService service, ItemTypeDtoMapper mapper) {
+    public ItemTypeController(ItemTypeService service,
+                              ItemTypeDtoMapper mapper
+                             ) {
         this.service = service;
-        this.mapper = mapper;
+        this.mapper  = mapper;
     }
 
     /**
      * Retrieves a list of all item types.
-     * ---
+     *
      * @return a list of ItemType objects representing all item types currently available
      */
     @GetMapping
@@ -68,7 +69,7 @@ public class ItemTypeController {
     /**
      * Retrieves an ItemType based on the given unique identifier.
      * Delegates the retrieval operation to the service layer.
-     * ---
+     *
      * @param id the unique identifier of the ItemType to retrieve; must not be null
      * @return the ItemType associated with the given ID
      */
@@ -82,7 +83,7 @@ public class ItemTypeController {
                 item,
                 null
             )
-        );
+                                );
     }
 
     /**
@@ -102,20 +103,22 @@ public class ItemTypeController {
                 item,
                 null
             )
-        );
+                                );
     }
 
     /**
      * Updates the details of an existing item type based on the provided ID and name.
      * Creates a new {@code ItemTypeEntity} instance, sets the ID and name, and calls the service layer
      * to perform the update operation. The updated {@code ItemType} is returned as the result.
-     * ---
+     *
      * @param id   the unique identifier of the item type to be updated; must not be null
      * @param name the new name of the item type to be updated; must not be null
-     * @return     the updated {@code ItemType} instance reflecting the changes applied
+     * @return the updated {@code ItemType} instance reflecting the changes applied
      */
     @PutMapping("/{id}/{name}")
-    public ItemType update(@PathVariable("id") Long id, @PathVariable("name") String name) {
+    public ItemType update(@PathVariable("id") Long id,
+                           @PathVariable("name") String name
+                          ) {
         ItemTypeEntity entity = new ItemTypeEntity();
         entity.setId(id);
         entity.setName(name);
@@ -126,7 +129,7 @@ public class ItemTypeController {
      * Deletes an item type by its unique identifier.
      * This method delegates the deletion operation to the associated service layer,
      * which interacts with the persistence layer to remove the entity from the data store.
-     * ---
+     *
      * @param id the unique identifier of the item type to be deleted; must not be null.
      */
     @DeleteMapping("/{id}")
