@@ -21,9 +21,11 @@ public class WebConfig {
      *
      * @return A {@code WebMvcConfigurer} instance that defines the CORS configuration for the application.
      */
-    @Bean public WebMvcConfigurer corsConfigure() {
+    @Bean
+    public WebMvcConfigurer corsConfigure() {
         return new WebMvcConfigurer() {
-            @Override public void addCorsMappings(@NonNull CorsRegistry registry) {
+            @Override
+            public void addCorsMappings(@NonNull CorsRegistry registry) {
                 registry.addMapping("/**")
                         .allowedOrigins("*")
                         .allowedMethods("GET", "PUT", "POST", "PATCH", "DELETE");
