@@ -97,10 +97,10 @@ public class ItemTypeServiceImpl implements ItemTypeService {
     @Override
     public ItemType get(Long id) {
         if (id == 0) {
-            throw new InvalidRequestException("Item ID cannot be empty");
+            throw new InvalidRequestException("ItemType ID cannot be zero");
         }
         return repo.findById(id)
-                   .orElseThrow(() -> new ItemNotFoundException("Item " + id + " not found"));
+                   .orElseThrow(() -> new ItemNotFoundException("ItemType " + id + " not found"));
     }
 
     /**

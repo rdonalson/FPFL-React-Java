@@ -29,14 +29,11 @@ public class ItemTypeDtoMapper {
     }
 
     /**
-     * Converts an {@code ItemTypeDto} object to an {@code ItemTypeEntity} object.
-     * This method facilitates the transformation from the data transfer object
-     * (DTO) format, which is typically used for communication between layers or
-     * across system boundaries, to the entity format used within the persistence layer.
+     * Converts an {@code ItemTypeDto} instance to an {@code ItemTypeEntity} instance.
+     * This method maps the ID and name properties from the given DTO to a new entity object.
      *
-     * @param domain the {@code ItemTypeDto} instance to be converted; must not be null.
-     *               -----------            The {@code domain} parameter contains the ID and name of the item type.
-     * @return an {@code ItemTypeEntity} object representing the same data as the provided {@code ItemTypeDto}.
+     * @param domain the {@code ItemTypeDto} instance to be converted; must not be null
+     * @return an {@code ItemTypeEntity} instance populated with data from the given DTO
      */
     public ItemTypeEntity toEntity(ItemTypeDto domain) {
         return new ItemTypeEntity(domain.getId(), domain.getName());

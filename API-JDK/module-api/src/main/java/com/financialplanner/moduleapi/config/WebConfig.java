@@ -17,7 +17,7 @@ public class WebConfig {
      * Configures Cross-Origin Resource Sharing (CORS) settings for the application,
      * allowing all origins and enabling specific HTTP methods such as GET, PUT, POST,
      * PATCH, and DELETE.
-     * -----------
+     * ---
      *
      * @return A {@code WebMvcConfigurer} instance that defines the CORS configuration for the application.
      */

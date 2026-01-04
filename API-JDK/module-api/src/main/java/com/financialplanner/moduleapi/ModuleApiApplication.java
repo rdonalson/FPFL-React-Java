@@ -22,7 +22,6 @@ public class ModuleApiApplication {
      * The main method serves as the entry point of the application.
      * It initializes and runs the Spring Boot application.
      * -----------
-     *
      * @param args an array of command-line arguments passed to the application
      */
     static void main(String[] args) {

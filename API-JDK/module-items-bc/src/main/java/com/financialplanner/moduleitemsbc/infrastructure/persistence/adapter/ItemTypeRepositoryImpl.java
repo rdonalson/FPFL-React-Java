@@ -60,9 +60,7 @@ public class ItemTypeRepositoryImpl implements ItemTypeRepository {
      * @param mapper the mapper used for transforming between {@link ItemTypeEntity} and {@link ItemType} instances;
      *               must not be null
      */
-    public ItemTypeRepositoryImpl(JpaItemTypeRepository jpa,
-                                  ItemTypeMapper mapper
-                                 ) {
+    public ItemTypeRepositoryImpl(JpaItemTypeRepository jpa, ItemTypeMapper mapper) {
         this.jpa    = jpa;
         this.mapper = mapper;
     }
@@ -81,13 +79,9 @@ public class ItemTypeRepositoryImpl implements ItemTypeRepository {
             ItemTypeEntity saved = jpa.save(itemType);
             return mapper.toDomain(saved);
         } catch (DataIntegrityViolationException ex) {
-            throw new DuplicateItemException("Item already exists: " + itemType.getId(),
-                                             ex
-            );
+            throw new DuplicateItemException("Item already exists: " + itemType.getId(), ex);
         } catch (DataAccessException ex) {
-            throw new RepositoryException("Database failure while saving item " + itemType.getId(),
-                                          ex
-            );
+            throw new RepositoryException("Database failure while saving item " + itemType.getId(), ex);
         }
     }
 
@@ -106,9 +100,7 @@ public class ItemTypeRepositoryImpl implements ItemTypeRepository {
             return jpa.findById(id)
                       .map(mapper::toDomain);
         } catch (DataAccessException ex) {
-            throw new RepositoryException("Database failure while fetching item " + id,
-                                          ex
-            );
+            throw new RepositoryException("Database failure while fetching item " + id, ex);
         }
     }
 
