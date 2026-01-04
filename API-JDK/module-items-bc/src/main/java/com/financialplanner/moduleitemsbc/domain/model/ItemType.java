@@ -37,9 +37,7 @@ public class ItemType {
      * @param id   the unique identifier for the item type; must not be null
      * @param name the name of the item type; must not be null
      */
-    public ItemType(Long id,
-                    String name
-                   ) {
+    public ItemType(Long id, String name) {
         this.Id   = id;
         this.Name = name;
     }

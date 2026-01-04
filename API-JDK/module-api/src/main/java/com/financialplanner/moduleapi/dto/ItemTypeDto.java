@@ -32,9 +32,7 @@ public class ItemTypeDto {
      * @param id   the unique identifier of the item type
      * @param name the name of the item type
      */
-    public ItemTypeDto(Long id,
-                       String name
-                      ) {
+    public ItemTypeDto(Long id, String name) {
         this.id   = id;
         this.name = name;
     }

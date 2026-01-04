@@ -39,9 +39,7 @@ public class TimePeriod {
      * @param id   the unique identifier for the time period; must not be null
      * @param name the name of the time period; must not be null
      */
-    public TimePeriod(Long id,
-                      String name
-                     ) {
+    public TimePeriod(Long id, String name) {
         this.Id   = id;
         this.Name = name;
     }

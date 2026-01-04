@@ -49,8 +49,7 @@ public class ItemTypeEntity {
      * This constructor is typically used by frameworks or libraries (such as JPA)
      * that require a no-argument constructor to create instances of the entity.
      */
-    public ItemTypeEntity() {
-    }
+    public ItemTypeEntity() {}
 
     /**
      * Constructs an instance of {@code ItemTypeEntity} with the specified ID and name.
@@ -58,9 +57,7 @@ public class ItemTypeEntity {
      * @param id   the unique identifier for the item type, must not be null
      * @param name the name of the item type, must not be null
      */
-    public ItemTypeEntity(Long id,
-                          String name
-                         ) {
+    public ItemTypeEntity(Long id, String name) {
         this.Id   = id;
         this.Name = name;
     }

@@ -6,10 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class ModuleDisplayBcApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(ModuleDisplayBcApplication.class,
-                              args
-                             );
+    static void main(String[] args) {
+        SpringApplication.run(ModuleDisplayBcApplication.class, args);
     }
 
 }

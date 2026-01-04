@@ -5,11 +5,7 @@ public class InvalidRequestException extends DomainException {
         super(message);
     }
 
-    public InvalidRequestException(String message,
-                                   Throwable cause
-                                  ) {
-        super(message,
-              cause
-             );
+    public InvalidRequestException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

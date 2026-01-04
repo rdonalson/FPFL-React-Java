@@ -15,17 +15,14 @@ public class OpenApiConfig {
      * Configures and provides an instance of the OpenAPI object, which
      * includes metadata information about the FPFL API, such as its title,
      * description, and version.
-     * -----------
      *
      * @return an OpenAPI instance containing API documentation details including title,
      * description, and version information.
      */
     @Bean
     public OpenAPI apiInfo() {
-        return new OpenAPI()
-            .info(new Info()
-                      .title("FPFL API")
-                      .description("API documentation for FPFL backend services")
-                      .version("1.0.0"));
+        return new OpenAPI().info(new Info().title("FPFL API")
+                                            .description("API documentation for FPFL backend services")
+                                            .version("1.0.0"));
     }
 }

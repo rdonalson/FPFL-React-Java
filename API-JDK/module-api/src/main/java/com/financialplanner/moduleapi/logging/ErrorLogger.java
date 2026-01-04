@@ -10,11 +10,7 @@ public class ErrorLogger {
     public static String logException(Exception ex) {
         String correlationId = java.util.UUID.randomUUID()
                                              .toString();
-        log.error("Correlation ID: {} - Exception: {}",
-                  correlationId,
-                  ex.getMessage(),
-                  ex
-                 );
+        log.error("Correlation ID: {} - Exception: {}", correlationId, ex.getMessage(), ex);
         return correlationId;
     }
 }

@@ -49,9 +49,7 @@ public class ItemTypeController {
      * @param service the ItemTypeService instance used to manage business logic; must not be null
      * @param mapper  the ItemTypeDtoMapper instance used to convert between DTOs and entities; must not be null
      */
-    public ItemTypeController(ItemTypeService service,
-                              ItemTypeDtoMapper mapper
-                             ) {
+    public ItemTypeController(ItemTypeService service, ItemTypeDtoMapper mapper) {
         this.service = service;
         this.mapper  = mapper;
     }
@@ -76,14 +74,7 @@ public class ItemTypeController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ItemType>> get(@PathVariable("id") Long id) {
         ItemType item = service.get(id);
-        return ResponseEntity.ok(
-            new ApiResponse<>(
-                200,
-                "ItemType retrieved successfully",
-                item,
-                null
-            )
-                                );
+        return ResponseEntity.ok(new ApiResponse<>(200, "ItemType retrieved successfully", item, null));
     }
 
     /**
@@ -96,14 +87,7 @@ public class ItemTypeController {
     public ResponseEntity<ApiResponse<ItemType>> create(@RequestBody ItemTypeDto request) {
         ItemTypeEntity entity = mapper.toEntity(request);
         ItemType item = service.create(entity);
-        return ResponseEntity.ok(
-            new ApiResponse<>(
-                201,
-                "ItemType created successfully",
-                item,
-                null
-            )
-                                );
+        return ResponseEntity.ok(new ApiResponse<>(201, "ItemType created successfully", item, null));
     }
 
     /**
@@ -116,9 +100,7 @@ public class ItemTypeController {
      * @return the updated {@code ItemType} instance reflecting the changes applied
      */
     @PutMapping("/{id}/{name}")
-    public ItemType update(@PathVariable("id") Long id,
-                           @PathVariable("name") String name
-                          ) {
+    public ItemType update(@PathVariable("id") Long id, @PathVariable("name") String name) {
         ItemTypeEntity entity = new ItemTypeEntity();
         entity.setId(id);
         entity.setName(name);

@@ -327,35 +327,13 @@ public class ItemEntity {
      * @param annualDom        The day of the month for annual occurrences.
      * @param dateRangeReq     Indicates whether a date range is required for the item (true/false).
      */
-    public ItemEntity(Long id,
-                      UUID userId,
-                      String name,
-                      Double amount,
-                      ItemTypeEntity itemType,
-                      TimePeriodEntity timePeriod,
-                      LocalDate beginDate,
-                      LocalDate endDate,
-                      Integer weeklyDow,
-                      Integer everOtherWeekDow,
-                      Integer biMonthlyDay1,
-                      Integer biMonthlyDay2,
-                      Integer monthlyDom,
-                      Integer quarterly1Month,
-                      Integer quarterly1Day,
-                      Integer quarterly2Month,
-                      Integer quarterly2Day,
-                      Integer quarterly3Month,
-                      Integer quarterly3Day,
-                      Integer quarterly4Month,
-                      Integer quarterly4Day,
-                      Integer semiAnnual1Month,
-                      Integer semiAnnual1Day,
-                      Integer semiAnnual2Month,
-                      Integer semiAnnual2Day,
-                      Integer annualMoy,
-                      Integer annualDom,
-                      Boolean dateRangeReq
-                     ) {
+    public ItemEntity(Long id, UUID userId, String name, Double amount, ItemTypeEntity itemType,
+                      TimePeriodEntity timePeriod, LocalDate beginDate, LocalDate endDate, Integer weeklyDow,
+                      Integer everOtherWeekDow, Integer biMonthlyDay1, Integer biMonthlyDay2, Integer monthlyDom,
+                      Integer quarterly1Month, Integer quarterly1Day, Integer quarterly2Month, Integer quarterly2Day,
+                      Integer quarterly3Month, Integer quarterly3Day, Integer quarterly4Month, Integer quarterly4Day,
+                      Integer semiAnnual1Month, Integer semiAnnual1Day, Integer semiAnnual2Month,
+                      Integer semiAnnual2Day, Integer annualMoy, Integer annualDom, Boolean dateRangeReq) {
         this.id          = id;
         UserId           = userId;
         Name             = name;

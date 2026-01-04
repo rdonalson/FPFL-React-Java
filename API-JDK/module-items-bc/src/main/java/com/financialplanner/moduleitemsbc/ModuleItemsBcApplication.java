@@ -16,9 +16,7 @@ public class ModuleItemsBcApplication {
      *
      * @param args an array of command-line arguments passed during the application startup
      */
-    public static void main(String[] args) {
-        SpringApplication.run(ModuleItemsBcApplication.class,
-                              args
-                             );
+    static void main(String[] args) {
+        SpringApplication.run(ModuleItemsBcApplication.class, args);
     }
 }

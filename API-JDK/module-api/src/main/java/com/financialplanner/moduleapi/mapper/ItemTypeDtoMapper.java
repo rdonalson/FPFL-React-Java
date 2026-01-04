@@ -25,9 +25,7 @@ public class ItemTypeDtoMapper {
      * @return an {@code ItemTypeDto} instance populated with data from the given entity
      */
     public ItemTypeDto toDomain(ItemTypeEntity entity) {
-        return new ItemTypeDto(entity.getId(),
-                               entity.getName()
-        );
+        return new ItemTypeDto(entity.getId(), entity.getName());
     }
 
     /**
@@ -41,8 +39,6 @@ public class ItemTypeDtoMapper {
      * @return an {@code ItemTypeEntity} object representing the same data as the provided {@code ItemTypeDto}.
      */
     public ItemTypeEntity toEntity(ItemTypeDto domain) {
-        return new ItemTypeEntity(domain.getId(),
-                                  domain.getName()
-        );
+        return new ItemTypeEntity(domain.getId(), domain.getName());
     }
 }

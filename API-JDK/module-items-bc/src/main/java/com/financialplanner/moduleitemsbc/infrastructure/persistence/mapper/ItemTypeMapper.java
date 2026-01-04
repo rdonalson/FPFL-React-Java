@@ -30,10 +30,7 @@ public class ItemTypeMapper {
      * @return an {@link ItemType} representing the domain model equivalent of the provided entity
      */
     public ItemType toDomain(ItemTypeEntity entity) {
-        return new ItemType(
-            entity.getId(),
-            entity.getName()
-        );
+        return new ItemType(entity.getId(), entity.getName());
     }
 
     /**
@@ -45,9 +42,6 @@ public class ItemTypeMapper {
      * ID and name from the provided {@code ItemType} object
      */
     public ItemTypeEntity toEntity(ItemType domain) {
-        return new ItemTypeEntity(
-            domain.getId(),
-            domain.getName()
-        );
+        return new ItemTypeEntity(domain.getId(), domain.getName());
     }
 }

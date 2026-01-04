@@ -19,6 +19,5 @@ import org.springframework.stereotype.Repository;
  * The primary key type of the entity is {@code Long}.
  */
 @Repository
-public interface JpaItemTypeRepository extends JpaRepository<ItemTypeEntity, Long> {
-}
+public interface JpaItemTypeRepository extends JpaRepository<ItemTypeEntity, Long> {}
 

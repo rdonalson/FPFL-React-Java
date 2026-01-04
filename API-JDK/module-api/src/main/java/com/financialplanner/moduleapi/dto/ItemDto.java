@@ -92,35 +92,13 @@ public class ItemDto {
      * @param annualDom        the day of the month for annual recurrence
      * @param dateRangeReq     indicates whether the date range is required for the item
      */
-    public ItemDto(Integer id,
-                   UUID userId,
-                   String name,
-                   Double amount,
-                   Integer fkItemType,
-                   Integer fkPeriod,
-                   LocalDate beginDate,
-                   LocalDate endDate,
-                   Integer weeklyDow,
-                   Integer everOtherWeekDow,
-                   Integer biMonthlyDay1,
-                   Integer biMonthlyDay2,
-                   Integer monthlyDom,
-                   Integer quarterly1Month,
-                   Integer quarterly1Day,
-                   Integer quarterly2Month,
-                   Integer quarterly2Day,
-                   Integer quarterly3Month,
-                   Integer quarterly3Day,
-                   Integer quarterly4Month,
-                   Integer quarterly4Day,
-                   Integer semiAnnual1Month,
-                   Integer semiAnnual1Day,
-                   Integer semiAnnual2Month,
-                   Integer semiAnnual2Day,
-                   Integer annualMoy,
-                   Integer annualDom,
-                   Boolean dateRangeReq
-                  ) {
+    public ItemDto(Integer id, UUID userId, String name, Double amount, Integer fkItemType, Integer fkPeriod,
+                   LocalDate beginDate, LocalDate endDate, Integer weeklyDow, Integer everOtherWeekDow,
+                   Integer biMonthlyDay1, Integer biMonthlyDay2, Integer monthlyDom, Integer quarterly1Month,
+                   Integer quarterly1Day, Integer quarterly2Month, Integer quarterly2Day, Integer quarterly3Month,
+                   Integer quarterly3Day, Integer quarterly4Month, Integer quarterly4Day, Integer semiAnnual1Month,
+                   Integer semiAnnual1Day, Integer semiAnnual2Month, Integer semiAnnual2Day, Integer annualMoy,
+                   Integer annualDom, Boolean dateRangeReq) {
         Id               = id;
         UserId           = userId;
         Name             = name;
