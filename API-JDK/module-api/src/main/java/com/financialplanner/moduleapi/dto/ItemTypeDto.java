@@ -1,39 +1,59 @@
 package com.financialplanner.moduleapi.dto;
 
+import lombok.Getter;
+
 /**
- * Data Transfer Object (DTO) for representing an item type.
- * This class is used to encapsulate the data related to an item type, including its unique identifier and name.
- * It serves as a lightweight object for data exchange between application layers.
+ * Represents a Data Transfer Object (DTO) for an item type.
+ * This class is designed to carry data related to item types between different layers
+ * of an application, such as services and controllers.
+ * The class enforces validation on its attributes to ensure data integrity.
  */
-@lombok.Data
 public class ItemTypeDto {
+
     /**
-     * Represents the unique identifier for an instance of the entity.
-     * This field is used to differentiate between different instances of the same entity class.
+     * Represents the unique identifier for an item type.
+     * This field holds a numeric value used to uniquely identify an instance of the item type.
      */
+    @Getter
     private Long id;
     /**
      * Represents the name of the item type.
-     * This field is typically used to describe or identify an item type in human-readable form.
+     * This field holds the descriptive name associated with a specific item type.
      */
+    @Getter
     private String name;
 
     /**
      * Default constructor for the ItemTypeDto class.
-     * Initializes a new instance of the ItemTypeDto class without setting any values for its fields.
+     * Initializes a new instance of the ItemTypeDto object with default values.
      */
-    public ItemTypeDto() {
+    public ItemTypeDto() {}
+
+    /**
+     * Sets the unique identifier of the item type.
+     * The identifier cannot be null; otherwise, an IllegalArgumentException is thrown.
+     *
+     * @param id the unique identifier to set for the item type
+     * @throws IllegalArgumentException if the provided id is null
+     */
+    public void setId(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("Id is required");
+        }
+        this.id = id;
     }
 
     /**
-     * Constructs an instance of the ItemTypeDto class with the specified parameters.
-     * -----------
+     * Sets the name of the item type.
+     * The name cannot be null or blank; otherwise, an IllegalArgumentException is thrown.
      *
-     * @param id   the unique identifier of the item type
-     * @param name the name of the item type
+     * @param name the name to set for the item type
+     * @throws IllegalArgumentException if the provided name is null or blank
      */
-    public ItemTypeDto(Long id, String name) {
-        this.id   = id;
+    public void setName(String name) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("Name is required");
+        }
         this.name = name;
     }
 }

@@ -5,35 +5,23 @@ import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.Item
 import org.springframework.stereotype.Component;
 
 /**
- * A mapper class responsible for converting between {@code ItemTypeEntity} and {@code ItemTypeDto}.
- * This class provides utility methods for transforming entities to DTOs and vice versa, ensuring
- * a clean separation between the persistence layer and the application layer.
- * This class is typically used in service or controller layers where such conversions are necessary.
- * By using this mapper, we can simplify data transformation and reduce duplication of mapping logic
- * across the application.
- * The class is annotated with {@code @Component}, allowing Spring to manage its lifecycle and dependency injection.
+ * Provides functionality for mapping data between the {@code ItemTypeDto} and {@code ItemTypeEntity} objects.
+ * This class acts as a bridge to convert the ItemType DTO, used in the service or controller layers,
+ * into the ItemType entity, required for persistence in the database layer.
+ * The mapping process ensures that all required attributes are transferred and validated
+ * during the conversion between these two distinct object representations.
+ * <p>
+ * This class is annotated with {@code @Component} making it a Spring-managed bean that can be easily
+ * injected into other components or services.
  */
 @Component
 public class ItemTypeDtoMapper {
-    /**
-     * Converts an {@code ItemTypeEntity} instance to an {@code ItemTypeDto} instance.
-     * This method extracts the ID and name from the given entity and maps them
-     * to a new DTO object.
-     * -----------
-     *
-     * @param entity the {@code ItemTypeEntity} instance to be converted; must not be null
-     * @return an {@code ItemTypeDto} instance populated with data from the given entity
-     */
-    public ItemTypeDto toDomain(ItemTypeEntity entity) {
-        return new ItemTypeDto(entity.getId(), entity.getName());
-    }
 
     /**
-     * Converts an {@code ItemTypeDto} instance to an {@code ItemTypeEntity} instance.
-     * This method maps the ID and name properties from the given DTO to a new entity object.
+     * Converts an instance of {@code ItemTypeDto} to an instance of {@code ItemTypeEntity}.
      *
-     * @param domain the {@code ItemTypeDto} instance to be converted; must not be null
-     * @return an {@code ItemTypeEntity} instance populated with data from the given DTO
+     * @param domain the {@code ItemTypeDto} object to be converted; must not be null
+     * @return a new {@code ItemTypeEntity} object containing the data from the provided {@code ItemTypeDto}
      */
     public ItemTypeEntity toEntity(ItemTypeDto domain) {
         return new ItemTypeEntity(domain.getId(), domain.getName());
