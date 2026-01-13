@@ -12,13 +12,13 @@ import java.util.List;
  * in the underlying data store.
  */
 public interface ItemTypeService {
-    ItemType create(ItemTypeEntity entity);
+    ItemTypeEntity create(ItemTypeEntity entity);
 
-    ItemType update(ItemTypeEntity entity);
+    ItemTypeEntity update(ItemTypeEntity entity);
 
-    List<ItemType> list();
+    List<ItemTypeEntity> list();
 
-    ItemType get(Long id);
+    ItemTypeEntity get(Long id);
 
     void delete(Long id);
 }

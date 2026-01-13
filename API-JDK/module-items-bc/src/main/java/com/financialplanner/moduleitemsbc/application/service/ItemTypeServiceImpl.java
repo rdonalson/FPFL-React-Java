@@ -3,7 +3,6 @@ package com.financialplanner.moduleitemsbc.application.service;
 import com.financialplanner.moduleitemsbc.domain.exception.DuplicateItemException;
 import com.financialplanner.moduleitemsbc.domain.exception.InvalidRequestException;
 import com.financialplanner.moduleitemsbc.domain.exception.ItemNotFoundException;
-import com.financialplanner.moduleitemsbc.domain.model.ItemType;
 import com.financialplanner.moduleitemsbc.domain.repository.ItemTypeRepository;
 import com.financialplanner.moduleitemsbc.domain.service.ItemTypeService;
 import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.ItemTypeEntity;
@@ -49,10 +48,10 @@ public class ItemTypeServiceImpl implements ItemTypeService {
      * @return the saved ItemType object after successful persistence
      */
     @Override
-    public ItemType create(ItemTypeEntity entity) {
+    public ItemTypeEntity create(ItemTypeEntity entity) {
         if (repo.findById(entity.getId())
                 .isPresent()) {
-            throw new DuplicateItemException("ItemType already exists: " + entity.getId());
+            throw new DuplicateItemException("ItemType " + entity.getId() + " already exists.");
         }
         // Return the new domain model
         return repo.save(entity);
@@ -69,8 +68,8 @@ public class ItemTypeServiceImpl implements ItemTypeService {
      * @throws RuntimeException if the entity with the provided ID does not exist in the repository.
      */
     @Override
-    public ItemType update(ItemTypeEntity entity) {
-        ItemType e = repo.findById(entity.getId())
+    public ItemTypeEntity update(ItemTypeEntity entity) {
+        ItemTypeEntity e = repo.findById(entity.getId())
                          .orElseThrow(() -> new ItemNotFoundException("ItemType not found"));
         // Return the updated domain model
         return repo.save(entity);
@@ -82,7 +81,7 @@ public class ItemTypeServiceImpl implements ItemTypeService {
      * @return a list of ItemType objects representing all item types present in the data store
      */
     @Override
-    public List<ItemType> list() {
+    public List<ItemTypeEntity> list() {
         return repo.findAll();
     }
 
@@ -95,7 +94,7 @@ public class ItemTypeServiceImpl implements ItemTypeService {
      * @throws RuntimeException if no ItemType is found with the specified ID
      */
     @Override
-    public ItemType get(Long id) {
+    public ItemTypeEntity get(Long id) {
         if (id == 0) {
             throw new InvalidRequestException("ItemType ID cannot be zero");
         }

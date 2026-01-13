@@ -1,4 +1,4 @@
-package com.financialplanner.moduleapi.dto;
+package com.financialplanner.moduleapi.dto.item;
 
 import jakarta.validation.constraints.NotNull;
 

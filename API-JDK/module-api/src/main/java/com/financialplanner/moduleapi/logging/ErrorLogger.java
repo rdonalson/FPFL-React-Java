@@ -21,7 +21,7 @@ public class ErrorLogger {
      * It provides a mechanism to log messages with different levels of severity and supports
      * structured logging for better traceability of logs.
      */
-    private static final Logger log = LoggerFactory.getLogger(ErrorLogger.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ErrorLogger.class);
 
     /**
      * Logs the provided exception with a uniquely generated correlation ID and returns the correlation ID.
@@ -37,7 +37,7 @@ public class ErrorLogger {
     public static String logException(Exception ex) {
         String correlationId = java.util.UUID.randomUUID()
                                              .toString();
-        log.error("Correlation ID: {} - Exception: {}", correlationId, ex.getMessage(), ex);
+        LOG.error("Correlation ID: {} - Exception: {}", correlationId, ex.getMessage(), ex);
         return correlationId;
     }
 }
