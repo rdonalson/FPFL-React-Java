@@ -1,0 +1,10 @@
+version: "1.0"
+
+profile:
+    name: qodana.starter
+
+exclude:
+    - name: QodanaXss
+      paths:
+          - "src/main/java/com/example/api/ItemTypeController.java"
+reason: "False positive: sanitized inbound DTO, sanitized DB entity, sanitized ApiResponse wrapper. Documented in /docs/security/false-positives/xss-201-created.md"

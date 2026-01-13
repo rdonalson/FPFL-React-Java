@@ -16,7 +16,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * and services within the defined base packages and initiates the application's
  * lifecycle.
  */
-@SpringBootApplication(scanBasePackages = {"com.financialplanner.moduleapi", "com.financialplanner.moduleitemsbc"})
+@SpringBootApplication(scanBasePackages = "com.financialplanner")
 public class ModuleApiApplication {
     /**
      * The main method serves as the entry point of the application.

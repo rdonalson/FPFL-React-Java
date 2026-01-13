@@ -25,7 +25,7 @@ public interface ItemTypeRepository {
      * @param entity the {@link ItemTypeEntity} object to be saved; must not be null
      * @return the resulting {@link ItemType} object after the entity has been saved
      */
-    ItemType save(ItemTypeEntity entity);
+    ItemTypeEntity save(ItemTypeEntity entity);
 
     /**
      * Retrieves an optional {@link ItemType} instance by its unique identifier.
@@ -35,7 +35,7 @@ public interface ItemTypeRepository {
      * @param id the unique identifier of the {@link ItemType} to retrieve; must not be null
      * @return an {@link Optional} containing the {@link ItemType} if found, or an empty {@link Optional} if not found
      */
-    Optional<ItemType> findById(Long id);
+    Optional<ItemTypeEntity> findById(Long id);
 
     /**
      * Retrieves a list of all available ItemType instances from the underlying data store.
@@ -44,7 +44,7 @@ public interface ItemTypeRepository {
      *
      * @return a list of ItemType objects representing all item types present in the data source
      */
-    List<ItemType> findAll();
+    List<ItemTypeEntity> findAll();
 
     /**
      * Deletes the entity with the specified unique identifier from the underlying data store.

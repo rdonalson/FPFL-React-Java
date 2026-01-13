@@ -5,13 +5,11 @@ import com.financialplanner.moduleitemsbc.domain.exception.RepositoryException;
 import com.financialplanner.moduleitemsbc.domain.model.ItemType;
 import com.financialplanner.moduleitemsbc.domain.repository.ItemTypeRepository;
 import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.ItemTypeEntity;
-import com.financialplanner.moduleitemsbc.infrastructure.persistence.mapper.ItemTypeMapper;
 import com.financialplanner.moduleitemsbc.infrastructure.persistence.repository.JpaItemTypeRepository;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,16 +36,6 @@ public class ItemTypeRepositoryImpl implements ItemTypeRepository {
      * for persistence operations within the {@link ItemTypeRepositoryImpl} implementation.
      */
     private final JpaItemTypeRepository jpa;
-    /**
-     * Mapper responsible for converting between {@link ItemTypeEntity} and {@link ItemType} objects.
-     * This field is used to encapsulate the logic for transforming persistence layer entities
-     * into domain models and vice versa.
-     * <p>
-     * Its primary purpose is to abstract away the mapping logic, ensuring that the repository
-     * implementations remain focused on persistence concerns and use domain models for
-     * business operations.
-     */
-    private final ItemTypeMapper mapper;
 
     /**
      * Creates a new instance of ItemTypeRepositoryImpl, which serves as an implementation
@@ -55,14 +43,11 @@ public class ItemTypeRepositoryImpl implements ItemTypeRepository {
      * This implementation relies on a JPA repository for data persistence and a mapper
      * for converting between domain objects and entity objects.
      *
-     * @param jpa    the JPA repository used for accessing and managing {@link ItemTypeEntity} instances; must not be
-     *               null
-     * @param mapper the mapper used for transforming between {@link ItemTypeEntity} and {@link ItemType} instances;
-     *               must not be null
+     * @param jpa the JPA repository used for accessing and managing {@link ItemTypeEntity} instances; must not be
+     *            null
      */
-    public ItemTypeRepositoryImpl(JpaItemTypeRepository jpa, ItemTypeMapper mapper) {
-        this.jpa    = jpa;
-        this.mapper = mapper;
+    public ItemTypeRepositoryImpl(JpaItemTypeRepository jpa) {
+        this.jpa = jpa;
     }
 
     /**
@@ -74,10 +59,9 @@ public class ItemTypeRepositoryImpl implements ItemTypeRepository {
      * @return the resulting {@link ItemType} domain model after the entity has been saved
      */
     @Override
-    public ItemType save(ItemTypeEntity itemType) {
+    public ItemTypeEntity save(ItemTypeEntity itemType) {
         try {
-            ItemTypeEntity saved = jpa.save(itemType);
-            return mapper.toDomain(saved);
+            return jpa.save(itemType);
         } catch (DataIntegrityViolationException ex) {
             throw new DuplicateItemException("Item already exists: " + itemType.getId(), ex);
         } catch (DataAccessException ex) {
@@ -95,10 +79,9 @@ public class ItemTypeRepositoryImpl implements ItemTypeRepository {
      * @return an {@link Optional} containing the {@link ItemType} if found, or an empty {@link Optional} if not found
      */
     @Override
-    public Optional<ItemType> findById(Long id) {
+    public Optional<ItemTypeEntity> findById(Long id) {
         try {
-            return jpa.findById(id)
-                      .map(mapper::toDomain);
+            return jpa.findById(id);
         } catch (DataAccessException ex) {
             throw new RepositoryException("Database failure while fetching item " + id, ex);
         }
@@ -113,13 +96,8 @@ public class ItemTypeRepositoryImpl implements ItemTypeRepository {
      * @return a list of {@link ItemType} objects representing all available item types
      */
     @Override
-    public List<ItemType> findAll() {
-        List<ItemType> list = new ArrayList<>();
-        for (ItemTypeEntity itemTypeEntity : jpa.findAll()) {
-            ItemType domain = mapper.toDomain(itemTypeEntity);
-            list.add(domain);
-        }
-        return list;
+    public List<ItemTypeEntity> findAll() {
+        return jpa.findAll();
     }
 
     /**
