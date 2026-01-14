@@ -2,9 +2,8 @@ package com.financialplanner.moduleitemsbc.infrastructure.persistence.adapter;
 
 import com.financialplanner.moduleitemsbc.domain.exception.DuplicateItemException;
 import com.financialplanner.moduleitemsbc.domain.exception.RepositoryException;
-import com.financialplanner.moduleitemsbc.domain.model.ItemType;
 import com.financialplanner.moduleitemsbc.domain.repository.ItemTypeRepository;
-import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.ItemTypeEntity;
+import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.ItemType;
 import com.financialplanner.moduleitemsbc.infrastructure.persistence.repository.JpaItemTypeRepository;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -15,7 +14,7 @@ import java.util.Optional;
 
 /**
  * Implementation of the {@link ItemTypeRepository} interface for managing
- * {@link ItemTypeEntity} objects. This class serves as a bridge between the
+ * {@link ItemType} objects. This class serves as a bridge between the
  * persistence layer and the domain layer, enabling CRUD operations while
  * adhering to the repository abstraction.
  * <p>
@@ -28,10 +27,10 @@ public class ItemTypeRepositoryImpl implements ItemTypeRepository {
 
     /**
      * Reference to the JPA repository used for performing CRUD operations
-     * on {@link ItemTypeEntity} instances in the underlying data store.
+     * on {@link ItemType} instances in the underlying data store.
      * <p>
      * This repository is based on Spring Data JPA and leverages its built-in
-     * functionality to simplify database access for the {@link ItemTypeEntity}
+     * functionality to simplify database access for the {@link ItemType}
      * entity class. The {@code jpa} variable is used as the primary entry point
      * for persistence operations within the {@link ItemTypeRepositoryImpl} implementation.
      */
@@ -39,11 +38,11 @@ public class ItemTypeRepositoryImpl implements ItemTypeRepository {
 
     /**
      * Creates a new instance of ItemTypeRepositoryImpl, which serves as an implementation
-     * of the ItemTypeRepository interface for managing {@link ItemType} entities.
+     * of the ItemTypeRepository interface for managing {@link com.financialplanner.moduleitemsbc.domain.model.ItemType} entities.
      * This implementation relies on a JPA repository for data persistence and a mapper
      * for converting between domain objects and entity objects.
      *
-     * @param jpa the JPA repository used for accessing and managing {@link ItemTypeEntity} instances; must not be
+     * @param jpa the JPA repository used for accessing and managing {@link ItemType} instances; must not be
      *            null
      */
     public ItemTypeRepositoryImpl(JpaItemTypeRepository jpa) {
@@ -51,15 +50,15 @@ public class ItemTypeRepositoryImpl implements ItemTypeRepository {
     }
 
     /**
-     * Saves the provided {@link ItemTypeEntity} instance and maps it to a domain model {@link ItemType}.
+     * Saves the provided {@link ItemType} instance and maps it to a domain model {@link com.financialplanner.moduleitemsbc.domain.model.ItemType}.
      * This method persists the entity to the database and converts the saved entity
      * into its corresponding domain representation.
      *
-     * @param itemType the {@link ItemTypeEntity} object to be persisted; must not be null
-     * @return the resulting {@link ItemType} domain model after the entity has been saved
+     * @param itemType the {@link ItemType} object to be persisted; must not be null
+     * @return the resulting {@link com.financialplanner.moduleitemsbc.domain.model.ItemType} domain model after the entity has been saved
      */
     @Override
-    public ItemTypeEntity save(ItemTypeEntity itemType) {
+    public ItemType save(ItemType itemType) {
         try {
             return jpa.save(itemType);
         } catch (DataIntegrityViolationException ex) {
@@ -70,16 +69,16 @@ public class ItemTypeRepositoryImpl implements ItemTypeRepository {
     }
 
     /**
-     * Retrieves an {@link Optional} containing a domain model {@link ItemType} based on the
+     * Retrieves an {@link Optional} containing a domain model {@link com.financialplanner.moduleitemsbc.domain.model.ItemType} based on the
      * provided unique identifier. If the entity with the given ID exists in the persistence store,
      * it is transformed into a domain model and returned. If no such entity is found, an empty
      * {@link Optional} is returned.
      *
-     * @param id the unique identifier of the {@link ItemType} to be retrieved; must not be null
-     * @return an {@link Optional} containing the {@link ItemType} if found, or an empty {@link Optional} if not found
+     * @param id the unique identifier of the {@link com.financialplanner.moduleitemsbc.domain.model.ItemType} to be retrieved; must not be null
+     * @return an {@link Optional} containing the {@link com.financialplanner.moduleitemsbc.domain.model.ItemType} if found, or an empty {@link Optional} if not found
      */
     @Override
-    public Optional<ItemTypeEntity> findById(Long id) {
+    public Optional<ItemType> findById(Long id) {
         try {
             return jpa.findById(id);
         } catch (DataAccessException ex) {
@@ -88,15 +87,15 @@ public class ItemTypeRepositoryImpl implements ItemTypeRepository {
     }
 
     /**
-     * Retrieves all instances of {@link ItemType} from the underlying data source.
-     * This method converts each {@link ItemTypeEntity} retrieved from the repository
-     * into its corresponding domain model {@link ItemType}, ensuring a separation
+     * Retrieves all instances of {@link com.financialplanner.moduleitemsbc.domain.model.ItemType} from the underlying data source.
+     * This method converts each {@link ItemType} retrieved from the repository
+     * into its corresponding domain model {@link com.financialplanner.moduleitemsbc.domain.model.ItemType}, ensuring a separation
      * between the persistence layer and the domain layer.
      *
-     * @return a list of {@link ItemType} objects representing all available item types
+     * @return a list of {@link com.financialplanner.moduleitemsbc.domain.model.ItemType} objects representing all available item types
      */
     @Override
-    public List<ItemTypeEntity> findAll() {
+    public List<ItemType> findAll() {
         return jpa.findAll();
     }
 

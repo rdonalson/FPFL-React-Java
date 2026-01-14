@@ -14,15 +14,15 @@ import jakarta.validation.constraints.NotNull;
  * Key Characteristics:
  * - The "id" field serves as the primary key for this entity.
  * - The "name" field represents the name of the item type and is required.
- * This entity may be referenced by other entities, such as {@code ItemEntity},
+ * This entity may be referenced by other entities, such as {@code Item},
  * to associate specific items with their respective types.
  */
 @lombok.Data
 @Entity
 @Table(name = "item_types", schema = "fpfl")
-public class ItemTypeEntity {
+public class ItemType {
     /**
-     * Represents the unique identifier for the {@code ItemTypeEntity}.
+     * Represents the unique identifier for the {@code ItemType}.
      * This field is the primary key in the "item_types" table within the "fpfl" schema.
      * Characteristics:
      * - It is annotated with {@code @Id}, indicating it is the primary key.
@@ -44,20 +44,20 @@ public class ItemTypeEntity {
     private String Name;
 
     /**
-     * Default constructor for the ItemTypeEntity class.
-     * Instantiates a new instance of the ItemTypeEntity entity without setting any properties.
+     * Default constructor for the ItemType class.
+     * Instantiates a new instance of the ItemType entity without setting any properties.
      * This constructor is typically used by frameworks or libraries (such as JPA)
      * that require a no-argument constructor to create instances of the entity.
      */
-    public ItemTypeEntity() {}
+    public ItemType() {}
 
     /**
-     * Constructs an instance of {@code ItemTypeEntity} with the specified ID and name.
+     * Constructs an instance of {@code ItemType} with the specified ID and name.
      *
      * @param id   the unique identifier for the item type, must not be null
      * @param name the name of the item type, must not be null
      */
-    public ItemTypeEntity(Long id, String name) {
+    public ItemType(Long id, String name) {
         this.Id   = id;
         this.Name = name;
     }

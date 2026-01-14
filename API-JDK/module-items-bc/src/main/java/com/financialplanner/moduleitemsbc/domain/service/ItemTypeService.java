@@ -1,7 +1,6 @@
 package com.financialplanner.moduleitemsbc.domain.service;
 
-import com.financialplanner.moduleitemsbc.domain.model.ItemType;
-import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.ItemTypeEntity;
+import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.ItemType;
 
 import java.util.List;
 
@@ -12,13 +11,13 @@ import java.util.List;
  * in the underlying data store.
  */
 public interface ItemTypeService {
-    ItemTypeEntity create(ItemTypeEntity entity);
+    ItemType create(ItemType entity);
 
-    ItemTypeEntity update(ItemTypeEntity entity);
+    ItemType update(ItemType entity);
 
-    List<ItemTypeEntity> list();
+    List<ItemType> list();
 
-    ItemTypeEntity get(Long id);
+    ItemType get(Long id);
 
     void delete(Long id);
 }

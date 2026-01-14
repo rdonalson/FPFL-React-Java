@@ -1,13 +1,12 @@
 package com.financialplanner.moduleitemsbc.domain.repository;
 
-import com.financialplanner.moduleitemsbc.domain.model.TimePeriod;
-import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.TimePeriodEntity;
+import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.TimePeriod;
 
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Interface representing the repository for managing {@link TimePeriodEntity} instances.
+ * Interface representing the repository for managing {@link TimePeriod} instances.
  * Provides CRUD operations for persisting and retrieving time period-related data
  * from the underlying data source.
  *
@@ -16,11 +15,11 @@ import java.util.Optional;
  * and persistence operations.
  */
 public interface TimePeriodRepository {
-    TimePeriod save(TimePeriodEntity entity);
+    com.financialplanner.moduleitemsbc.domain.model.TimePeriod save(TimePeriod entity);
 
-    Optional<TimePeriod> findById(Long id);
+    Optional<com.financialplanner.moduleitemsbc.domain.model.TimePeriod> findById(Long id);
 
-    List<TimePeriod> findAll();
+    List<com.financialplanner.moduleitemsbc.domain.model.TimePeriod> findAll();
 
     void deleteById(Long id);
 }

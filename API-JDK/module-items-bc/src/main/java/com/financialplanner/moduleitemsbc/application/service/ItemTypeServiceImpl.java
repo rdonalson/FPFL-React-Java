@@ -5,7 +5,7 @@ import com.financialplanner.moduleitemsbc.domain.exception.InvalidRequestExcepti
 import com.financialplanner.moduleitemsbc.domain.exception.ItemNotFoundException;
 import com.financialplanner.moduleitemsbc.domain.repository.ItemTypeRepository;
 import com.financialplanner.moduleitemsbc.domain.service.ItemTypeService;
-import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.ItemTypeEntity;
+import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.ItemType;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,7 +21,7 @@ public class ItemTypeServiceImpl implements ItemTypeService {
 
     /**
      * Repository instance responsible for performing data access operations
-     * related to the {@link ItemTypeEntity}.
+     * related to the {@link ItemType}.
      * The repository provides methods for saving, retrieving, updating, and deleting
      * ItemType records in the underlying data store. It acts as a bridge between
      * the application business logic and the persistence layer, enabling effective
@@ -42,13 +42,13 @@ public class ItemTypeServiceImpl implements ItemTypeService {
     }
 
     /**
-     * Creates and persists a new ItemType by saving the provided ItemTypeEntity.
+     * Creates and persists a new ItemType by saving the provided ItemType.
      *
-     * @param entity the ItemTypeEntity object to be saved; must not be null
+     * @param entity the ItemType object to be saved; must not be null
      * @return the saved ItemType object after successful persistence
      */
     @Override
-    public ItemTypeEntity create(ItemTypeEntity entity) {
+    public ItemType create(ItemType entity) {
         if (repo.findById(entity.getId())
                 .isPresent()) {
             throw new DuplicateItemException("ItemType " + entity.getId() + " already exists.");
@@ -62,14 +62,14 @@ public class ItemTypeServiceImpl implements ItemTypeService {
      * The method first checks if the entity exists in the repository. If the entity is not found,
      * a RuntimeException is thrown. Otherwise, the entity is updated.
      *
-     * @param entity the ItemTypeEntity to be updated. The entity must include a valid ID
+     * @param entity the ItemType to be updated. The entity must include a valid ID
      *               that corresponds to an existing record in the database.
      * @return the updated ItemType instance reflecting changes persisted in the database.
      * @throws RuntimeException if the entity with the provided ID does not exist in the repository.
      */
     @Override
-    public ItemTypeEntity update(ItemTypeEntity entity) {
-        ItemTypeEntity e = repo.findById(entity.getId())
+    public ItemType update(ItemType entity) {
+        ItemType e = repo.findById(entity.getId())
                          .orElseThrow(() -> new ItemNotFoundException("ItemType not found"));
         // Return the updated domain model
         return repo.save(entity);
@@ -81,7 +81,7 @@ public class ItemTypeServiceImpl implements ItemTypeService {
      * @return a list of ItemType objects representing all item types present in the data store
      */
     @Override
-    public List<ItemTypeEntity> list() {
+    public List<ItemType> list() {
         return repo.findAll();
     }
 
@@ -94,7 +94,7 @@ public class ItemTypeServiceImpl implements ItemTypeService {
      * @throws RuntimeException if no ItemType is found with the specified ID
      */
     @Override
-    public ItemTypeEntity get(Long id) {
+    public ItemType get(Long id) {
         if (id == 0) {
             throw new InvalidRequestException("ItemType ID cannot be zero");
         }
