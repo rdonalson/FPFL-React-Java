@@ -75,7 +75,7 @@ public class ItemTypeServiceImpl implements ItemTypeService {
     @Override
     public ItemType update(ItemType entity) {
         ItemType e = repo.findById(entity.getId())
-                         .orElseThrow(() -> new ItemNotFoundException("ItemType not found"));
+                         .orElseThrow(() -> new ItemNotFoundException("ItemType " + entity.getId() + " not found"));
         // Return the updated domain model
         return repo.save(entity);
     }
