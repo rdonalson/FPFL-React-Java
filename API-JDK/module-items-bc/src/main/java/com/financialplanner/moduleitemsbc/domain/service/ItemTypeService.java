@@ -5,10 +5,17 @@ import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.Item
 import java.util.List;
 
 /**
- * Service interface for managing operations related to ItemType entities.
- * Provides methods for creating, updating, retrieving, deleting, and listing item types.
- * This interface serves as a contract for the service layer to interact with ItemType entities
- * in the underlying data store.
+ * Service interface for managing {@code ItemType} entities.
+ * This interface provides methods for performing CRUD (Create, Read, Update, Delete) operations
+ * and listing all {@code ItemType} entities. It defines the contract for interacting
+ * with the underlying data repository that stores {@code ItemType} objects.
+ *
+ * The typical responsibilities of this service include:
+ * - Persisting new {@code ItemType} entities.
+ * - Updating existing {@code ItemType} entities.
+ * - Retrieving specific {@code ItemType} entities by their unique identifier.
+ * - Listing all existing {@code ItemType} entities.
+ * - Deleting specific {@code ItemType} entities by their unique identifier.
  */
 public interface ItemTypeService {
     ItemType create(ItemType entity);

@@ -1,18 +1,18 @@
 package com.financialplanner.moduleitemsbc.domain.exception;
 
 /**
- * Exception thrown when an expected item is not found in the system or repository.
+ * Exception thrown to indicate that a specific item could not be found.
  *
- * This exception indicates that an operation which assumed the existence of a specific
- * item failed because the item could not be located. It is a specialized type of
- * {@link DomainException} dedicated to representing item-not-found scenarios.
+ * This exception is a type of {@link DomainException}, intended to signal situations
+ * where an operation or request requires the presence of an item that does not exist
+ * or cannot be located.
  *
- * Common causes for this exception include:
- * - Attempting to retrieve a non-existent entity by its ID
- * - Operations that require an existing item but the item was removed or never added
+ * Typical scenarios for this exception include:
+ * - Attempting to retrieve a nonexistent entity from a repository or collection
+ * - Operations that depend on the existence of an item, which is missing
  *
- * This exception supports providing additional context through a custom message
- * and an optional nested cause for more detailed debugging information.
+ * This exception allows for the inclusion of a descriptive error message and, optionally,
+ * a nested cause to provide additional context for debugging and error tracking.
  */
 public class ItemNotFoundException extends DomainException {
     public ItemNotFoundException(String message) {

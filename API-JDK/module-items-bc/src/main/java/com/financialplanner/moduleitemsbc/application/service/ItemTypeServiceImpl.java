@@ -20,32 +20,37 @@ import java.util.List;
 public class ItemTypeServiceImpl implements ItemTypeService {
 
     /**
-     * Repository instance responsible for performing data access operations
-     * related to the {@link ItemType}.
-     * The repository provides methods for saving, retrieving, updating, and deleting
-     * ItemType records in the underlying data store. It acts as a bridge between
-     * the application business logic and the persistence layer, enabling effective
-     * interaction with the item type data.
+     * Repository instance used for performing data persistence operations
+     * related to {@code ItemType} entities.
+     *
+     * Acts as the primary access point for interacting with the underlying data
+     * layer, encapsulating CRUD operations such as saving, updating, retrieving,
+     * and deleting {@code ItemType} records.
+     *
+     * This instance is injected into the service to ensure separation of
+     * concerns between business logic and data access, promoting modularity
+     * and testability of the service implementation.
      */
     private final ItemTypeRepository repo;
 
     /**
-     * Constructs a new instance of the ItemTypeService class.
-     * This service is responsible for managing operations related to ItemType entities,
-     * such as creating, updating, retrieving, and deleting item types.
-     * It uses the provided ItemTypeRepository to interact with the underlying data store.
+     * Constructs a new instance of {@code ItemTypeServiceImpl} with the specified repository.
+     * This constructor initializes the service with an {@code ItemTypeRepository} that will be used
+     * to perform data operations such as create, read, update, and delete for {@code ItemType} entities.
      *
-     * @param repo the ItemTypeRepository instance used to perform database operations; must not be null
+     * @param repo the {@code ItemTypeRepository} to be used by this service implementation; must not be null
      */
     public ItemTypeServiceImpl(ItemTypeRepository repo) {
         this.repo = repo;
     }
 
     /**
-     * Creates and persists a new ItemType by saving the provided ItemType.
+     * Creates a new {@code ItemType} entity and persists it in the repository.
+     * If an {@code ItemType} with the same ID already exists, a {@code DuplicateItemException} is thrown.
      *
-     * @param entity the ItemType object to be saved; must not be null
-     * @return the saved ItemType object after successful persistence
+     * @param entity the {@code ItemType} entity to be created, must not be null
+     * @return the newly created and persisted {@code ItemType} entity
+     * @throws DuplicateItemException if an {@code ItemType} with the same ID already exists
      */
     @Override
     public ItemType create(ItemType entity) {
@@ -58,14 +63,14 @@ public class ItemTypeServiceImpl implements ItemTypeService {
     }
 
     /**
-     * Updates an existing ItemType in the database.
-     * The method first checks if the entity exists in the repository. If the entity is not found,
-     * a RuntimeException is thrown. Otherwise, the entity is updated.
+     * Updates an existing {@code ItemType} entity in the data store.
+     * The method validates that the entity exists by attempting to retrieve it
+     * using its unique identifier. If the entity does not exist, an {@code ItemNotFoundException}
+     * is thrown. If the entity exists, it is updated and persisted in the data store.
      *
-     * @param entity the ItemType to be updated. The entity must include a valid ID
-     *               that corresponds to an existing record in the database.
-     * @return the updated ItemType instance reflecting changes persisted in the database.
-     * @throws RuntimeException if the entity with the provided ID does not exist in the repository.
+     * @param entity the {@code ItemType} entity to be updated. Must be non-null and must contain a valid ID.
+     * @return the updated {@code ItemType} entity after being successfully persisted in the data store.
+     * @throws ItemNotFoundException if no {@code ItemType} matching the given ID is found in the data store.
      */
     @Override
     public ItemType update(ItemType entity) {
@@ -76,9 +81,10 @@ public class ItemTypeServiceImpl implements ItemTypeService {
     }
 
     /**
-     * Retrieves a list of all available item types from the repository.
+     * Retrieves all {@code ItemType} entities from the underlying data source.
+     * This method returns a complete list of item types available in the repository.
      *
-     * @return a list of ItemType objects representing all item types present in the data store
+     * @return a list of {@code ItemType} entities, or an empty list if no entities are found
      */
     @Override
     public List<ItemType> list() {
@@ -86,12 +92,14 @@ public class ItemTypeServiceImpl implements ItemTypeService {
     }
 
     /**
-     * Retrieves an ItemType based on the provided unique identifier (ID).
-     * If the ItemType with the given ID is not found, a RuntimeException is thrown.
+     * Retrieves an {@code ItemType} entity based on its unique identifier.
+     * If the provided ID is zero, an {@code InvalidRequestException} is thrown.
+     * If no {@code ItemType} is found for the given ID, an {@code ItemNotFoundException} is thrown.
      *
-     * @param id the unique identifier of the ItemType to retrieve; must not be null
-     * @return the ItemType associated with the given ID
-     * @throws RuntimeException if no ItemType is found with the specified ID
+     * @param id the unique identifier of the {@code ItemType} to be retrieved; must not be zero
+     * @return the {@code ItemType} entity associated with the provided ID
+     * @throws InvalidRequestException if the provided ID is zero
+     * @throws ItemNotFoundException if no {@code ItemType} entity is found for the given ID
      */
     @Override
     public ItemType get(Long id) {
@@ -103,11 +111,11 @@ public class ItemTypeServiceImpl implements ItemTypeService {
     }
 
     /**
-     * Deletes an ItemType entity with the specified unique identifier from the repository.
-     * This method leverages the underlying repository implementation to remove the entity
-     * from the data store based on its ID.
+     * Deletes an existing ItemType entity identified by the given ID.
+     * This operation removes the entity from the underlying data store.
      *
-     * @param id the unique identifier of the ItemType entity to be deleted; must not be null.
+     * @param id the unique identifier of the ItemType to be deleted; must not be null.
+     *           If the specified ID does not exist in the repository, no action is performed.
      */
     @Override
     public void delete(Long id) {

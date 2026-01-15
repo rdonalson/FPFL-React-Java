@@ -7,27 +7,33 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 
 /**
- * Represents the entity for item types in the persistence layer.
- * This class maps to the "item_types" table in the "fpfl" schema.
- * It is primarily used to define types or categories of items.
- * An item type is identified by its unique ID and associated name.
- * Key Characteristics:
- * - The "id" field serves as the primary key for this entity.
- * - The "name" field represents the name of the item type and is required.
- * This entity may be referenced by other entities, such as {@code Item},
- * to associate specific items with their respective types.
+ * Represents an item type entity that is persisted in the database.
+ * This class is annotated with JPA and validation annotations to define
+ * the database schema mapping and field constraints.
+ *
+ * The {@code ItemType} entity is part of the {@code fpfl} schema and maps to
+ * the "item_types" table. It contains fields for a unique identifier and
+ * a name to describe the item type.
+ *
+ * Annotations:
+ * - {@code @Entity}: Marks this class as a JPA entity.
+ * - {@code @Table(name = "item_types", schema = "fpfl")}: Specifies the table
+ *   name and schema under which this entity is maintained.
+ * - {@code @lombok.Data}: Automatically generates boilerplate code such as
+ *   getters, setters, equals, hashCode, and toString methods.
  */
 @lombok.Data
 @Entity
 @Table(name = "item_types", schema = "fpfl")
 public class ItemType {
     /**
-     * Represents the unique identifier for the {@code ItemType}.
-     * This field is the primary key in the "item_types" table within the "fpfl" schema.
-     * Characteristics:
-     * - It is annotated with {@code @Id}, indicating it is the primary key.
-     * - It is a non-nullable field, enforced by {@code @NotNull} and the {@code nullable = false} attribute.
-     * - Mapped to the "id" column in the database table through the {@code @Column} annotation.
+     * Represents the unique identifier for the item type entity.
+     * Acts as the primary key and ensures each item type is uniquely
+     * identifiable within the persistence layer.
+     *
+     * Constraints:
+     * - Must not be null.
+     * - Mapped to the "id" column in the "item_types" table.
      */
     @Id
     @NotNull
@@ -35,27 +41,27 @@ public class ItemType {
     private Long Id;
     /**
      * Represents the name of the item type.
-     * This field is mandatory and is bound to the "name" column in the "item_types" table.
-     * It holds the descriptive name of the item type and is used to categorize specific items.
-     * The value of this field must not be null and adheres to validation constraints.
+     * This field is mandatory and cannot be null.
+     * It is mapped to the "name" column in the "item_types" table within the "fpfl" schema.
+     * Used to define a descriptive label or title for the item type.
      */
     @NotNull
     @Column(name = "name", nullable = false)
     private String Name;
 
     /**
-     * Default constructor for the ItemType class.
-     * Instantiates a new instance of the ItemType entity without setting any properties.
-     * This constructor is typically used by frameworks or libraries (such as JPA)
-     * that require a no-argument constructor to create instances of the entity.
+     * Default no-argument constructor for the {@code ItemType} class.
+     * This constructor initializes a new instance of the {@code ItemType} entity
+     * without setting any of its properties. It is primarily used by frameworks
+     * such as JPA for entity instantiation.
      */
     public ItemType() {}
 
     /**
-     * Constructs an instance of {@code ItemType} with the specified ID and name.
+     * Constructs a new ItemType instance with the specified ID and name.
      *
-     * @param id   the unique identifier for the item type, must not be null
-     * @param name the name of the item type, must not be null
+     * @param id   the unique identifier for the item type. Must not be null.
+     * @param name the name of the item type. Must not be null.
      */
     public ItemType(Long id, String name) {
         this.Id   = id;

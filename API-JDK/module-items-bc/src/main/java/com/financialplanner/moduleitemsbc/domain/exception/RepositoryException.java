@@ -1,23 +1,25 @@
 package com.financialplanner.moduleitemsbc.domain.exception;
 
 /**
- * Represents an exception that occurs when there is a failure at the repository layer.
- * This exception is typically used to encapsulate database access issues or other
- * persistence-related errors.
+ * Exception thrown to indicate a failure in the persistence layer or during
+ * interactions with a repository.
  *
- * Inherits from {@link DomainException}, allowing it to serve as a specialized
- * exception type for the domain layer with additional context on persistence failures.
+ * This exception is a specialized subclass of {@link DomainException}, designed
+ * to encapsulate errors originating from the repository or database layer, such as
+ * database access issues, constraint violations, or other persistence failures.
  *
- * Common causes of this exception include:
- * - Database connection failures
- * - Unexpected errors in repository operations
- * - Violations of database constraints
+ * Typical scenarios for this exception include:
+ * - Failures in saving, updating, or deleting entities in the repository
+ * - Unexpected errors during repository queries or transactions
+ * - Issues caused by database errors or corruption
+ *
+ * This exception allows for customization by including a specific error message
+ * and an optional nested cause to provide context and aid in debugging.
  */
 public class RepositoryException extends DomainException {
     public RepositoryException(String message) {
         super(message);
     }
-
     public RepositoryException(String message, Throwable cause) {
         super(message, cause);
     }

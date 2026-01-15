@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Interface representing the repository for managing {@link TimePeriod} instances.
- * Provides CRUD operations for persisting and retrieving time period-related data
- * from the underlying data source.
+ * Interface representing the repository for managing {@code TimePeriod} entities.
+ * Provides CRUD (Create, Read, Update, Delete) operations for persisting and retrieving
+ * time period-related data from the underlying data source.
  *
- * This interface defines the contract for managing TimePeriod entities. It abstracts
- * persistence details and facilitates interaction between the application and the data store.
+ * This interface serves as a contract for interacting with {@code TimePeriod} entities
+ * and abstracts the persistence layer, enabling consistent data operations within the application.
  */
 public interface TimePeriodRepository {
     TimePeriod save(TimePeriod entity);
