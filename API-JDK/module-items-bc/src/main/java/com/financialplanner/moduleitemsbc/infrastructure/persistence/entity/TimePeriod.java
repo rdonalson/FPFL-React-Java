@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotNull;
 @lombok.Data
 @Entity
 @Table(name = "time_periods", schema = "fpfl")
-public class TimePeriodEntity {
+public class TimePeriod {
     @Id
     @NotNull
     @Column(name = "id", nullable = false)

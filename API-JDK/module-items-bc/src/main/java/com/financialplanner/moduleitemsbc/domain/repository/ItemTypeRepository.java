@@ -1,13 +1,12 @@
 package com.financialplanner.moduleitemsbc.domain.repository;
 
-import com.financialplanner.moduleitemsbc.domain.model.ItemType;
-import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.ItemTypeEntity;
+import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.ItemType;
 
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Interface representing the repository for managing {@link ItemTypeEntity} instances.
+ * Interface representing the repository for managing {@link ItemType} instances.
  * Provides CRUD operations for persisting and retrieving item type-related data
  * from the underlying data source.
  * <p>
@@ -17,25 +16,25 @@ import java.util.Optional;
  */
 public interface ItemTypeRepository {
     /**
-     * Saves the provided {@link ItemTypeEntity} instance and returns the corresponding
-     * domain model {@link ItemType} after successful persistence.
+     * Saves the provided {@link ItemType} instance and returns the corresponding
+     * domain model {@link com.financialplanner.moduleitemsbc.domain.model.ItemType} after successful persistence.
      * This method persists the entity in the underlying data store and transforms
      * it into a usable domain object.
      *
-     * @param entity the {@link ItemTypeEntity} object to be saved; must not be null
-     * @return the resulting {@link ItemType} object after the entity has been saved
+     * @param entity the {@link ItemType} object to be saved; must not be null
+     * @return the resulting {@link com.financialplanner.moduleitemsbc.domain.model.ItemType} object after the entity has been saved
      */
-    ItemTypeEntity save(ItemTypeEntity entity);
+    ItemType save(ItemType entity);
 
     /**
-     * Retrieves an optional {@link ItemType} instance by its unique identifier.
+     * Retrieves an optional {@link com.financialplanner.moduleitemsbc.domain.model.ItemType} instance by its unique identifier.
      * If an entity with the specified ID exists, it is returned wrapped in an {@link Optional}.
      * If no entity is found, an empty {@link Optional} is returned.
      *
-     * @param id the unique identifier of the {@link ItemType} to retrieve; must not be null
-     * @return an {@link Optional} containing the {@link ItemType} if found, or an empty {@link Optional} if not found
+     * @param id the unique identifier of the {@link com.financialplanner.moduleitemsbc.domain.model.ItemType} to retrieve; must not be null
+     * @return an {@link Optional} containing the {@link com.financialplanner.moduleitemsbc.domain.model.ItemType} if found, or an empty {@link Optional} if not found
      */
-    Optional<ItemTypeEntity> findById(Long id);
+    Optional<ItemType> findById(Long id);
 
     /**
      * Retrieves a list of all available ItemType instances from the underlying data store.
@@ -44,7 +43,7 @@ public interface ItemTypeRepository {
      *
      * @return a list of ItemType objects representing all item types present in the data source
      */
-    List<ItemTypeEntity> findAll();
+    List<ItemType> findAll();
 
     /**
      * Deletes the entity with the specified unique identifier from the underlying data store.

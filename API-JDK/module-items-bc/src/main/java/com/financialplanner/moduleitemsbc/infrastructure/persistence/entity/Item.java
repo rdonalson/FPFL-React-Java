@@ -10,18 +10,18 @@ import java.util.UUID;
  * Represents an item entity with various attributes and details related to
  * scheduling, monetary value, and associations with other entities.
  * <p>
- * The ItemEntity class is used to encapsulate data for an item, including
+ * The Item class is used to encapsulate data for an item, including
  * scheduling attributes for different frequencies (e.g., weekly, bi-monthly,
  * quarterly, annual), monetary amounts, date ranges, and associations with
- * related entities such as ItemTypeEntity and TimePeriodEntity. It also provides
+ * related entities such as ItemType and TimePeriod. It also provides
  * mechanisms to store identifiers for both the item itself and the associated user.
  */
 @lombok.Data
 @Entity
 @Table(name = "items", schema = "fpfl")
-public class ItemEntity {
+public class Item {
     /**
-     * Represents the unique identifier for the {@code ItemEntity}.
+     * Represents the unique identifier for the {@code Item}.
      * This field is automatically generated using the {@code GenerationType.IDENTITY} strategy.
      * It is a non-nullable column in the database represented by the name "id".
      */
@@ -54,31 +54,31 @@ public class ItemEntity {
     private Double Amount;
 
     /**
-     * Represents the relationship between the ItemEntity and the ItemTypeEntity.
-     * This field establishes a many-to-one association with the ItemTypeEntity,
+     * Represents the relationship between the Item and the ItemType.
+     * This field establishes a many-to-one association with the ItemType,
      * which represents the type or category of the item.
      * <p>
      * Constraints:
      * - This association is mandatory (cannot be null).
-     * - Fetch type is configured as lazy, meaning the related ItemTypeEntity will be
+     * - Fetch type is configured as lazy, meaning the related ItemType will be
      * loaded only when explicitly accessed.
      * - The foreign key column name in the database is 'fk_item_type', and it does not allow null values.
      * <p>
      * Mapping Details:
      * - Many-to-One relationship: An item can belong to one item type, but an item type can have multiple items.
      * - Foreign Key: The 'fk_item_type' column maps this relationship to the appropriate
-     * ItemTypeEntity record in the database schema.
+     * ItemType record in the database schema.
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "fk_item_type", nullable = false)
-    private ItemTypeEntity ItemType;
+    private ItemType ItemType;
 
     /**
-     * Represents the association to a specific time period for the {@link ItemEntity}.
-     * The reference is made to the {@link TimePeriodEntity} table.
+     * Represents the association to a specific time period for the {@link Item}.
+     * The reference is made to the {@link TimePeriod} table.
      * <p>
      * This field establishes a many-to-one relationship, indicating that multiple
-     * {@link ItemEntity} instances can reference the same {@link TimePeriodEntity}.
+     * {@link Item} instances can reference the same {@link TimePeriod}.
      * <p>
      * Constraints:
      * - The relationship is mandatory (non-null).
@@ -90,7 +90,7 @@ public class ItemEntity {
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "fk_time_period", nullable = false)
-    private TimePeriodEntity TimePeriod;
+    private TimePeriod TimePeriod;
 
     /**
      * Represents the starting date for an entity or schedule.
@@ -289,21 +289,21 @@ public class ItemEntity {
     private Boolean DateRangeReq = false;
 
     /**
-     * Default constructor for the ItemEntity class.
-     * Initializes an instance of ItemEntity with default values.
+     * Default constructor for the Item class.
+     * Initializes an instance of Item with default values.
      */
-    public ItemEntity() {
+    public Item() {
     }
 
     /**
-     * Constructs an instance of ItemEntity with the provided parameters.
+     * Constructs an instance of Item with the provided parameters.
      *
      * @param id               The unique identifier of the item.
      * @param userId           The unique identifier of the user associated with this item.
      * @param name             The name of the item.
      * @param amount           The monetary amount associated with the item.
-     * @param itemType         The type of the item (reference to ItemTypeEntity).
-     * @param timePeriod       The time period associated with the item (reference to TimePeriodEntity).
+     * @param itemType         The type of the item (reference to ItemType).
+     * @param timePeriod       The time period associated with the item (reference to TimePeriod).
      * @param beginDate        The beginning date for the item.
      * @param endDate          The ending date for the item.
      * @param weeklyDow        The day of the week for weekly occurrences.
@@ -327,13 +327,13 @@ public class ItemEntity {
      * @param annualDom        The day of the month for annual occurrences.
      * @param dateRangeReq     Indicates whether a date range is required for the item (true/false).
      */
-    public ItemEntity(Long id, UUID userId, String name, Double amount, ItemTypeEntity itemType,
-                      TimePeriodEntity timePeriod, LocalDate beginDate, LocalDate endDate, Integer weeklyDow,
-                      Integer everOtherWeekDow, Integer biMonthlyDay1, Integer biMonthlyDay2, Integer monthlyDom,
-                      Integer quarterly1Month, Integer quarterly1Day, Integer quarterly2Month, Integer quarterly2Day,
-                      Integer quarterly3Month, Integer quarterly3Day, Integer quarterly4Month, Integer quarterly4Day,
-                      Integer semiAnnual1Month, Integer semiAnnual1Day, Integer semiAnnual2Month,
-                      Integer semiAnnual2Day, Integer annualMoy, Integer annualDom, Boolean dateRangeReq) {
+    public Item(Long id, UUID userId, String name, Double amount, ItemType itemType,
+                TimePeriod timePeriod, LocalDate beginDate, LocalDate endDate, Integer weeklyDow,
+                Integer everOtherWeekDow, Integer biMonthlyDay1, Integer biMonthlyDay2, Integer monthlyDom,
+                Integer quarterly1Month, Integer quarterly1Day, Integer quarterly2Month, Integer quarterly2Day,
+                Integer quarterly3Month, Integer quarterly3Day, Integer quarterly4Month, Integer quarterly4Day,
+                Integer semiAnnual1Month, Integer semiAnnual1Day, Integer semiAnnual2Month,
+                Integer semiAnnual2Day, Integer annualMoy, Integer annualDom, Boolean dateRangeReq) {
         this.id          = id;
         UserId           = userId;
         Name             = name;

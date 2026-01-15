@@ -6,7 +6,7 @@ import com.financialplanner.moduleapi.mapper.ItemTypeDtoMapper;
 import com.financialplanner.moduleapi.response.ApiResponse;
 import com.financialplanner.moduleapi.response.ApiResponseFactory;
 import com.financialplanner.moduleitemsbc.domain.service.ItemTypeService;
-import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.ItemTypeEntity;
+import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.ItemType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,7 +33,7 @@ public class ItemTypeController {
     /**
      * A mapper used to translate between {@code ItemTypeDto} objects, which are
      * used for data transfer between application layers, and corresponding domain
-     * entities (e.g., {@code ItemTypeEntity}).
+     * entities (e.g., {@code ItemType}).
      * <p>
      * This field is typically utilized in the controller layer to delegate
      * mapping responsibilities to a separate component, thus ensuring clean
@@ -102,7 +102,7 @@ public class ItemTypeController {
     @PostMapping
     public ResponseEntity<ApiResponse<ItemTypeResponse>> create(@RequestBody ItemTypeRequest request) {
         // Convert request → entity & sanitize input
-        ItemTypeEntity entity = mapper.toEntity(request);
+        ItemType entity = mapper.toEntity(request);
         // Persist entity and then convert & sanitize the response
         ItemTypeResponse response = mapper.toResponse(service.create(entity));
         // Build Location header for 201 Created
@@ -118,7 +118,7 @@ public class ItemTypeController {
 
     /**
      * Updates the details of an existing item type based on the provided ID and name.
-     * Creates a new {@code ItemTypeEntity} instance, sets the ID and name, and calls the service layer
+     * Creates a new {@code ItemType} instance, sets the ID and name, and calls the service layer
      * to perform the update operation. The updated {@code ItemType} is returned as the result.
      *
      * @param id   the unique identifier of the item type to be updated; must not be null
@@ -127,7 +127,7 @@ public class ItemTypeController {
      */
     //    @PutMapping("/{id}/{name}")
     //    public ItemTypeResponse update(@PathVariable("id") Long id, @PathVariable("name") String name) {
-    //        ItemTypeEntity entity = new ItemTypeEntity();
+    //        ItemType entity = new ItemType();
     //        entity.setId(id);
     //        entity.setName(name);
     //        return service.update(entity);
