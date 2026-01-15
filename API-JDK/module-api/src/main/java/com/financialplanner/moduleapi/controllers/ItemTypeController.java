@@ -2,6 +2,7 @@ package com.financialplanner.moduleapi.controllers;
 
 import com.financialplanner.moduleapi.dto.itemtype.ItemTypeRequest;
 import com.financialplanner.moduleapi.dto.itemtype.ItemTypeResponse;
+import com.financialplanner.moduleapi.dto.itemtype.UpdateItemTypeNameRequest;
 import com.financialplanner.moduleapi.mapper.ItemTypeDtoMapper;
 import com.financialplanner.moduleapi.response.ApiResponse;
 import com.financialplanner.moduleapi.response.ApiResponseFactory;
@@ -76,6 +77,7 @@ public class ItemTypeController {
      * Delegates the retrieval operation to the service layer.
      *
      * @param id the unique identifier of the ItemType to retrieve; must not be null
+     *
      * @return the ItemType associated with the given ID
      */
     @GetMapping("/{id}")
@@ -95,6 +97,7 @@ public class ItemTypeController {
      *
      * @param request the ItemTypeRequest object containing the necessary details
      *                for creating a new ItemType; must not be null.
+     *
      * @return a ResponseEntity containing an ApiResponse with the details of the
      * created ItemType and the associated HTTP status code 201 (Created).
      */
@@ -123,15 +126,21 @@ public class ItemTypeController {
      *
      * @param id   the unique identifier of the item type to be updated; must not be null
      * @param name the new name of the item type to be updated; must not be null
+     *
      * @return the updated {@code ItemType} instance reflecting the changes applied
      */
-    //    @PutMapping("/{id}/{name}")
-    //    public ItemTypeResponse update(@PathVariable("id") Long id, @PathVariable("name") String name) {
-    //        ItemType entity = new ItemType();
-    //        entity.setId(id);
-    //        entity.setName(name);
-    //        return service.update(entity);
-    //    }
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<ItemTypeResponse>> update(@PathVariable("id") Long id,
+                                                                @RequestBody UpdateItemTypeNameRequest request) {
+        // Convert request → entity & sanitize input
+        ItemType entity = mapper.toEntity(new ItemTypeRequest(id, request.name()));
+        // Persist entity and then convert & sanitize the response
+        ItemTypeResponse response = mapper.toResponse(service.update(entity));
+        // Build sanitized ApiResponse using ResponseFactory
+        ApiResponse<ItemTypeResponse> body = responseFactory.success(response, "ItemType updated successfully", null);
+        // Return 200 Updated + sanitized body
+        return ResponseEntity.ok(body);
+    }
 
     /**
      * Deletes an item type by its unique identifier.

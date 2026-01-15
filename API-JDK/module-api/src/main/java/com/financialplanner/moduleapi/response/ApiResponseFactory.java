@@ -21,7 +21,11 @@ public class ApiResponseFactory {
     }
 
     public <T> ApiResponse<T> success(T data, String message, String correlationId) {
-        return new ApiResponse<>(200, message, data, correlationId);
+        //return new ApiResponse<>(200, message, data, correlationId);
+        ApiResponse<T> response = new ApiResponse<>(200, message, data, correlationId);
+        // ⭐ Break final tainted flow
+        sanitizer.sanitize(response);
+        return response;
     }
 
     public ApiResponse<Void> success(String message, String correlationId) {
