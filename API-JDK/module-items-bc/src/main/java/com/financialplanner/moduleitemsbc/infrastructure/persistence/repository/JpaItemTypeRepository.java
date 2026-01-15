@@ -5,18 +5,21 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * Repository interface for managing {@code ItemType} persistence.
- * This interface extends {@code JpaRepository}, providing CRUD operations
- * and query method support for the {@code ItemType} type.
- * -------
- * It interacts with the "item_types" table in the "fpfl" schema.
- * The entity serves as a representation of item types used to categorize or define items.
- * --------
- * Key Responsibilities:
- * - Supports standard CRUD operations out of the box.
- * - Enables the extension of custom query methods for more sophisticated use cases.
- * ----------
- * The primary key type of the entity is {@code Long}.
+ * Repository interface for managing {@link ItemType} entities.
+ * Extends the {@link JpaRepository} interface to provide basic CRUD operations
+ * and query construction capabilities for the {@link ItemType} entity.
+ *
+ * This interface serves as a bridge between the persistence layer and the service layer
+ * by leveraging Spring Data JPA's repository abstraction, enabling interaction
+ * with the database without requiring the implementation of boilerplate code.
+ *
+ * Annotations:
+ * - {@code @Repository}: Indicates that this interface is a repository that should
+ *   be managed by the Spring framework as a bean for dependency injection.
+ *
+ * Features:
+ * - Inherits generic CRUD and pagination operations from {@link JpaRepository}.
+ * - Operates on {@link ItemType} entities with a primary key of type {@code Long}.
  */
 @Repository
 public interface JpaItemTypeRepository extends JpaRepository<ItemType, Long> {}

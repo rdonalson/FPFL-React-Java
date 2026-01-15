@@ -38,7 +38,7 @@ public class ItemTypeRepositoryImpl implements ItemTypeRepository {
 
     /**
      * Creates a new instance of ItemTypeRepositoryImpl, which serves as an implementation
-     * of the ItemTypeRepository interface for managing {@link com.financialplanner.moduleitemsbc.domain.model.ItemType} entities.
+     * of the ItemTypeRepository interface for managing {@link ItemType} entities.
      * This implementation relies on a JPA repository for data persistence and a mapper
      * for converting between domain objects and entity objects.
      *
@@ -50,12 +50,12 @@ public class ItemTypeRepositoryImpl implements ItemTypeRepository {
     }
 
     /**
-     * Saves the provided {@link ItemType} instance and maps it to a domain model {@link com.financialplanner.moduleitemsbc.domain.model.ItemType}.
+     * Saves the provided {@link ItemType} instance and maps it to a domain model {@link ItemType}.
      * This method persists the entity to the database and converts the saved entity
      * into its corresponding domain representation.
      *
      * @param itemType the {@link ItemType} object to be persisted; must not be null
-     * @return the resulting {@link com.financialplanner.moduleitemsbc.domain.model.ItemType} domain model after the entity has been saved
+     * @return the resulting {@link ItemType} domain model after the entity has been saved
      */
     @Override
     public ItemType save(ItemType itemType) {
@@ -69,13 +69,13 @@ public class ItemTypeRepositoryImpl implements ItemTypeRepository {
     }
 
     /**
-     * Retrieves an {@link Optional} containing a domain model {@link com.financialplanner.moduleitemsbc.domain.model.ItemType} based on the
+     * Retrieves an {@link Optional} containing a domain model {@link ItemType} based on the
      * provided unique identifier. If the entity with the given ID exists in the persistence store,
      * it is transformed into a domain model and returned. If no such entity is found, an empty
      * {@link Optional} is returned.
      *
-     * @param id the unique identifier of the {@link com.financialplanner.moduleitemsbc.domain.model.ItemType} to be retrieved; must not be null
-     * @return an {@link Optional} containing the {@link com.financialplanner.moduleitemsbc.domain.model.ItemType} if found, or an empty {@link Optional} if not found
+     * @param id the unique identifier of the {@link ItemType} to be retrieved; must not be null
+     * @return an {@link Optional} containing the {@link ItemType} if found, or an empty {@link Optional} if not found
      */
     @Override
     public Optional<ItemType> findById(Long id) {
@@ -87,12 +87,12 @@ public class ItemTypeRepositoryImpl implements ItemTypeRepository {
     }
 
     /**
-     * Retrieves all instances of {@link com.financialplanner.moduleitemsbc.domain.model.ItemType} from the underlying data source.
+     * Retrieves all instances of {@link ItemType} from the underlying data source.
      * This method converts each {@link ItemType} retrieved from the repository
-     * into its corresponding domain model {@link com.financialplanner.moduleitemsbc.domain.model.ItemType}, ensuring a separation
+     * into its corresponding domain model {@link ItemType}, ensuring a separation
      * between the persistence layer and the domain layer.
      *
-     * @return a list of {@link com.financialplanner.moduleitemsbc.domain.model.ItemType} objects representing all available item types
+     * @return a list of {@link ItemType} objects representing all available item types
      */
     @Override
     public List<ItemType> findAll() {
