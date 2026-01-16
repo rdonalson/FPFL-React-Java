@@ -1,5 +1,6 @@
 package com.financialplanner.moduleapi.dto.itemtype;
 
+import com.financialplanner.modulecommonbc.exception.IllegalArgumentException;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 

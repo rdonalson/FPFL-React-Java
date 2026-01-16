@@ -1,10 +1,10 @@
-package com.financialplanner.moduleitemsbc.domain.exception;
+package com.financialplanner.modulecommonbc.exception;
 
 /**
  * Exception thrown to indicate a failure in the persistence layer or during
  * interactions with a repository.
  *
- * This exception is a specialized subclass of {@link DomainException}, designed
+ * This exception is a specialized subclass of {@link com.financialplanner.modulecommonbc.exception.DomainException}, designed
  * to encapsulate errors originating from the repository or database layer, such as
  * database access issues, constraint violations, or other persistence failures.
  *
@@ -16,7 +16,7 @@ package com.financialplanner.moduleitemsbc.domain.exception;
  * This exception allows for customization by including a specific error message
  * and an optional nested cause to provide context and aid in debugging.
  */
-public class RepositoryException extends DomainException {
+public class RepositoryException extends com.financialplanner.modulecommonbc.exception.DomainException {
     public RepositoryException(String message) {
         super(message);
     }

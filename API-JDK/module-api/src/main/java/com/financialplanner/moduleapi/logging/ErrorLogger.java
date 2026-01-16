@@ -4,9 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Utility class responsible for logging errors and exceptions in a structured and traceable manner.
+ * Utility class responsible for logging errors and exception in a structured and traceable manner.
  * ---
- * The ErrorLogger class provides a centralized mechanism to log exceptions along with
+ * The ErrorLogger class provides a centralized mechanism to log exception along with
  * a unique correlation ID, enabling better tracking and debugging of issues across different
  * parts of the application. The correlation ID serves as a unique identifier that links
  * error log entries with corresponding client-facing error responses.
@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 public class ErrorLogger {
 
     /**
-     * Logger instance used for logging error messages and exceptions within the ErrorLogger class.
+     * Logger instance used for logging error messages and exception within the ErrorLogger class.
      * It provides a mechanism to log messages with different levels of severity and supports
      * structured logging for better traceability of logs.
      */

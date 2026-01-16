@@ -1,7 +1,7 @@
 package com.financialplanner.moduleitemsbc.infrastructure.persistence.adapter;
 
-import com.financialplanner.moduleitemsbc.domain.exception.DuplicateItemException;
-import com.financialplanner.moduleitemsbc.domain.exception.RepositoryException;
+import com.financialplanner.modulecommonbc.exception.DuplicateItemException;
+import com.financialplanner.modulecommonbc.exception.RepositoryException;
 import com.financialplanner.moduleitemsbc.domain.repository.ItemTypeRepository;
 import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.ItemType;
 import com.financialplanner.moduleitemsbc.infrastructure.persistence.repository.JpaItemTypeRepository;

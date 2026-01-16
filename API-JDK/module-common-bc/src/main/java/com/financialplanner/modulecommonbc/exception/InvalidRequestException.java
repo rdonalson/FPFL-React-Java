@@ -1,10 +1,10 @@
-package com.financialplanner.moduleitemsbc.domain.exception;
+package com.financialplanner.modulecommonbc.exception;
 
 /**
  * Exception thrown to indicate that an invalid request has been made, violating
  * certain business or domain-specific rules and constraints.
  *
- * This exception is a type of {@link DomainException}, designed to signal
+ * This exception is a type of {@link com.financialplanner.modulecommonbc.exception.DomainException}, designed to signal
  * issues arising from improper or malformed requests within the domain's context.
  * It serves as a mechanism to enforce domain invariants and constraints.
  *
@@ -16,7 +16,7 @@ package com.financialplanner.moduleitemsbc.domain.exception;
  * This exception allows for the inclusion of a descriptive error message and,
  * optionally, a nested cause for enhanced debugging and error tracing.
  */
-public class InvalidRequestException extends DomainException {
+public class InvalidRequestException extends com.financialplanner.modulecommonbc.exception.DomainException {
     public InvalidRequestException(String message) {
         super(message);
     }

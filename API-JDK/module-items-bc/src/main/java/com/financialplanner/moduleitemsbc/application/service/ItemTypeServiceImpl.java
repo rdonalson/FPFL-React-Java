@@ -1,8 +1,8 @@
 package com.financialplanner.moduleitemsbc.application.service;
 
-import com.financialplanner.moduleitemsbc.domain.exception.DuplicateItemException;
-import com.financialplanner.moduleitemsbc.domain.exception.InvalidRequestException;
-import com.financialplanner.moduleitemsbc.domain.exception.ItemNotFoundException;
+import com.financialplanner.modulecommonbc.exception.DuplicateItemException;
+import com.financialplanner.modulecommonbc.exception.InvalidRequestException;
+import com.financialplanner.modulecommonbc.exception.ItemNotFoundException;
 import com.financialplanner.moduleitemsbc.domain.repository.ItemTypeRepository;
 import com.financialplanner.moduleitemsbc.domain.service.ItemTypeService;
 import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.ItemType;

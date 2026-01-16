@@ -1,9 +1,9 @@
-package com.financialplanner.moduleitemsbc.domain.exception;
+package com.financialplanner.modulecommonbc.exception;
 
 /**
  * Exception thrown to indicate that an attempt to add a duplicate item has been made.
  *
- * This exception is a subclass of {@link DomainException}, used to enforce domain-specific
+ * This exception is a subclass of {@link com.financialplanner.modulecommonbc.exception.DomainException}, used to enforce domain-specific
  * constraints that prevent the existence of duplicate items in a collection, repository,
  * or any other domain-specific context.
  *
@@ -15,7 +15,7 @@ package com.financialplanner.moduleitemsbc.domain.exception;
  * to provide clarity about the duplicate condition, as well as an optional
  * nested cause for enhanced debugging and error tracing.
  */
-public class DuplicateItemException extends DomainException {
+public class DuplicateItemException extends com.financialplanner.modulecommonbc.exception.DomainException {
     public DuplicateItemException(String message) {
         super(message);
     }

@@ -109,7 +109,7 @@ public class ItemTypeController {
         // Persist entity and then convert & sanitize the response
         ItemTypeResponse response = mapper.toResponse(service.create(entity));
         // Build Location header for 201 Created
-        URI location = URI.create("/item-types/create/" + response.name());
+        URI location = URI.create("/item-types/create/" + response.id());
         // Build sanitized ApiResponse using ResponseFactory
         ApiResponse<ItemTypeResponse> body = responseFactory.created(response, "ItemType created successfully",
                                                                      location.toString());

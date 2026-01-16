@@ -1,19 +1,19 @@
-package com.financialplanner.moduleitemsbc.domain.exception;
+package com.financialplanner.modulecommonbc.exception;
 
 /**
  * Base exception for all domain-specific errors.
  *
- * This abstract class serves as a foundation for defining exceptions that represent
+ * This abstract class serves as a foundation for defining exception that represent
  * violations of business rules, domain invariants, or other constraints specific to
  * the domain logic. Subclasses of this exception are used to encapsulate various
  * domain-specific error scenarios.
  *
  * By inheriting from {@link RuntimeException}, this exception and its subclasses
- * allow for unchecked exceptions, which can propagate freely to signal issues that
+ * allow for unchecked exception, which can propagate freely to signal issues that
  * require attention or intervention at higher levels of the application stack.
  *
  * Typical uses of this class include:
- * - Defining custom exceptions for different types of domain-specific errors
+ * - Defining custom exception for different types of domain-specific errors
  * - Standardizing error handling within the domain layer
  * - Improving clarity and granularity of error types in domain-related operations
  *

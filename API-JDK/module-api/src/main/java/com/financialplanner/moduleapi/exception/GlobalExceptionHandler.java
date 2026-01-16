@@ -2,9 +2,10 @@ package com.financialplanner.moduleapi.exception;
 
 import com.financialplanner.moduleapi.logging.ErrorLogger;
 import com.financialplanner.moduleapi.response.ApiResponse;
-import com.financialplanner.moduleitemsbc.domain.exception.DuplicateItemException;
-import com.financialplanner.moduleitemsbc.domain.exception.InvalidRequestException;
-import com.financialplanner.moduleitemsbc.domain.exception.ItemNotFoundException;
+import com.financialplanner.modulecommonbc.exception.IllegalArgumentException;
+import com.financialplanner.modulecommonbc.exception.DuplicateItemException;
+import com.financialplanner.modulecommonbc.exception.InvalidRequestException;
+import com.financialplanner.modulecommonbc.exception.ItemNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -12,12 +13,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
  * A global exception handler class that provides centralized handling for
- * exceptions thrown across the application. This class uses
+ * exception thrown across the application. This class uses
  *
- * @RestControllerAdvice annotation to intercept and process exceptions by
+ * @RestControllerAdvice annotation to intercept and process exception by
  * mapping them to standardized responses.
  * ---
- * The methods in this class handle various types of exceptions and return
+ * The methods in this class handle various types of exception and return
  * a ResponseEntity containing an ApiResponse object. The ApiResponse includes
  * details like the HTTP status code, error message, and a correlation ID
  * for tracking errors in a distributed system.

@@ -2,6 +2,7 @@ package com.financialplanner.modulecommonbc.sanitizer;
 
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.stereotype.Component;
+import com.financialplanner.modulecommonbc.exception.IllegalArgumentException;
 
 import java.lang.reflect.*;
 import java.net.URI;
@@ -61,7 +62,7 @@ public class SanitizerImpl implements Sanitizer {
      * - Facilitates efficient and consistent logging without needing re-initialization.
      * - Cannot be modified, ensuring thread safety in multi-threaded environments.
      * ---
-     * Typical use cases include logging exceptions, warnings, and other significant
+     * Typical use cases include logging exception, warnings, and other significant
      * events that occur during the invocation of methods in this class.
      */
     private static final Logger LOG = Logger.getLogger(SanitizerImpl.class.getName());
@@ -72,6 +73,7 @@ public class SanitizerImpl implements Sanitizer {
      * ---
      *
      * @param type the class whose fields are to be retrieved; must not be {@code null}.
+     *
      * @return a list of {@link Field} objects representing all fields declared
      * in the given class and its superclasses.
      */
@@ -113,6 +115,7 @@ public class SanitizerImpl implements Sanitizer {
      *                including primitives, strings, collections, maps, arrays, or custom objects.
      * @param visited A set of objects that have been visited during the sanitization
      *                process to prevent processing the same object multiple times.
+     *
      * @return The sanitized object. Depending on the type, the original object
      * might be returned as-is or replaced with a sanitized version.
      */
@@ -185,6 +188,7 @@ public class SanitizerImpl implements Sanitizer {
      * ---
      *
      * @param s the string to evaluate; can be null or empty
+     *
      * @return true if the string looks like a URI, false otherwise
      */
     private boolean looksLikeUri(String s) {
@@ -362,11 +366,14 @@ public class SanitizerImpl implements Sanitizer {
      * If any value is modified during sanitization, a new record instance is created and returned.
      * Otherwise, the original record is returned.
      * ---
+     *
      * @param record  the record instance to sanitize; must not be null
      * @param clazz   the class of the record being sanitized; must not be null and must represent a record type
      * @param visited a set of objects already visited during sanitization, used to prevent cyclic processing; must
      *                not be null
+     *
      * @return the sanitized record instance, or null if sanitization fails
+     *
      * @throws IllegalArgumentException if any value in the record is deemed invalid during sanitization
      */
     private Object sanitizeRecord(Object record, Class<?> clazz, Set<Object> visited) {
@@ -456,6 +463,7 @@ public class SanitizerImpl implements Sanitizer {
      * ---
      *
      * @param clazz the class to be checked; must not be null
+     *
      * @return true if the specified class is a primitive type or its corresponding
      * wrapper type, otherwise false
      */
@@ -471,7 +479,9 @@ public class SanitizerImpl implements Sanitizer {
      * ---
      *
      * @param input the input string to be sanitized; may be null
+     *
      * @return the sanitized string, or null if the input was null
+     *
      * @throws IllegalArgumentException if the input string contains invalid characters outside the allowed whitelist
      */
     private String escape(String input) {
@@ -519,7 +529,9 @@ public class SanitizerImpl implements Sanitizer {
      * ---
      *
      * @param input the input string to escape and validate as a URI. If null, the method returns null.
+     *
      * @return a normalized and escaped string representing a valid URI, or null if the input is null.
+     *
      * @throws IllegalArgumentException if the input string is not a valid URI.
      */
     private String escapeUri(String input) {

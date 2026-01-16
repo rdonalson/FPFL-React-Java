@@ -1,5 +1,4 @@
-package com.financialplanner.moduleitemsbc.domain.exception;
-
+package com.financialplanner.modulecommonbc.exception;
 
 /**
  * Exception thrown to indicate that an illegal or inappropriate argument has been passed.

@@ -1,9 +1,9 @@
-package com.financialplanner.moduleitemsbc.domain.exception;
+package com.financialplanner.modulecommonbc.exception;
 
 /**
  * Exception thrown to indicate that a specific item could not be found.
  *
- * This exception is a type of {@link DomainException}, intended to signal situations
+ * This exception is a type of {@link com.financialplanner.modulecommonbc.exception.DomainException}, intended to signal situations
  * where an operation or request requires the presence of an item that does not exist
  * or cannot be located.
  *
@@ -14,7 +14,7 @@ package com.financialplanner.moduleitemsbc.domain.exception;
  * This exception allows for the inclusion of a descriptive error message and, optionally,
  * a nested cause to provide additional context for debugging and error tracking.
  */
-public class ItemNotFoundException extends DomainException {
+public class ItemNotFoundException extends com.financialplanner.modulecommonbc.exception.DomainException {
     public ItemNotFoundException(String message) {
         super(message);
     }
