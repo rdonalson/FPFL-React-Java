@@ -15,55 +15,46 @@ import java.net.URI;
 import java.util.List;
 
 /**
- * REST controller for managing item types.
- * Handles HTTP requests for CRUD (Create, Read, Update, Delete) operations on item type entities.
- * Delegates business logic to the {@code ItemTypeService} and object mapping responsibilities
- * to the {@code ItemTypeDtoMapper} for cleaner separation of concerns and enhanced maintainability.
- * Mapped to the endpoint "/item-types".
+ * Controller for managing item types through RESTful APIs.
+ * This controller provides endpoints for creating, reading, updating, and deleting item types,
+ * as well as for retrieving a list of all item types.
+ *
+ * Responsibilities of this controller include:
+ * - Exposing an API for creating new item types via POST requests.
+ * - Allowing retrieval of a specific item type by its identifier via GET requests.
+ * - Enabling retrieval of a list of existing item types via GET requests.
+ * - Supporting updates to existing item types via PUT requests.
+ * - Facilitating deletion of item types by their unique identifier via DELETE requests.
+ *
+ * The controller internally uses:
+ * - {@code ItemTypeService} for service-layer logic and interactions with the persistence layer.
+ * - {@code ItemTypeDtoMapper} for mapping between DTOs and domain entities.
+ * - {@code ApiResponseFactory} for formatting and constructing API responses.
+ *
+ * Request mappings:
+ * - Base URL: {@code /item-types}
+ *
+ * Endpoint Details:
+ * - {@code GET /item-types}: Retrieves a list of all item types.
+ * - {@code GET /item-types/{id}}: Retrieves details of a specific item type based on its ID.
+ * - {@code POST /item-types}: Creates a new item type based on the provided request payload.
+ * - {@code PUT /item-types/{id}}: Updates the name of an existing item type.
+ * - {@code DELETE /item-types/{id}}: Deletes an item type based on its ID.
  */
 @RestController
 @RequestMapping("/item-types")
 public class ItemTypeController {
 
-    /**
-     * Service class responsible for managing operations related to ItemType entities.
-     * Used for performing create, read, update, and delete operations on item types
-     * through interactions with the underlying persistence layer.
-     */
     private final ItemTypeService service;
-    /**
-     * A mapper used to translate between {@code ItemTypeDto} objects, which are
-     * used for data transfer between application layers, and corresponding domain
-     * entities (e.g., {@code ItemType}).
-     * <p>
-     * This field is typically utilized in the controller layer to delegate
-     * mapping responsibilities to a separate component, thus ensuring clean
-     * and maintainable separation of concerns. It enables seamless conversion
-     * when handling requests and responses for item types.
-     */
     private final ItemTypeDtoMapper mapper;
     private final ApiResponseFactory responseFactory;
 
-    /**
-     * Constructs a new instance of the ItemTypeController class.
-     * This controller is responsible for handling HTTP requests related to item types,
-     * such as retrieving, creating, updating, and deleting item types.
-     * It uses the provided service and mapper for delegating business logic and object mapping, respectively.
-     *
-     * @param service the ItemTypeService instance used to manage business logic; must not be null
-     * @param mapper  the ItemTypeDtoMapper instance used to convert between DTOs and entities; must not be null
-     */
     public ItemTypeController(ItemTypeService service, ItemTypeDtoMapper mapper, ApiResponseFactory responseFactory) {
         this.service         = service;
         this.mapper          = mapper;
         this.responseFactory = responseFactory;
     }
 
-    /**
-     * Retrieves a list of all item types.
-     *
-     * @return a list of ItemType objects representing all item types currently available
-     */
     @GetMapping
     public List<ItemTypeResponse> list() {
         return service.list()
@@ -72,35 +63,12 @@ public class ItemTypeController {
                       .toList();
     }
 
-    /**
-     * Retrieves an ItemType based on the given unique identifier.
-     * Delegates the retrieval operation to the service layer.
-     *
-     * @param id the unique identifier of the ItemType to retrieve; must not be null
-     *
-     * @return the ItemType associated with the given ID
-     */
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ItemTypeResponse>> get(@PathVariable("id") Long id) {
         ItemTypeResponse item = mapper.toResponse(service.get(id));
         return ResponseEntity.ok(new ApiResponse<>(200, "ItemType retrieved successfully", item, null));
     }
 
-    /**
-     * Creates a new ItemType entity based on the provided request payload.
-     * Converts the request DTO to a domain entity, sanitizes the input data,
-     * persists the entity, and then maps and sanitizes the response. A Location
-     * header is included in the response to identify the created resource.
-     * QODANA-FP: XSS.201.Created.Response
-     * Reason: All user-controlled fields sanitized at inbound DTO, DB entity, and ApiResponse wrapper.
-     * Evidence: See /docs/security/false-positives/xss-201-created.md
-     *
-     * @param request the ItemTypeRequest object containing the necessary details
-     *                for creating a new ItemType; must not be null.
-     *
-     * @return a ResponseEntity containing an ApiResponse with the details of the
-     * created ItemType and the associated HTTP status code 201 (Created).
-     */
     @SuppressWarnings({"QodanaXss", "JvmTaintAnalysis", "XSS"})
     @PostMapping
     public ResponseEntity<ApiResponse<ItemTypeResponse>> create(@RequestBody ItemTypeRequest request) {
@@ -118,17 +86,6 @@ public class ItemTypeController {
                              .body(body);
     }
 
-
-    /**
-     * Updates the details of an existing item type based on the provided ID and name.
-     * Creates a new {@code ItemType} instance, sets the ID and name, and calls the service layer
-     * to perform the update operation. The updated {@code ItemType} is returned as the result.
-     *
-     * @param id   the unique identifier of the item type to be updated; must not be null
-     * @param name the new name of the item type to be updated; must not be null
-     *
-     * @return the updated {@code ItemType} instance reflecting the changes applied
-     */
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<ItemTypeResponse>> update(@PathVariable("id") Long id,
                                                                 @RequestBody UpdateItemTypeNameRequest request) {
@@ -142,13 +99,6 @@ public class ItemTypeController {
         return ResponseEntity.ok(body);
     }
 
-    /**
-     * Deletes an item type by its unique identifier.
-     * This method delegates the deletion operation to the associated service layer,
-     * which interacts with the persistence layer to remove the entity from the data store.
-     *
-     * @param id the unique identifier of the item type to be deleted; must not be null.
-     */
     @DeleteMapping("/{id}")
     public void delete(@PathVariable("id") Long id) {
         service.delete(id);

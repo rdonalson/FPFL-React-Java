@@ -1,24 +1,21 @@
 package com.financialplanner.modulecommonbc.exception;
 
 /**
- * Base exception for all domain-specific errors.
+ * Base class for exceptions that occur within the domain layer.
  *
- * This abstract class serves as a foundation for defining exception that represent
- * violations of business rules, domain invariants, or other constraints specific to
- * the domain logic. Subclasses of this exception are used to encapsulate various
- * domain-specific error scenarios.
+ * This abstract exception serves as the foundational type for all domain-specific
+ * exceptions, enabling a consistent approach to error handling and propagation
+ * within the domain logic. Subclasses of this exception represent specific types
+ * of errors or violations related to business rules, constraints, or logic
+ * specific to the domain model.
  *
- * By inheriting from {@link RuntimeException}, this exception and its subclasses
- * allow for unchecked exception, which can propagate freely to signal issues that
- * require attention or intervention at higher levels of the application stack.
+ * Common use cases for exceptions extending this class include:
+ * - Violations of domain invariants or rules
+ * - Errors in repository interactions or data integrity
+ * - Invalid or unsupported domain-specific operations
  *
- * Typical uses of this class include:
- * - Defining custom exception for different types of domain-specific errors
- * - Standardizing error handling within the domain layer
- * - Improving clarity and granularity of error types in domain-related operations
- *
- * The constructors allow for the inclusion of a detailed error message and,
- * optionally, a nested cause to provide context and facilitate debugging or error tracing.
+ * This class provides constructors to define a descriptive error message and,
+ * optionally, a nested cause, enabling effective debugging and error traceability.
  */
 public abstract class DomainException extends RuntimeException {
     public DomainException(String message) {

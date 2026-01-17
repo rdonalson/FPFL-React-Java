@@ -5,21 +5,26 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * Repository interface for managing {@link ItemType} entities.
- * Extends the {@link JpaRepository} interface to provide basic CRUD operations
- * and query construction capabilities for the {@link ItemType} entity.
+ * Repository interface for performing CRUD operations on {@code ItemType} entities
+ * in the persistence layer using JPA.
  *
- * This interface serves as a bridge between the persistence layer and the service layer
- * by leveraging Spring Data JPA's repository abstraction, enabling interaction
- * with the database without requiring the implementation of boilerplate code.
- *
- * Annotations:
- * - {@code @Repository}: Indicates that this interface is a repository that should
- *   be managed by the Spring framework as a bean for dependency injection.
+ * This interface extends {@code JpaRepository}, providing default implementations
+ * for common data access methods such as saving, finding, and deleting entities.
+ * It serves as the main mechanism for interacting with the "item_types" table
+ * in the "fpfl" schema.
  *
  * Features:
- * - Inherits generic CRUD and pagination operations from {@link JpaRepository}.
- * - Operates on {@link ItemType} entities with a primary key of type {@code Long}.
+ * - Supports primary key type {@code Long} for entity {@code ItemType}.
+ * - Leverages Spring Data JPA capabilities for query methods and repository abstraction.
+ *
+ * Usage:
+ * This repository is typically used within service or implementation classes
+ * that require access to {@code ItemType} entities. It is injected as a dependency
+ * to perform persistence operations while abstracting away JPA complexities.
+ *
+ * Thread Safety:
+ * - This interface is thread-safe when used through Spring's repository framework,
+ *   as instances are managed by the container and scoped appropriately.
  */
 @Repository
 public interface JpaItemTypeRepository extends JpaRepository<ItemType, Long> {}

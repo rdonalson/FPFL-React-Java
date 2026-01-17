@@ -4,26 +4,18 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * ModuleApiApplication is the entry point for the Spring Boot application.
- * It is responsible for bootstrapping and initializing the application
- * by scanning the specified base packages.
- * -----------
- * The base packages included for scanning are:
- * - com.financialplanner.moduleapi
- * - com.financialplanner.moduleitemsbc
- * -----------
- * This class enables the auto-detection of components, configurations,
- * and services within the defined base packages and initiates the application's
- * lifecycle.
+ * Main application class for the Module API.
+ *
+ * This class serves as the entry point for the Spring Boot application. It is
+ * responsible for launching the application and initializing the configured
+ * Spring context with the specified base package for component scanning.
+ *
+ * The application primarily handles module-based operations for financial
+ * planning purposes and is configured to scan components and beans within the
+ * "com.financialplanner" package.
  */
 @SpringBootApplication(scanBasePackages = "com.financialplanner")
 public class ModuleApiApplication {
-    /**
-     * The main method serves as the entry point of the application.
-     * It initializes and runs the Spring Boot application.
-     * -----------
-     * @param args an array of command-line arguments passed to the application
-     */
     static void main(String[] args) {
         SpringApplication.run(ModuleApiApplication.class, args);
     }
