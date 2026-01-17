@@ -1,19 +1,21 @@
 package com.financialplanner.modulecommonbc.exception;
 
 /**
- * Exception thrown to indicate that an attempt to add a duplicate item has been made.
+ * Exception thrown to indicate that a duplicate item exists within the domain context.
  *
- * This exception is a subclass of {@link com.financialplanner.modulecommonbc.exception.DomainException}, used to enforce domain-specific
- * constraints that prevent the existence of duplicate items in a collection, repository,
- * or any other domain-specific context.
+ * This exception is a subclass of {@link DomainException}, used to represent scenarios
+ * where an operation fails due to the presence of an item that violates uniqueness constraints
+ * or business rules. It is commonly employed in cases where creating or adding a duplicate
+ * item would result in inconsistent domain state.
  *
  * Typical scenarios for this exception include:
- * - Attempting to add an entity that already exists in the system or repository
- * - Violations of domain uniqueness rules or constraints
+ * - Attempting to insert an item into a repository that already exists
+ * - Violations of constraints that require unique identifiers or attributes
+ * - Conflicts during operations that expect items to be distinct
  *
- * This exception allows for the inclusion of a descriptive error message
- * to provide clarity about the duplicate condition, as well as an optional
- * nested cause for enhanced debugging and error tracing.
+ * This exception provides constructors to include a descriptive error message, with an
+ * optional nested cause, allowing domain experts and developers to gain insight into
+ * the nature and context of the duplication issue for debugging and error resolution.
  */
 public class DuplicateItemException extends com.financialplanner.modulecommonbc.exception.DomainException {
     public DuplicateItemException(String message) {

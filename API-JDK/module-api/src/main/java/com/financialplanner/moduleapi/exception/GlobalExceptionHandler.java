@@ -2,8 +2,8 @@ package com.financialplanner.moduleapi.exception;
 
 import com.financialplanner.moduleapi.logging.ErrorLogger;
 import com.financialplanner.moduleapi.response.ApiResponse;
-import com.financialplanner.modulecommonbc.exception.IllegalArgumentException;
 import com.financialplanner.modulecommonbc.exception.DuplicateItemException;
+import com.financialplanner.modulecommonbc.exception.IllegalArgumentException;
 import com.financialplanner.modulecommonbc.exception.InvalidRequestException;
 import com.financialplanner.modulecommonbc.exception.ItemNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -12,21 +12,32 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
- * A global exception handler class that provides centralized handling for
- * exception thrown across the application. This class uses
+ * A centralized exception handler for managing and standardizing API error responses
+ * across the application. Exceptions handled by this class will automatically
+ * return structured and meaningful HTTP responses to the client, adhering to defined
+ * status codes and including additional context when necessary.
  *
- * @RestControllerAdvice annotation to intercept and process exception by
- * mapping them to standardized responses.
- * ---
- * The methods in this class handle various types of exception and return
- * a ResponseEntity containing an ApiResponse object. The ApiResponse includes
- * details like the HTTP status code, error message, and a correlation ID
- * for tracking errors in a distributed system.
+ * This class uses Spring's {@code @RestControllerAdvice} and {@code @ExceptionHandler}
+ * annotations to define global exception handling mechanisms.
+ *
+ * Handled Exceptions:
+ * - {@link java.lang.IllegalArgumentException}: Returns a 400 Bad Request status code.
+ * - {@link InvalidRequestException}: Returns a 400 Bad Request status code.
+ * - {@link ItemNotFoundException}: Returns a 404 Not Found status code.
+ * - {@link DuplicateItemException}: Returns a 409 Conflict status code.
+ * - {@link Exception}: Catches all other uncaught exceptions and returns a 500 Internal Server Error.
+ *
+ * Key Features:
+ * - Logs exceptions using the {@code ErrorLogger.logException} method to capture details
+ *   and generate a unique correlation ID for traceability.
+ * - Standardizes API responses by returning an {@code ApiResponse<Void>} object, which includes
+ *   essential response details such as status, message, and correlation ID.
+ * - Ensures a consistent client experience by using meaningful HTTP status codes and descriptive messages.
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(IllegalArgumentException.class)
+    @ExceptionHandler(com.financialplanner.modulecommonbc.exception.IllegalArgumentException.class)
     public ResponseEntity<ApiResponse<Void>> handleIllegalArgument(IllegalArgumentException ex) {
         String correlationId = ErrorLogger.logException(ex);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)

@@ -7,18 +7,15 @@ import java.util.Optional;
 
 /**
  * Interface representing the repository for managing {@code TimePeriod} entities.
- * Provides CRUD (Create, Read, Update, Delete) operations for persisting and retrieving
- * time period-related data from the underlying data source.
+ * Provides CRUD (Create, Read, Update, Delete) operations for interacting with
+ * {@code TimePeriod} data within the underlying data source.
  *
- * This interface serves as a contract for interacting with {@code TimePeriod} entities
- * and abstracts the persistence layer, enabling consistent data operations within the application.
+ * This repository abstracts the data persistence layer, enabling domain-driven access
+ * to {@code TimePeriod} entities while encapsulating the necessary data operations.
  */
 public interface TimePeriodRepository {
     TimePeriod save(TimePeriod entity);
-
     Optional<TimePeriod> findById(Long id);
-
     List<TimePeriod> findAll();
-
     void deleteById(Long id);
 }

@@ -1,20 +1,21 @@
 package com.financialplanner.modulecommonbc.exception;
 
 /**
- * Exception thrown to indicate that an invalid request has been made, violating
- * certain business or domain-specific rules and constraints.
+ * Exception thrown to indicate that a request within the domain context is invalid.
  *
- * This exception is a type of {@link com.financialplanner.modulecommonbc.exception.DomainException}, designed to signal
- * issues arising from improper or malformed requests within the domain's context.
- * It serves as a mechanism to enforce domain invariants and constraints.
+ * This exception is a subclass of {@link DomainException}, and it is used to represent
+ * scenarios where a request or input violates domain-specific constraints, rules,
+ * or expectations. It serves as a means to standardize the handling of errors caused
+ * by invalid or malformed requests in the domain layer.
  *
- * Common scenarios for this exception include:
- * - Requests that fail validation or violate business requirements
- * - Operations that are disallowed under the current state or rules
- * - Requests containing invalid or inconsistent data
+ * Typical scenarios for this exception include:
+ * - Requests with missing or incorrect required parameters
+ * - Violations of domain rules or policies by the request
+ * - Operations that fail due to logical inconsistencies in the request data
  *
- * This exception allows for the inclusion of a descriptive error message and,
- * optionally, a nested cause for enhanced debugging and error tracing.
+ * This exception provides constructors to include a descriptive error message,
+ * with an optional nested cause, enabling developers and domain experts to trace
+ * and analyze the source of the issue for debugging and resolution purposes.
  */
 public class InvalidRequestException extends com.financialplanner.modulecommonbc.exception.DomainException {
     public InvalidRequestException(String message) {
