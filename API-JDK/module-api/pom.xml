@@ -15,6 +15,15 @@
     <packaging>jar</packaging>
     <description>FPFL-V2-Microservice API Module</description>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
 
         <!-- BC modules -->
