@@ -14,7 +14,6 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
         </processorPath>
         <module name="module-items-bc" />
         <module name="module-api" />
@@ -25,8 +24,10 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="module-display-bc" options="" />
-      <module name="module-items-bc" options="" />
+      <module name="module-api" options="-parameters" />
+      <module name="module-common-bc" options="-parameters" />
+      <module name="module-display-bc" options="-parameters" />
+      <module name="module-items-bc" options="-parameters" />
     </option>
   </component>
 </project>
