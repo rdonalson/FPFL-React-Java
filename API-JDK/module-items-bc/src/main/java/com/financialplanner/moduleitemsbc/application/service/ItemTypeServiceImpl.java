@@ -65,8 +65,8 @@ public class ItemTypeServiceImpl implements ItemTypeService {
 
     @Override
     public ItemType get(Long id) {
-        if (id == 0) {
-            throw new InvalidRequestException("ItemType ID cannot be zero");
+        if (id == null || id <= 0) {
+            throw new InvalidRequestException("ItemType id must be a positive number");
         }
         return repo.findById(id)
                    .orElseThrow(() -> new ItemNotFoundException("ItemType " + id + " not found"));
@@ -74,6 +74,9 @@ public class ItemTypeServiceImpl implements ItemTypeService {
 
     @Override
     public void delete(Long id) {
+        if (id == null || id <= 0) {
+            throw new InvalidRequestException("ItemType id must be a positive number");
+        }
         repo.deleteById(id);
     }
 }

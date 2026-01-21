@@ -1,6 +1,7 @@
 package com.financialplanner.moduleitemsbc.infrastructure.persistence.adapter;
 
 import com.financialplanner.modulecommonbc.exception.DuplicateItemException;
+import com.financialplanner.modulecommonbc.exception.ItemNotFoundException;
 import com.financialplanner.modulecommonbc.exception.RepositoryException;
 import com.financialplanner.moduleitemsbc.domain.repository.ItemTypeRepository;
 import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.ItemType;
@@ -77,7 +78,16 @@ public class ItemTypeRepositoryImpl implements ItemTypeRepository {
 
     @Override
     public void deleteById(Long id) {
-        jpa.deleteById(id);
+        try {
+            if (!jpa.existsById(id)) {
+                throw new ItemNotFoundException("ItemType " + id + " not found");
+            }
+            jpa.deleteById(id);
+        } catch (DataIntegrityViolationException ex) {
+            throw new RepositoryException("Constraint violation while deleting item " + id, ex);
+        } catch (DataAccessException ex) {
+            throw new RepositoryException("Database failure while deleting item " + id, ex);
+        }
     }
 }
 

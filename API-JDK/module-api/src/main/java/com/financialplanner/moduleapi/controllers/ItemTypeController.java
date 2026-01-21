@@ -100,8 +100,12 @@ public class ItemTypeController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable("id") Long id) {
+    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable("id") Long id) {
+        // Build ApiResponse using ResponseFactory
         service.delete(id);
+        ApiResponse<Void> body = responseFactory.success("ItemType " + id + " deleted successfully", null);
+        // Return 200 Deleted
+        return ResponseEntity.ok(body);
     }
 }
 
