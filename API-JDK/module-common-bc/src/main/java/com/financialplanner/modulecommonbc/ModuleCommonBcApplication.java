@@ -1,20 +1,21 @@
 package com.financialplanner.modulecommonbc;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
 
 import java.lang.module.Configuration;
 
 /**
- * Entry point for the ModuleCommonBcApplication.
- * <p>
- * This class serves as the main entry point for the Spring Boot application.
- * It is annotated with {@link SpringBootApplication}, which acts as a convenience annotation
- * that combines {@link Configuration}, {@link EnableAutoConfiguration}, and {@link ComponentScan}.
- * <p>
- * The {@code main} method uses {@link SpringApplication#run(Class, String...)} to launch the application.
+ * The entry point for the ModuleCommonBcApplication Spring Boot application.
+ *
+ * This class is annotated with @SpringBootApplication, which is a convenience annotation
+ * that adds @Configuration, @EnableAutoConfiguration, and @ComponentScan. It serves as
+ * the primary configuration class and bootstraps the application by invoking the
+ * SpringApplication.run method.
+ *
+ * The main method is the starting point of the application and initializes the Spring
+ * context. This application may include various components, services, and configurations
+ * defined in its package or sub-packages.
  */
 @SpringBootApplication
 public class ModuleCommonBcApplication {
