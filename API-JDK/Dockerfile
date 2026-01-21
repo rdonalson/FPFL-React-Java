@@ -1,8 +1,3 @@
-#FROM ubuntu:latest
-#LABEL authors="rickd"
-#
-#ENTRYPOINT ["top", "-b"]
-
 # ============================
 # 1. Build Stage
 # ============================
@@ -23,7 +18,7 @@ RUN mvn -q -e -B dependency:go-offline
 # Copy full source
 COPY . .
 
-# Build the Boot JAR
+# Build the Boot JAR (fat jar)
 RUN mvn -q -e -B clean package -DskipTests
 
 
@@ -34,10 +29,11 @@ FROM eclipse-temurin:25-jre
 
 WORKDIR /app
 
+# Copy the fat JAR from the build stage
 COPY --from=build /app/module-api/target/module-api-1.0.0.jar app.jar
 
-# Expose your WebFlux port
-EXPOSE 8010
+# Expose the API port
+EXPOSE 9000
 
-# Run the service
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+# Run the Spring Boot application
+ENTRYPOINT ["java", "-jar", "app.jar"]
