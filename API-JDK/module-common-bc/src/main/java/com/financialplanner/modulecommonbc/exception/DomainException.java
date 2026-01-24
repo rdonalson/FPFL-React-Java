@@ -1,21 +1,18 @@
 package com.financialplanner.modulecommonbc.exception;
 
 /**
- * Base class for exceptions that occur within the domain layer.
- *
- * This abstract exception serves as the foundational type for all domain-specific
- * exceptions, enabling a consistent approach to error handling and propagation
- * within the domain logic. Subclasses of this exception represent specific types
- * of errors or violations related to business rules, constraints, or logic
- * specific to the domain model.
- *
- * Common use cases for exceptions extending this class include:
- * - Violations of domain invariants or rules
- * - Errors in repository interactions or data integrity
- * - Invalid or unsupported domain-specific operations
- *
- * This class provides constructors to define a descriptive error message and,
- * optionally, a nested cause, enabling effective debugging and error traceability.
+ * Base class for all exceptions that represent domain-specific errors.
+ * This abstract exception serves as the root for custom exceptions within the domain layer.
+ * It is designed to encapsulate errors and deviations encountered in the execution of
+ * business logic, rules, or constraints specific to the domain context. Domain exceptions
+ * are used to indicate conditions that prevent the application from adhering to its
+ * business rules or expected behavior.
+ * Subclasses of this exception typically represent more refined categories of domain errors,
+ * such as validation failures, repository issues, or domain rule violations. By using a
+ * common base class, domain-specific exceptions can be more easily identified, categorized,
+ * and handled at appropriate levels in the application.
+ * This exception supports detailed error messages and optional causes, simplifying the
+ * process of debugging and diagnosing domain-related issues.
  */
 public abstract class DomainException extends RuntimeException {
     public DomainException(String message) {
