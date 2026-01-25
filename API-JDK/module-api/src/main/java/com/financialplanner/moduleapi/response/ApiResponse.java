@@ -15,15 +15,25 @@ public class ApiResponse<T> {
     private int status;
     private String message;
     private T data;
-    private Instant timestamp;
-    private String correlationId; // optional, for debugging
+    private Instant timestamp = Instant.now();
+    private String correlationId;
 
     public ApiResponse(int status, String message, T data, String correlationId) {
         this.status        = status;
         this.message       = message;
         this.data          = data;
         this.correlationId = correlationId;
-        this.timestamp     = Instant.now();
+    }
+
+    public ApiResponse(int status, String message, T data) {
+        this.status        = status;
+        this.message       = message;
+        this.data          = data;
+        this.correlationId = "";
+    }
+
+    public ApiResponse(int status, String message) {
+        this(status, message, null, "");
     }
 
     public ApiResponse(int status, String message, String correlationId) {

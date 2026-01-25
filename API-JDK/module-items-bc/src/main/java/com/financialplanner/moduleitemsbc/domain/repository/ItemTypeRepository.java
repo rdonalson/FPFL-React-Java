@@ -7,15 +7,15 @@ import java.util.Optional;
 
 /**
  * Interface representing the repository for managing {@code ItemType} entities.
- * Provides CRUD (Create, Read, Update, Delete) operations for persisting and retrieving
- * {@code ItemType} data from the underlying data source.
- *
- * This interface acts as a contract for interacting with {@code ItemType} entities,
- * abstracting the data persistence layer and allowing for domain-driven data operations.
+ * Provides CRUD (Create, Read, Update, Delete) operations for interacting with
+ * {@code ItemType} data in the underlying data source.
+ * This repository serves as an abstraction over the data persistence layer, facilitating
+ * domain-driven access to {@code ItemType} entities. It encapsulates interactions
+ * with the persistence framework, ensuring clean separation of concerns.
  */
 public interface ItemTypeRepository {
-    ItemType save(ItemType entity);
-    Optional<ItemType> findById(Long id);
     List<ItemType> findAll();
+    Optional<ItemType> findById(Long id);
+    ItemType save(ItemType entity);
     void deleteById(Long id);
 }
