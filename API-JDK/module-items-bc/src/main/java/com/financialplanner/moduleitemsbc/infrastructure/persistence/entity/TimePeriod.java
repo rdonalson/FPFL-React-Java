@@ -7,20 +7,8 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 
 /**
- * Represents a TimePeriod entity that is mapped to the "time_periods" table
- * in the "fpfl" schema of the database.
- *
- * The TimePeriod class is used to store information about time periods,
- * including a unique identifier and name. This entity is annotated
- * with JPA and validation constraints to ensure data integrity.
- *
- * Annotations used:
- * - {@code @Entity}: Specifies that this class is an entity.
- * - {@code @Table}: Defines the corresponding table name and schema in the database.
- * - {@code @Id}: Identifies the primary key field.
- * - {@code @Column}: Maps the fields to columns in the database table.
- * - {@code @NotNull}: Ensures that the fields are not null.
- * - {@code @lombok.Data}: Generates getters, setters, equals, hashCode, and toString methods automatically.
+ * Represents a specific time period entity stored in the database.
+ * This entity is used for managing and persisting time period data.
  */
 @lombok.Data
 @Entity

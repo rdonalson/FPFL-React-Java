@@ -1,22 +1,19 @@
 package com.financialplanner.moduleitemsbc;
 
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * The ModuleItemsBcApplication class initializes and launches the Spring Boot application.
- * This class is the main entry point of the application.
+ * Entry point for the ModuleItemsBcApplication.
+ * This class is annotated with @SpringBootApplication, which serves as a
+ * convenience annotation that adds the following:
+ * - @Configuration: Marks the class as a source of bean definitions.
+ * - @EnableAutoConfiguration: Enables Spring Boot’s auto-configuration mechanism.
+ * - @ComponentScan: Scans the package of the annotated class for Spring components.
+ * The ModuleItemsBcApplication class is responsible for bootstrapping the
+ * application, initializing the Spring context, and managing the lifecycle of
+ * the application.
+ * To execute the application, the main method within this class is invoked,
+ * which launches the embedded server and sets up the application environment.
  */
 @SpringBootApplication
-public class ModuleItemsBcApplication {
-
-    /**
-     * The main method serves as the entry point for the Spring Boot application.
-     * It bootstraps the application by invoking the SpringApplication.run method.
-     *
-     * @param args an array of command-line arguments passed during the application startup
-     */
-    static void main(String[] args) {
-        SpringApplication.run(ModuleItemsBcApplication.class, args);
-    }
-}
+public class ModuleItemsBcApplication {}

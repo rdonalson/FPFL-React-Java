@@ -11,21 +11,16 @@ import java.util.UUID;
  * scheduling and relational attributes such as type, time period, and
  * occurrence schedules. This entity is mapped to the "items" table within
  * the "fpfl" schema in the database.
- *
  * Each instance of this class corresponds to a row in the "items" table.
  * The primary key is represented by the {@code id} field.
- *
  * The entity tracks various attributes, including the owner's unique identifier
  * (UUID), scheduling information (weekly, monthly, quarterly, semi-annual, annual),
  * date range settings, and relationships to associated item types and time periods.
- *
  * The following fields support specific business logic:
  * - {@code dateRangeReq}: Indicates whether a specific date range is required for the item.
- *
  * Relational mappings include:
  * - {@code ItemType}: A many-to-one relationship defining the item type.
  * - {@code TimePeriod}: A many-to-one relationship defining the time period associated with this item.
- *
  * This class supports both no-argument and full-argument constructors, allowing the
  * creation of fully populated item instances or empty instances for further manipulation.
  */
@@ -55,10 +50,8 @@ public class Item {
      * Represents the type of item associated with this entity.
      * This is a Many-to-One relationship, indicating that multiple entities
      * can be associated with a single item type.
-     *
      * The association is lazily loaded, meaning that the item type details
      * will not be fetched from the database until explicitly accessed.
-     *
      * The foreign key column in the database is named "fk_item_type", and
      * it is a mandatory field, with null values not allowed.
      */
@@ -70,11 +63,10 @@ public class Item {
      * Represents the associated time period for a specific entity.
      * This variable is mapped as a many-to-one relationship to the TimePeriod entity.
      * The relationship is lazy-loaded and mandatory, ensuring this field cannot be null.
-     *
      * - `@ManyToOne` indicates a many-to-one relationship between the owning entity and the TimePeriod entity.
      * - `fetch = FetchType.LAZY` specifies that the associated TimePeriod entity will be loaded lazily.
      * - `@JoinColumn(name = "fk_time_period", nullable = false)` defines the foreign key column name in the database
-     *   and mandates that the column cannot contain null values.
+     * and mandates that the column cannot contain null values.
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "fk_time_period", nullable = false)

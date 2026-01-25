@@ -5,12 +5,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * Repository interface for performing CRUD operations on {@code ItemType} entities.
- * Extends the {@code JpaRepository} interface provided by Spring Data JPA.
- * This repository serves as a mechanism to interact with the underlying data store
- * for {@code ItemType} entities through JPA-based methods.
- * This is annotated as a {@code @Repository} to indicate that it is a Spring bean
- * and participates in Spring's exception translation mechanism for persistence layers.
+ * Repository interface for managing {@code ItemType} entities.
+ * This interface extends {@code JpaRepository} to provide CRUD operations
+ * and additional query methods for interacting with the underlying database.
+ * The {@code ItemType} entity represents item types in the financial planner system
+ * and is associated with the "item_types" table in the "fpfl" schema.
+ * By extending {@code JpaRepository}, this interface gains access to several
+ * built-in methods such as save, findById, findAll, and deleteById.
+ * These methods enable efficient interaction with the persistent data.
  */
 @Repository
 public interface JpaItemTypeRepository extends JpaRepository<ItemType, Long> {}

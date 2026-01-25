@@ -7,26 +7,19 @@ import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.Item
 import org.springframework.stereotype.Component;
 
 /**
- * A mapper class responsible for converting between {@code ItemType} domain objects,
- * {@code ItemTypeRequest} objects, and {@code ItemTypeResponse} objects.
- *
- * This class is used to facilitate transformations in both directions:
- * - From domain objects to response DTOs for API communication.
- * - From request DTOs to domain objects for persistence or further processing.
- *
- * The class utilizes a {@code Sanitizer} to ensure objects are properly sanitized
- * before conversion to mitigate potential security risks or ensure data integrity.
- *
- * Primary responsibilities:
- * - Transform a {@code ItemType} domain entity into a {@code ItemTypeResponse} DTO.
- * - Transform a {@code ItemTypeRequest} DTO into a {@code ItemType} domain entity.
- *
+ * Maps between ItemType entity and its corresponding request and response DTOs.
+ * This class is responsible for converting ItemType entities to ItemTypeResponse DTOs
+ * and vice versa. It applies data sanitization before performing the conversion
+ * to ensure input and output data meet defined constraints.
+ * Responsibilities:
+ * - Convert an ItemType entity to a corresponding ItemTypeResponse DTO.
+ * - Convert an ItemTypeRequest DTO to a corresponding ItemType entity.
+ * - Sanitize input objects before processing using the Sanitizer component.
  * Dependencies:
- * - {@code Sanitizer}: Used to clean and validate objects before processing.
- *
+ * - Sanitizer: Used to sanitize data for both entities and DTOs to ensure integrity.
  * Thread Safety:
- * This class is marked with {@code @Component} and should be used in a Spring application
- * context, ensuring thread safety through the container's management of bean instances.
+ * - Instances of this class are thread-safe as long as the provided Sanitizer
+ * implementation is thread-safe.
  */
 @Component
 public class ItemTypeDtoMapper {

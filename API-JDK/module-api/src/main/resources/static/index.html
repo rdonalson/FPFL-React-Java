@@ -54,27 +54,58 @@
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
+
+        .pre-block {
+            background: #f5f5f5;
+            padding: 1rem;
+            border-radius: 6px;
+            overflow: auto;
+            white-space: pre-wrap;
+            text-align: justify;
+            width: fit-content;
+            margin: 0 auto;
+        }
     </style>
 </head>
-
-<body>
-
 <header>
     <!-- Example icon (replace with your own) -->
     <img alt="App Icon" src="images/Java-1.png">
     <h2>FPFL API V2</h2>
 </header>
-
-<div class="container">
-    <h1>Welcome</h1>
-    <p>This service exposes modular bounded contexts: Items & Display.</p>
-    <p>You can find the API documentation below.</p>
-    <a href="/swagger-ui.html">API Documentation</a>
-    <div class="card">
-        <h3>API Status</h3>
-        <p>Everything is running smoothly.</p>
+<body>
+    <div class="container">
+        <h1>Welcome</h1>
+        <p>This service exposes modular bounded contexts: Items & Display.</p>
+        <p>You can find the API documentation below.</p>
+        <a href="/swagger-ui.html">Swagger API Documentation</a>
+        <div class="card">
+            <h3>Application Health</h3>
+            <div id="status"></div>
+            <pre id="raw" class="pre-block"></pre>
+        </div>
     </div>
-</div>
+    <script>
+        async function loadHealth() {
+            try {
+                const res = await fetch('/actuator/health');
+                if (!res.ok) {
+                    document.getElementById('status').innerText = 'Failed to load health';
+                    return;
+                }
+                const data = await res.json();
 
+                const status = data.status || 'UNKNOWN';
+                const statusEl = document.getElementById('status');
+                statusEl.textContent = `Status: ${status}`;
+                statusEl.className = status === 'UP' ? 'status-up' : 'status-down';
+
+                document.getElementById('raw').textContent = JSON.stringify(data, null, 2);
+            } catch (e) {
+                document.getElementById('status').innerText = 'Error loading health';
+            }
+        }
+
+        loadHealth();
+    </script>
 </body>
 </html>

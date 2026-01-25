@@ -1,6 +1,7 @@
 package com.financialplanner.moduleitemsbc.domain.service;
 
 import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.ItemType;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
