@@ -1,5 +1,6 @@
 package com.financialplanner.moduleapi.exception;
 
+
 import com.financialplanner.moduleapi.logging.ErrorLogger;
 import com.financialplanner.moduleapi.response.ApiResponse;
 import com.financialplanner.modulecommonbc.exception.DomainValidationException;
@@ -37,7 +38,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(SanitizationException.class)
     public ResponseEntity<ApiResponse<Void>> handleSanitization(SanitizationException ex) {
         String correlationId = ErrorLogger.logException(ex);
-        return ResponseEntity.badRequest()
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                              .body(new ApiResponse<>(400, ex.getMessage(), correlationId));
     }
 
@@ -48,19 +49,6 @@ public class GlobalExceptionHandler {
                              .body(new ApiResponse<>(400, ex.getMessage(), correlationId));
     }
 
-//    @ExceptionHandler(IllegalArgumentException.class)
-//    public ResponseEntity<ApiResponse<Void>> handleIllegalArgument(IllegalArgumentException ex) {
-//        String correlationId = ErrorLogger.logException(ex);
-//        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-//                             .body(new ApiResponse<>(400, ex.getMessage(), correlationId));
-//    }
-
-//    @ExceptionHandler(InvalidRequestException.class)
-//    public ResponseEntity<ApiResponse<Void>> handleBadRequest(InvalidRequestException ex) {
-//        String correlationId = ErrorLogger.logException(ex);
-//        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-//                             .body(new ApiResponse<>(400, ex.getMessage(), correlationId));
-//    }
 
     @ExceptionHandler(ItemNotFoundException.class)
     public ResponseEntity<ApiResponse<Void>> handleItemNotFound(ItemNotFoundException ex) {

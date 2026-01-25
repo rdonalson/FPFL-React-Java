@@ -14,7 +14,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * planning purposes and is configured to scan components and beans within the
  * "com.financialplanner" package.
  */
-@SpringBootApplication(scanBasePackages = "com.financialplanner")
+@SpringBootApplication(scanBasePackages = {
+    "com.financialplanner.moduleapi",
+    "com.financialplanner.moduleitemsbc",
+    "com.financialplanner.moduledisplaybc",
+    "com.financialplanner.modulecommonbc"
+})
 public class ModuleApiApplication {
     static void main(String[] args) {
         SpringApplication.run(ModuleApiApplication.class, args);
