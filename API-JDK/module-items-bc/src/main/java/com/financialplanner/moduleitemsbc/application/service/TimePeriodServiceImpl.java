@@ -52,7 +52,7 @@ public class TimePeriodServiceImpl implements TimePeriodService {
     @Override
     public TimePeriod update(TimePeriod entity) {
         // Validate input
-        TimePeriod _ = repo.findById(entity.getId())
+        TimePeriod e = repo.findById(entity.getId())
                            .orElseThrow(() -> new ItemNotFoundException("TimePeriod " + entity.getId() + " not found"));
         // Update the domain model
         return repo.save(entity);
