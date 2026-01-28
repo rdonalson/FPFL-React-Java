@@ -5,6 +5,7 @@ import com.financialplanner.modulecommonbc.exception.ItemNotFoundException;
 import com.financialplanner.moduleitemsbc.domain.repository.ItemRepository;
 import com.financialplanner.moduleitemsbc.domain.service.ItemService;
 import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.Item;
+import com.financialplanner.moduleitemsbc.infrastructure.persistence.mapper.ItemEntityMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,10 +14,12 @@ import java.util.List;
 public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository repo;
+    private final ItemEntityMapper mapper;
 
     // Constructor
-    public ItemServiceImpl(ItemRepository repo) {
+    public ItemServiceImpl(ItemRepository repo, ItemEntityMapper mapper) {
         this.repo = repo;
+        this.mapper = mapper;
     }
 
     @Override
@@ -46,10 +49,14 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public Item update(Long id, Item entity) {
         // Validate input
+        if (id == null || id <= 0) {
+            throw new DomainValidationException("Item id must be a positive integer");
+        }
         Item e = repo.findById(id)
                          .orElseThrow(() -> new ItemNotFoundException("Item " + id + " not found"));
+        Item result = mapper.copyEntity(id, entity);
         // Update the domain model
-        return repo.save(entity);
+        return repo.save(result);
     }
 
     @Override

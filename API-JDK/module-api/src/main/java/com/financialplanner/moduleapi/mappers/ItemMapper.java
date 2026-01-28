@@ -12,6 +12,25 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+/**
+ * The {@code ItemMapper} class is responsible for mapping between {@code Item} domain objects
+ * and their corresponding request and response objects. This class facilitates the transformation
+ * of data for use in client-facing responses and persistence operations.
+ * Responsibilities:
+ * - Convert {@code Item} domain objects to {@code ItemResponse} objects.
+ * - Convert {@code ItemRequest} objects to {@code Item} entities.
+ * - Perform sanitization on objects to ensure clean and safe data.
+ * Dependencies:
+ * - {@code Sanitizer}: Used to sanitize input objects and strings.
+ * - {@code ItemTypeRepository}: Provides access to {@code ItemType} entities.
+ * - {@code TimePeriodRepository}: Provides access to {@code TimePeriod} entities.
+ * Thread Safety:
+ * - Instances of this class are thread-safe as long as the dependent components
+ * ({@code Sanitizer}, {@code ItemTypeRepository}, {@code TimePeriodRepository}) are thread-safe.
+ * Exceptions:
+ * - This class may throw exceptions related to repository operations, such as entity not found
+ * or database connectivity issues, during the conversion process.
+ */
 @Component
 public class ItemMapper {
 
@@ -47,7 +66,7 @@ public class ItemMapper {
         Optional<TimePeriod> timePeriod = timePeriodRepository.findById(request.fkPeriod()
                                                                                .longValue());
 
-        return new Item(request.userId(), request.name(), request.amount(), itemType, timePeriod.orElse(null),
+        return new Item(null, request.userId(), request.name(), request.amount(), itemType, timePeriod.orElse(null),
                         request.beginDate(), request.endDate(), request.weeklyDow(), request.everyOtherWeekDow(),
                         request.biMonthlyDay1(), request.biMonthlyDay2(), request.monthlyDom(),
                         request.quarterly1Month(), request.quarterly1Day(), request.quarterly2Month(),

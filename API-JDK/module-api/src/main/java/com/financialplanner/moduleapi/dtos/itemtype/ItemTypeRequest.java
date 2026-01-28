@@ -5,18 +5,17 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 /**
- * Represents a request object for creating or processing an item type.
- * This record encapsulates the necessary data to define an item type, including its unique
- * identifier and name. Validation rules enforce constraints on the fields to ensure the integrity
- * of the data before further processing.
- * Validation rules:
- * - {@code id} must not be null.
- * - {@code name} must not be blank.
- * - {@code name} must not exceed 75 characters.
- * If the validation constraints are violated, an {@code IllegalArgumentException} will be thrown
- * during object construction.
+ * Represents a request object for creating or updating an item type.
+ * This record encapsulates the necessary data to define an item type, which
+ * includes its unique identifier and name. Validation rules are enforced on
+ * the fields to ensure they adhere to the domain constraints.
+ * Constraints:
+ * - {@code id}: Must not be null and must be a positive integer.
+ * - {@code name}: Must not be blank and must not exceed 75 characters.
+ * If any validation constraints are violated, a {@code DomainValidationException}
+ * will be thrown during the construction of the object.
  *
- * @param id   The unique identifier for the item type.
+ * @param id   The unique identifier of the item type.
  * @param name The name of the item type.
  */
 public record ItemTypeRequest(Long id, @NotBlank @Size(max = 75) String name) {

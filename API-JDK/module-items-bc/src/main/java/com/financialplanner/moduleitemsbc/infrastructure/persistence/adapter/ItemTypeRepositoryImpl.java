@@ -14,25 +14,22 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Implementation of the {@code ItemTypeRepository} interface, providing
- * CRUD (Create, Read, Update, Delete) functionality for managing {@code ItemType}
- * entities in the repository layer. This class acts as a bridge between the domain layer
- * and the persistence layer by delegating data access operations to the underlying
- * {@code JpaItemTypeRepository}.
- * This implementation handles specific scenarios such as data integrity violations,
- * entity duplication, or missing entities by throwing appropriate domain exceptions to ensure
- * consistent error handling and domain integrity.
- * Responsibilities of this class include:
- * - Fetching all {@code ItemType} records from the data source.
- * - Retrieving a specific {@code ItemType} by its identifier.
- * - Saving new or updated {@code ItemType} entities.
- * - Deleting {@code ItemType} entities by their identifier with appropriate validation.
- * Exception handling:
- * - {@code RepositoryException} is thrown for general database communication or
- * persistence layer failures.
- * - {@code ItemNotFoundException} is thrown when trying to delete a non-existent entity.
- * - {@code DuplicateItemException} is thrown upon encountering integrity violations
- * due to duplicate entities.
+ * Implementation of the {@code ItemTypeRepository} interface that provides
+ * methods to perform CRUD operations on {@code ItemType} entities.
+ * This class uses a JPA repository ({@code JpaItemTypeRepository}) for
+ * data access and introduces exception handling to manage
+ * database access issues and integrity constraints in the domain context.
+ * Methods in this class perform the following operations:
+ * - Retrieve all {@code ItemType} entities from the database
+ * - Retrieve an {@code ItemType} by its unique identifier
+ * - Obtain a reference to an {@code ItemType} without initialization
+ * - Save a new or updated {@code ItemType} into the database
+ * - Delete an {@code ItemType} by its unique identifier
+ * Custom exceptions ({@code RepositoryException}, {@code DuplicateItemException},
+ * and {@code ItemNotFoundException}) are thrown to encapsulate database errors,
+ * constraint violations, and cases where specific items are not found.
+ * This class is annotated with {@code @Component} to enable Spring's
+ * component-scanning mechanism to detect and register it as a bean.
  */
 @Component
 public class ItemTypeRepositoryImpl implements ItemTypeRepository {
@@ -62,6 +59,13 @@ public class ItemTypeRepositoryImpl implements ItemTypeRepository {
         }
     }
 
+    /**
+     * Retrieves a reference to the {@code ItemType} entity identified by the given ID
+     * without fully initializing or loading it from the database.
+     * @param id the unique identifier of the {@code ItemType} to retrieve
+     * @return a reference to the {@code ItemType} if found
+     * @throws RepositoryException if a database access error occurs while fetching the entity
+     */
     public ItemType getReferenceById(Long id) {
         try {
             return jpa.getReferenceById(id);

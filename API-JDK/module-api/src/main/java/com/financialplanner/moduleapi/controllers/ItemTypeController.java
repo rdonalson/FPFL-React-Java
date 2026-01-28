@@ -15,27 +15,12 @@ import java.net.URI;
 import java.util.List;
 
 /**
- * Controller for managing item types through RESTful APIs.
- * This controller provides endpoints for creating, reading, updating, and deleting item types,
- * as well as for retrieving a list of all item types.
- * Responsibilities of this controller include:
- * - Exposing an API for creating new item types via POST requests.
- * - Allowing retrieval of a specific item type by its identifier via GET requests.
- * - Enabling retrieval of a list of existing item types via GET requests.
- * - Supporting updates to existing item types via PUT requests.
- * - Facilitating deletion of item types by their unique identifier via DELETE requests.
- * The controller internally uses:
- * - {@code ItemTypeService} for service-layer logic and interactions with the persistence layer.
- * - {@code ItemTypeMapper} for mapping between DTOs and domain entities.
- * - {@code ApiResponseFactory} for formatting and constructing API responses.
- * Request mappings:
- * - Base URL: {@code /item-types}
- * Endpoint Details:
- * - {@code GET /item-types}: Retrieves a list of all item types.
- * - {@code GET /item-types/{id}}: Retrieves details of a specific item type based on its ID.
- * - {@code POST /item-types}: Creates a new item type based on the provided request payload.
- * - {@code PUT /item-types/{id}}: Updates the name of an existing item type.
- * - {@code DELETE /item-types/{id}}: Deletes an item type based on its ID.
+ * The {@code ItemTypeController} class is a REST controller that manages CRUD operations
+ * for item types. This controller provides endpoints to list, retrieve, create, update,
+ * and delete item types, adhering to RESTful principles.
+ * The controller interacts with the service layer to process business logic and employs a
+ * mapper to convert between domain entities and Data Transfer Objects (DTOs). API responses
+ * are standardized using an {@code ApiResponseFactory}.
  */
 @RestController
 @RequestMapping("/item-types")
@@ -48,9 +33,9 @@ public class ItemTypeController {
     /**
      * Constructs an instance of {@code ItemTypeController}.
      *
-     * @param service         the service layer responsible for item type operations
-     * @param mapper          the mapper for converting between DTOs and domain entities
-     * @param responseFactory the factory for creating standardized API responses
+     * @param service         the service layer dependency for managing item type operations
+     * @param mapper          the mapper for converting between domain entities and DTOs
+     * @param responseFactory the factory for constructing standardized API responses
      */
     public ItemTypeController(ItemTypeService service, ItemTypeMapper mapper, ApiResponseFactory responseFactory) {
         this.service         = service;
@@ -60,9 +45,11 @@ public class ItemTypeController {
 
     /**
      * Retrieves a list of all item types.
+     * The method fetches all available item type entities, maps them to response objects,
+     * and returns a formatted API response with a success message.
      *
-     * @return ResponseEntity containing an ApiResponse with a list of ItemTypeResponse objects,
-     * a success message, and a 200 OK HTTP status.
+     * @return ResponseEntity containing an ApiResponse object with a list of ItemTypeResponse
+     * and a success message.
      */
     @GetMapping
     public ResponseEntity<ApiResponse<List<ItemTypeResponse>>> list() {
@@ -80,13 +67,15 @@ public class ItemTypeController {
     }
 
     /**
-     * Retrieves the details of a specific item type by its unique identifier.
+     * Retrieves a specific item type by its identifier.
+     * This method takes the unique identifier of the item type as input,
+     * retrieves the corresponding item type from the service layer,
+     * and returns it wrapped in a standardized response body.
      *
-     * @param id The unique identifier of the item type to be retrieved.
+     * @param id the unique identifier of the item type to be retrieved
      *
-     * @return A {@link ResponseEntity} containing an {@link ApiResponse} that encapsulates
-     * the retrieved {@link ItemTypeResponse} instance and a success message,
-     * or an appropriate error message if the item type is not found.
+     * @return a {@code ResponseEntity} containing an {@code ApiResponse} with the
+     * details of the requested item type, along with a success message
      */
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ItemTypeResponse>> get(@PathVariable("id") Long id) {
@@ -100,14 +89,16 @@ public class ItemTypeController {
     }
 
     /**
-     * Handles the creation of a new item type.
-     * Converts the provided request payload into a domain entity, persists the entity,
-     * and constructs an appropriate API response.
+     * Creates a new item type based on the provided request data.
+     * This method accepts an {@code ItemTypeRequest} payload, converts it into a domain entity,
+     * persists the entity, and returns a response containing the created item type's details.
+     * A Location header is included in the response indicating the URI of the newly created resource.
      *
-     * @param request the request payload containing the details of the item type to be created
+     * @param request the {@code ItemTypeRequest} containing details of the item type to be created
      *
-     * @return a {@code ResponseEntity} containing an {@code ApiResponse} with the created item type's details,
-     * a success message, and the resource's location
+     * @return a {@code ResponseEntity} containing the created {@code ItemTypeResponse} wrapped in an {@code
+     * ApiResponse},
+     * along with a Location header indicating the URI of the newly created item type
      */
     @SuppressWarnings({"QodanaXss", "JvmTaintAnalysis", "XSS"})
     @PostMapping
@@ -127,13 +118,12 @@ public class ItemTypeController {
     }
 
     /**
-     * Updates the name of an existing item type identified by the provided ID.
+     * Updates an existing item type with the specified ID using the provided update request.
      *
-     * @param id      The unique identifier of the item type to be updated.
-     * @param request The request payload containing the new name for the item type.
+     * @param id      the unique identifier of the item type to be updated
+     * @param request the update request containing the new name for the item type
      *
-     * @return A ResponseEntity containing an ApiResponse with the updated item type
-     * information and a success message.
+     * @return a {@link ResponseEntity} containing an {@link ApiResponse} with the updated item type details
      */
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<ItemTypeResponse>> update(@PathVariable("id") Long id,
@@ -149,11 +139,14 @@ public class ItemTypeController {
     }
 
     /**
-     * Deletes an item type with the specified identifier.
+     * Deletes an item type identified by the provided ID.
+     * This method performs the deletion of an item type from the system and returns
+     * an appropriate response indicating the success of the operation.
      *
-     * @param id the unique identifier of the item type to be deleted
+     * @param id The unique identifier of the item type to be deleted.
      *
-     * @return a ResponseEntity containing an ApiResponse with a message indicating successful deletion
+     * @return A {@code ResponseEntity} containing an {@code ApiResponse} object with
+     * a success message confirming the deletion and an HTTP 200 status code.
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable("id") Long id) {

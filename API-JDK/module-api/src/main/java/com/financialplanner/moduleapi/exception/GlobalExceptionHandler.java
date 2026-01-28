@@ -1,36 +1,38 @@
 package com.financialplanner.moduleapi.exception;
 
 
-import com.financialplanner.modulecommonbc.logging.ErrorLogger;
 import com.financialplanner.moduleapi.response.ApiResponse;
 import com.financialplanner.modulecommonbc.exception.DomainValidationException;
 import com.financialplanner.modulecommonbc.exception.DuplicateItemException;
 import com.financialplanner.modulecommonbc.exception.ItemNotFoundException;
 import com.financialplanner.modulecommonbc.exception.SanitizationException;
+import com.financialplanner.modulecommonbc.logging.ErrorLogger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
- * A centralized global exception handler for handling exceptions across the application.
- * This class uses Spring's {@code @RestControllerAdvice} and {@code @ExceptionHandler}
- * annotations to intercept and manage exceptions, providing consistent API responses
- * with appropriate HTTP status codes and error details.
- * This handler generates a unique correlation ID for each logged exception using the
- * {@link ErrorLogger} utility, enabling enhanced traceability of issues.
- * Key Features:
- * - Handles specific exceptions such as:
- * - {@link SanitizationException}: Indicates issues with input data sanitization.
- * - {@link DomainValidationException}: Identifies domain-specific validation errors.
- * - {@link ItemNotFoundException}: Represents scenarios where a required item is missing.
- * - {@link DuplicateItemException}: Indicates conflicts due to duplicate resources.
- * - Provides a generic handler for all other uncaught exceptions.
- * - Returns a standardized API response encapsulated in {@link ApiResponse}.
- * - Assigns appropriate HTTP status codes (e.g., 400, 404, 409, 500) based on the exception type.
- * Intended Usage:
- * - Use this class to ensure consistent error handling across all RESTful endpoints.
- * - Log all exceptions with a unique correlation ID to facilitate tracking and debugging.
+ * Global exception handler to manage and standardize exception responses across
+ * the application. This class leverages the Spring {@code @RestControllerAdvice}
+ * annotation to intercept and handle exceptions thrown by controller methods,
+ * mapping them to appropriate HTTP responses with structured payloads.
+ * The exception responses are encapsulated in {@link ApiResponse} objects, providing
+ * relevant details such as HTTP status, error message, optional correlation ID, and
+ * timestamp. Additionally, exceptions are logged with a unique correlation ID for
+ * traceability using {@link ErrorLogger}.
+ * Supported exception types and mapped HTTP status codes:
+ * - {@link SanitizationException}: Returns HTTP 400 (Bad Request).
+ * - {@link DomainValidationException}: Returns HTTP 400 (Bad Request).
+ * - {@link ItemNotFoundException}: Returns HTTP 404 (Not Found).
+ * - {@link DuplicateItemException}: Returns HTTP 409 (Conflict).
+ * - {@link Exception} (generic case): Returns HTTP 500 (Internal Server Error).
+ * Each handler logs the exception using {@code ErrorLogger.logException(Exception ex)},
+ * captures the generated correlation ID, and includes it in the response body for
+ * enhanced debugging and error tracking.
+ * Thread Safety:
+ * - This class is thread-safe as exception handling methods are stateless and rely
+ * on thread-safe components such as {@code ErrorLogger}.
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {

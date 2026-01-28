@@ -14,6 +14,12 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
 
+/**
+ * Controller class for managing time period resources in the system.
+ * Provides endpoints for CRUD operations on time periods, acting as an interface
+ * between the client and the service layer. Each endpoint returns standardized
+ * API responses to ensure a consistent interaction format.
+ */
 @RestController
 @RequestMapping("/time-periods")
 public class TimePeriodController {
@@ -23,11 +29,12 @@ public class TimePeriodController {
     private final ApiResponseFactory responseFactory;
 
     /**
-     * Constructs an instance of {@code TimePeriodController}.
+     * Constructs a {@code TimePeriodController} instance.
      *
-     * @param service         the service layer responsible for time period operations
-     * @param mapper          the mapper for converting between DTOs and domain entities
-     * @param responseFactory the factory for creating standardized API responses
+     * @param service         The {@code TimePeriodService} instance used for managing the business logic of time
+     *                        periods.
+     * @param mapper          The {@code TimePeriodMapper} instance used to map between entities and DTOs.
+     * @param responseFactory The {@code ApiResponseFactory} instance used to build standardized API responses.
      */
     public TimePeriodController(TimePeriodService service, TimePeriodMapper mapper,
                                 ApiResponseFactory responseFactory) {
@@ -37,10 +44,11 @@ public class TimePeriodController {
     }
 
     /**
-     * Retrieves a list of all time periods.
+     * Retrieves a list of all available time periods.
+     * Fetches time period entities from the service layer, maps them to their
+     * corresponding response objects, and returns them in a standardized API response.
      *
-     * @return ResponseEntity containing an ApiResponse with a list of TimePeriodResponse objects,
-     * a success message, and a 200 OK HTTP status.
+     * @return ResponseEntity containing an ApiResponse object with a list of TimePeriodResponse objects.
      */
     @GetMapping
     public ResponseEntity<ApiResponse<List<TimePeriodResponse>>> list() {
@@ -58,13 +66,12 @@ public class TimePeriodController {
     }
 
     /**
-     * Retrieves the details of a specific time period by its unique identifier.
+     * Handles HTTP GET requests to retrieve a specific time period by its unique identifier.
      *
-     * @param id The unique identifier of the time period to be retrieved.
+     * @param id the unique identifier of the time period to retrieve; must not be null
      *
-     * @return A {@link ResponseEntity} containing an {@link ApiResponse} that encapsulates
-     * the retrieved {@link TimePeriodResponse} instance and a success message,
-     * or an appropriate error message if the time period is not found.
+     * @return a {@code ResponseEntity} containing an {@code ApiResponse} with the detailed response
+     * object of the time period and a success message if found
      */
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<TimePeriodResponse>> get(@PathVariable("id") Long id) {
@@ -78,14 +85,16 @@ public class TimePeriodController {
     }
 
     /**
-     * Handles the creation of a new time period.
-     * Converts the provided request payload into a domain entity, persists the entity,
-     * and constructs an appropriate API response.
+     * Creates a new TimePeriod entity based on the specified request,
+     * persists it, and returns a sanitized response containing the
+     * created TimePeriod details along with a Location header for the created resource.
      *
-     * @param request the request payload containing the details of the time period to be created
+     * @param request a {@code TimePeriodRequest} object containing the details needed to create a new TimePeriod.
+     *                The request should include all the necessary fields for creating the entity.
      *
-     * @return a {@code ResponseEntity} containing an {@code ApiResponse} with the created time period's details,
-     * a success message, and the resource's location
+     * @return a {@code ResponseEntity} wrapping an {@code ApiResponse} that contains the created
+     * {@code TimePeriodResponse} object, a success message, and the Location where the new
+     * resource can be accessed.
      */
     @SuppressWarnings({"QodanaXss", "JvmTaintAnalysis", "XSS"})
     @PostMapping
@@ -105,13 +114,16 @@ public class TimePeriodController {
     }
 
     /**
-     * Updates the name of an existing time period identified by the provided ID.
+     * Updates an existing time period identified by its unique ID with the new details provided
+     * in the request body.
      *
-     * @param id      The unique identifier of the time period to be updated.
-     * @param request The request payload containing the new name for the time period.
+     * @param id      the unique identifier of the time period to be updated; it must not be {@code null}.
+     * @param request an instance of {@link UpdateTimePeriodNameRequest} containing the updated
+     *                name for the time period; it must not be {@code null}.
      *
-     * @return A ResponseEntity containing an ApiResponse with the updated time period
-     * information and a success message.
+     * @return a {@link ResponseEntity} containing an {@link ApiResponse} with the updated
+     * {@link TimePeriodResponse} and a success message; it returns HTTP 200 OK if the update
+     * is successful.
      */
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<TimePeriodResponse>> update(@PathVariable("id") Long id,
@@ -127,11 +139,12 @@ public class TimePeriodController {
     }
 
     /**
-     * Deletes an time period with the specified identifier.
+     * Deletes a TimePeriod entity by its unique identifier.
+     * Sends a standardized API response indicating the success of the operation.
      *
-     * @param id the unique identifier of the time period to be deleted
+     * @param id the unique identifier of the TimePeriod to be deleted
      *
-     * @return a ResponseEntity containing an ApiResponse with a message indicating successful deletion
+     * @return a ResponseEntity containing an {@code ApiResponse<Void>} which includes a success message
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable("id") Long id) {

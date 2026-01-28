@@ -10,8 +10,5 @@ import jakarta.validation.constraints.NotNull;
  * - {@code id}: The unique identifier of the item type.
  * - {@code name}: The name of the item type.
  */
-public record ItemTypeResponse(
-    @NotNull Long id,
-    @NotNull String name
-) {}
+public record ItemTypeResponse(@NotNull Long id, @NotNull String name) {}
 
