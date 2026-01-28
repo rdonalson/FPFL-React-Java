@@ -1,9 +1,9 @@
 package com.financialplanner.moduleapi.controllers;
 
-import com.financialplanner.moduleapi.dto.timeperiod.TimePeriodRequest;
-import com.financialplanner.moduleapi.dto.timeperiod.TimePeriodResponse;
-import com.financialplanner.moduleapi.dto.timeperiod.UpdateTimePeriodNameRequest;
-import com.financialplanner.moduleapi.mapper.TimePeriodDtoMapper;
+import com.financialplanner.moduleapi.dtos.timeperiod.TimePeriodRequest;
+import com.financialplanner.moduleapi.dtos.timeperiod.TimePeriodResponse;
+import com.financialplanner.moduleapi.dtos.timeperiod.UpdateTimePeriodNameRequest;
+import com.financialplanner.moduleapi.mappers.TimePeriodMapper;
 import com.financialplanner.moduleapi.response.ApiResponse;
 import com.financialplanner.moduleapi.response.ApiResponseFactory;
 import com.financialplanner.moduleitemsbc.domain.service.TimePeriodService;
@@ -19,7 +19,7 @@ import java.util.List;
 public class TimePeriodController {
 
     private final TimePeriodService service;
-    private final TimePeriodDtoMapper mapper;
+    private final TimePeriodMapper mapper;
     private final ApiResponseFactory responseFactory;
 
     /**
@@ -29,7 +29,7 @@ public class TimePeriodController {
      * @param mapper          the mapper for converting between DTOs and domain entities
      * @param responseFactory the factory for creating standardized API responses
      */
-    public TimePeriodController(TimePeriodService service, TimePeriodDtoMapper mapper,
+    public TimePeriodController(TimePeriodService service, TimePeriodMapper mapper,
                                 ApiResponseFactory responseFactory) {
         this.service         = service;
         this.mapper          = mapper;
@@ -95,7 +95,7 @@ public class TimePeriodController {
         // Persist entity and then convert & sanitize the response
         TimePeriodResponse response = mapper.toResponse(service.create(entity));
         // Build Location header for 201 Created
-        URI location = URI.create("/item-types/create/" + response.id());
+        URI location = URI.create("/time-periods/create/" + response.id());
         // Build sanitized ApiResponse using ResponseFactory
         ApiResponse<TimePeriodResponse> body = responseFactory.created(response, "TimePeriod created successfully",
                                                                        location.toString());

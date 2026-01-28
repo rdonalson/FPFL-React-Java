@@ -41,6 +41,14 @@ public class TimePeriodRepositoryImpl implements TimePeriodRepository {
         }
     }
 
+    public TimePeriod getReferenceById(Long id) {
+        try {
+            return jpa.getReferenceById(id);
+        } catch (DataAccessException ex) {
+            throw new RepositoryException("Database failure while fetching TimePeriod " + id, ex);
+        }
+    }
+
     @Override
     public TimePeriod save(TimePeriod timePeriod) {
         try {

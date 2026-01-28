@@ -1,4 +1,4 @@
-package com.financialplanner.moduleapi.dto.timeperiod;
+package com.financialplanner.moduleapi.dtos.timeperiod;
 
 import jakarta.validation.constraints.NotNull;
 

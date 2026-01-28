@@ -62,6 +62,14 @@ public class ItemTypeRepositoryImpl implements ItemTypeRepository {
         }
     }
 
+    public ItemType getReferenceById(Long id) {
+        try {
+            return jpa.getReferenceById(id);
+        } catch (DataAccessException ex) {
+            throw new RepositoryException("Database failure while fetching ItemType " + id, ex);
+        }
+    }
+
     @Override
     public ItemType save(ItemType entity) {
         try {

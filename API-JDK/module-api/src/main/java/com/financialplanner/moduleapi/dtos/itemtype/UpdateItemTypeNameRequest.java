@@ -1,4 +1,4 @@
-package com.financialplanner.moduleapi.dto.itemtype;
+package com.financialplanner.moduleapi.dtos.itemtype;
 
 import com.financialplanner.modulecommonbc.exception.DomainValidationException;
 import jakarta.validation.constraints.NotBlank;

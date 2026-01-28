@@ -1,17 +1,17 @@
-package com.financialplanner.moduleapi.mapper;
+package com.financialplanner.moduleapi.mappers;
 
-import com.financialplanner.moduleapi.dto.timeperiod.TimePeriodRequest;
-import com.financialplanner.moduleapi.dto.timeperiod.TimePeriodResponse;
+import com.financialplanner.moduleapi.dtos.timeperiod.TimePeriodRequest;
+import com.financialplanner.moduleapi.dtos.timeperiod.TimePeriodResponse;
 import com.financialplanner.modulecommonbc.sanitizer.Sanitizer;
 import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.TimePeriod;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TimePeriodDtoMapper {
+public class TimePeriodMapper {
 
     private final Sanitizer sanitizer;
 
-    public TimePeriodDtoMapper(Sanitizer sanitizer) {
+    public TimePeriodMapper(Sanitizer sanitizer) {
         this.sanitizer = sanitizer;
     }
 

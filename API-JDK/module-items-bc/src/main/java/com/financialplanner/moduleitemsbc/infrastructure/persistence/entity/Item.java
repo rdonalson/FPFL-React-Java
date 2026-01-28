@@ -1,5 +1,6 @@
 package com.financialplanner.moduleitemsbc.infrastructure.persistence.entity;
 
+import com.financialplanner.modulecommonbc.converters.BooleanToBitConverter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
@@ -31,16 +32,14 @@ public class Item {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @NotNull
-    @Column(name = "id", nullable = false)
-    private Long id;
+    @Column(name = "id")
+    private Long Id;
 
     @NotNull
     @Column(name = "user_id", nullable = false)
     private UUID UserId;
 
-    @NotNull
-    @Column(name = "name", nullable = false)
+    @Column(name = "name")
     private String Name;
 
     @Column(name = "amount")
@@ -68,8 +67,8 @@ public class Item {
      * - `@JoinColumn(name = "fk_time_period", nullable = false)` defines the foreign key column name in the database
      * and mandates that the column cannot contain null values.
      */
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "fk_time_period", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fk_time_period")
     private TimePeriod TimePeriod;
 
     @Column(name = "begin_date")
@@ -81,8 +80,8 @@ public class Item {
     @Column(name = "weekly_dow")
     private Integer WeeklyDow;
 
-    @Column(name = "ever_other_week_dow")
-    private Integer EverOtherWeekDow;
+    @Column(name = "every_other_week_dow")
+    private Integer EveryOtherWeekDow;
 
     @Column(name = "bi_monthly_day_1")
     private Integer BiMonthlyDay1;
@@ -135,11 +134,9 @@ public class Item {
     @Column(name = "annual_dom")
     private Integer AnnualDom;
 
-    @NotNull
-    @Column(name = "date_range_req", nullable = false, columnDefinition = "BIT DEFAULT B'0'")
-    private Boolean DateRangeReq = false;
-
-    public Item() {}
+    @Convert(converter = BooleanToBitConverter.class)
+    @Column(name = "date_range_req", nullable = false)
+    private Boolean DateRangeReq = false;;
 
     /**
      * Constructs a new Item with the given parameters.
@@ -173,40 +170,43 @@ public class Item {
      * @param annualDom        The day of the month for annual occurrences.
      * @param dateRangeReq     Indicates whether a date range is required.
      */
-    public Item(Long id, UUID userId, String name, Double amount, ItemType itemType,
+    public Item(//Long id,
+                UUID userId, String name, Double amount, ItemType itemType,
                 TimePeriod timePeriod, LocalDate beginDate, LocalDate endDate, Integer weeklyDow,
                 Integer everOtherWeekDow, Integer biMonthlyDay1, Integer biMonthlyDay2, Integer monthlyDom,
                 Integer quarterly1Month, Integer quarterly1Day, Integer quarterly2Month, Integer quarterly2Day,
                 Integer quarterly3Month, Integer quarterly3Day, Integer quarterly4Month, Integer quarterly4Day,
                 Integer semiAnnual1Month, Integer semiAnnual1Day, Integer semiAnnual2Month,
                 Integer semiAnnual2Day, Integer annualMoy, Integer annualDom, Boolean dateRangeReq) {
-        this.id          = id;
-        UserId           = userId;
-        Name             = name;
-        Amount           = amount;
-        ItemType         = itemType;
-        TimePeriod       = timePeriod;
-        BeginDate        = beginDate;
-        EndDate          = endDate;
-        WeeklyDow        = weeklyDow;
-        EverOtherWeekDow = everOtherWeekDow;
-        BiMonthlyDay1    = biMonthlyDay1;
-        BiMonthlyDay2    = biMonthlyDay2;
-        MonthlyDom       = monthlyDom;
-        Quarterly1Month  = quarterly1Month;
-        Quarterly1Day    = quarterly1Day;
-        Quarterly2Month  = quarterly2Month;
-        Quarterly2Day    = quarterly2Day;
-        Quarterly3Month  = quarterly3Month;
-        Quarterly3Day    = quarterly3Day;
-        Quarterly4Month  = quarterly4Month;
-        Quarterly4Day    = quarterly4Day;
-        SemiAnnual1Month = semiAnnual1Month;
-        SemiAnnual1Day   = semiAnnual1Day;
-        SemiAnnual2Month = semiAnnual2Month;
-        SemiAnnual2Day   = semiAnnual2Day;
-        AnnualMoy        = annualMoy;
-        AnnualDom        = annualDom;
-        DateRangeReq     = dateRangeReq;
+        //Id                = id;
+        UserId            = userId;
+        Name              = name;
+        Amount            = amount;
+        ItemType          = itemType;
+        TimePeriod        = timePeriod;
+        BeginDate         = beginDate;
+        EndDate           = endDate;
+        WeeklyDow         = weeklyDow;
+        EveryOtherWeekDow = everOtherWeekDow;
+        BiMonthlyDay1     = biMonthlyDay1;
+        BiMonthlyDay2     = biMonthlyDay2;
+        MonthlyDom        = monthlyDom;
+        Quarterly1Month   = quarterly1Month;
+        Quarterly1Day     = quarterly1Day;
+        Quarterly2Month   = quarterly2Month;
+        Quarterly2Day     = quarterly2Day;
+        Quarterly3Month   = quarterly3Month;
+        Quarterly3Day     = quarterly3Day;
+        Quarterly4Month   = quarterly4Month;
+        Quarterly4Day     = quarterly4Day;
+        SemiAnnual1Month  = semiAnnual1Month;
+        SemiAnnual1Day    = semiAnnual1Day;
+        SemiAnnual2Month  = semiAnnual2Month;
+        SemiAnnual2Day    = semiAnnual2Day;
+        AnnualMoy         = annualMoy;
+        AnnualDom         = annualDom;
+        DateRangeReq      = dateRangeReq;
     }
+
+    public Item() {}
 }
