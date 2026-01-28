@@ -1,9 +1,9 @@
 package com.financialplanner.moduleapi.controllers;
 
-import com.financialplanner.moduleapi.dto.itemtype.ItemTypeRequest;
-import com.financialplanner.moduleapi.dto.itemtype.ItemTypeResponse;
-import com.financialplanner.moduleapi.dto.itemtype.UpdateItemTypeNameRequest;
-import com.financialplanner.moduleapi.mapper.ItemTypeDtoMapper;
+import com.financialplanner.moduleapi.dtos.itemtype.ItemTypeRequest;
+import com.financialplanner.moduleapi.dtos.itemtype.ItemTypeResponse;
+import com.financialplanner.moduleapi.dtos.itemtype.UpdateItemTypeNameRequest;
+import com.financialplanner.moduleapi.mappers.ItemTypeMapper;
 import com.financialplanner.moduleapi.response.ApiResponse;
 import com.financialplanner.moduleapi.response.ApiResponseFactory;
 import com.financialplanner.moduleitemsbc.domain.service.ItemTypeService;
@@ -26,7 +26,7 @@ import java.util.List;
  * - Facilitating deletion of item types by their unique identifier via DELETE requests.
  * The controller internally uses:
  * - {@code ItemTypeService} for service-layer logic and interactions with the persistence layer.
- * - {@code ItemTypeDtoMapper} for mapping between DTOs and domain entities.
+ * - {@code ItemTypeMapper} for mapping between DTOs and domain entities.
  * - {@code ApiResponseFactory} for formatting and constructing API responses.
  * Request mappings:
  * - Base URL: {@code /item-types}
@@ -42,7 +42,7 @@ import java.util.List;
 public class ItemTypeController {
 
     private final ItemTypeService service;
-    private final ItemTypeDtoMapper mapper;
+    private final ItemTypeMapper mapper;
     private final ApiResponseFactory responseFactory;
 
     /**
@@ -52,7 +52,7 @@ public class ItemTypeController {
      * @param mapper          the mapper for converting between DTOs and domain entities
      * @param responseFactory the factory for creating standardized API responses
      */
-    public ItemTypeController(ItemTypeService service, ItemTypeDtoMapper mapper, ApiResponseFactory responseFactory) {
+    public ItemTypeController(ItemTypeService service, ItemTypeMapper mapper, ApiResponseFactory responseFactory) {
         this.service         = service;
         this.mapper          = mapper;
         this.responseFactory = responseFactory;

@@ -62,14 +62,22 @@ public class ItemTypeRepositoryImpl implements ItemTypeRepository {
         }
     }
 
-    @Override
-    public ItemType save(ItemType itemType) {
+    public ItemType getReferenceById(Long id) {
         try {
-            return jpa.save(itemType);
-        } catch (DataIntegrityViolationException ex) {
-            throw new DuplicateItemException("ItemType already exists: " + itemType.getId(), ex);
+            return jpa.getReferenceById(id);
         } catch (DataAccessException ex) {
-            throw new RepositoryException("Database failure while saving ItemType " + itemType.getId(), ex);
+            throw new RepositoryException("Database failure while fetching ItemType " + id, ex);
+        }
+    }
+
+    @Override
+    public ItemType save(ItemType entity) {
+        try {
+            return jpa.save(entity);
+        } catch (DataIntegrityViolationException ex) {
+            throw new DuplicateItemException("ItemType already exists: " + entity.getId(), ex);
+        } catch (DataAccessException ex) {
+            throw new RepositoryException("Database failure while saving ItemType " + entity.getId(), ex);
         }
     }
 

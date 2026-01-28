@@ -1,7 +1,7 @@
-package com.financialplanner.moduleapi.mapper;
+package com.financialplanner.moduleapi.mappers;
 
-import com.financialplanner.moduleapi.dto.itemtype.ItemTypeRequest;
-import com.financialplanner.moduleapi.dto.itemtype.ItemTypeResponse;
+import com.financialplanner.moduleapi.dtos.itemtype.ItemTypeRequest;
+import com.financialplanner.moduleapi.dtos.itemtype.ItemTypeResponse;
 import com.financialplanner.modulecommonbc.sanitizer.Sanitizer;
 import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.ItemType;
 import org.springframework.stereotype.Component;
@@ -22,11 +22,11 @@ import org.springframework.stereotype.Component;
  * implementation is thread-safe.
  */
 @Component
-public class ItemTypeDtoMapper {
+public class ItemTypeMapper {
 
     private final Sanitizer sanitizer;
 
-    public ItemTypeDtoMapper(Sanitizer sanitizer) {
+    public ItemTypeMapper(Sanitizer sanitizer) {
         this.sanitizer = sanitizer;
     }
 

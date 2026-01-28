@@ -1,5 +1,6 @@
 package com.financialplanner.moduleitemsbc.infrastructure.persistence.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -14,9 +15,11 @@ import jakarta.validation.constraints.NotNull;
 @Entity
 @Table(name = "time_periods", schema = "fpfl")
 public class TimePeriod {
+
     @Id
     @NotNull
     @Column(name = "id", nullable = false)
+
     private Long Id;
     @NotNull
     @Column(name = "name", nullable = false)
@@ -25,7 +28,7 @@ public class TimePeriod {
     public TimePeriod() {}
 
     public TimePeriod(Long id, String name) {
-        this.Id = id;
+        this.Id   = id;
         this.Name = name;
     }
 }
