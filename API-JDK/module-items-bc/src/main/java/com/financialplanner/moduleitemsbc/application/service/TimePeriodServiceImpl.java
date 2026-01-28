@@ -10,6 +10,28 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Implementation of the {@code TimePeriodService} interface for managing
+ * {@code TimePeriod} entities. This class provides methods to handle
+ * all operations defined in the service interface and implements business
+ * logic for interacting with the {@code TimePeriodRepository}.
+ * Responsibilities:
+ * - Retrieve all {@code TimePeriod} entities.
+ * - Retrieve a specific {@code TimePeriod} by ID.
+ * - Create a new {@code TimePeriod}.
+ * - Update an existing {@code TimePeriod}.
+ * - Delete a {@code TimePeriod} by ID.
+ * Features:
+ * - Validates inputs for all operations to ensure data integrity.
+ * - Handles scenarios where requested objects are not found.
+ * - Prevents duplication during entity creation.
+ * Exceptions:
+ * - {@code DomainValidationException}: Thrown when invalid input is provided.
+ * - {@code ItemNotFoundException}: Thrown when requested entities do not exist.
+ * - {@code DuplicateItemException}: Thrown when attempting to create a duplicate entity.
+ * Dependencies:
+ * - {@code TimePeriodRepository}: Provides access to the data persistence layer.
+ */
 @Service
 public class TimePeriodServiceImpl implements TimePeriodService {
 

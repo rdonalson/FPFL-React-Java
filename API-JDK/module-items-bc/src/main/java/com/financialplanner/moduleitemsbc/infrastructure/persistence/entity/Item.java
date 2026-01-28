@@ -8,22 +8,19 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 /**
- * Represents an Item entity which models the details of an item with various
- * scheduling and relational attributes such as type, time period, and
- * occurrence schedules. This entity is mapped to the "items" table within
- * the "fpfl" schema in the database.
- * Each instance of this class corresponds to a row in the "items" table.
- * The primary key is represented by the {@code id} field.
- * The entity tracks various attributes, including the owner's unique identifier
- * (UUID), scheduling information (weekly, monthly, quarterly, semi-annual, annual),
- * date range settings, and relationships to associated item types and time periods.
- * The following fields support specific business logic:
- * - {@code dateRangeReq}: Indicates whether a specific date range is required for the item.
- * Relational mappings include:
- * - {@code ItemType}: A many-to-one relationship defining the item type.
- * - {@code TimePeriod}: A many-to-one relationship defining the time period associated with this item.
- * This class supports both no-argument and full-argument constructors, allowing the
- * creation of fully populated item instances or empty instances for further manipulation.
+ * Represents an item entity with associated details including user information,
+ * monetary amount, item type, time periods, and various date or recurrence configurations.
+ * This entity is mapped to the "items" table in the "fpfl" database schema.
+ * It includes various attributes and relationships to define the characteristics
+ * and scheduling of an item.
+ * Key characteristics include:
+ * - User association identified by a UUID.
+ * - Attributes for tracking monetary amounts, names, and type relationships.
+ * - Date and recurrence configurations for diverse time periods.
+ * - Boolean flag to indicate if a date range is required.
+ * Entity relationships:
+ * - Many-to-one relationship with the {@link ItemType} entity.
+ * - Many-to-one relationship with the {@link TimePeriod} entity.
  */
 @lombok.Data
 @Entity
@@ -46,26 +43,22 @@ public class Item {
     private Double Amount;
 
     /**
-     * Represents the type of item associated with this entity.
-     * This is a Many-to-One relationship, indicating that multiple entities
-     * can be associated with a single item type.
-     * The association is lazily loaded, meaning that the item type details
-     * will not be fetched from the database until explicitly accessed.
-     * The foreign key column in the database is named "fk_item_type", and
-     * it is a mandatory field, with null values not allowed.
+     * Represents the type of the item in a many-to-one relationship.
+     * This field is mapped to the foreign key column "fk_item_type" in the database
+     * and defines a mandatory association with the ItemType entity.
+     * The association is lazily fetched, meaning the data is loaded only when accessed.
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "fk_item_type", nullable = false)
     private ItemType ItemType;
 
     /**
-     * Represents the associated time period for a specific entity.
-     * This variable is mapped as a many-to-one relationship to the TimePeriod entity.
-     * The relationship is lazy-loaded and mandatory, ensuring this field cannot be null.
-     * - `@ManyToOne` indicates a many-to-one relationship between the owning entity and the TimePeriod entity.
-     * - `fetch = FetchType.LAZY` specifies that the associated TimePeriod entity will be loaded lazily.
-     * - `@JoinColumn(name = "fk_time_period", nullable = false)` defines the foreign key column name in the database
-     * and mandates that the column cannot contain null values.
+     * Represents the time period associated with an entity.
+     * The relationship is established as a many-to-one association.
+     * The fetch type is configured as LAZY, meaning the data will be
+     * loaded on-demand when accessed.
+     * This variable is mapped to the database column "fk_time_period"
+     * using the @JoinColumn annotation.
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_time_period")
@@ -134,9 +127,17 @@ public class Item {
     @Column(name = "annual_dom")
     private Integer AnnualDom;
 
+    /**
+     * Represents a flag indicating whether a date range is required for a specific operation or process.
+     * This variable is stored in the database as a bit value, with conversion handled by the
+     * BooleanToBitConverter class.
+     * The field is mapped to the "date_range_req" column in the database and cannot be null.
+     */
     @Convert(converter = BooleanToBitConverter.class)
     @Column(name = "date_range_req", nullable = false)
-    private Boolean DateRangeReq = false;;
+    private Boolean DateRangeReq = false;
+
+    public Item() {}
 
     /**
      * Constructs a new Item with the given parameters.
@@ -170,15 +171,14 @@ public class Item {
      * @param annualDom        The day of the month for annual occurrences.
      * @param dateRangeReq     Indicates whether a date range is required.
      */
-    public Item(//Long id,
-                UUID userId, String name, Double amount, ItemType itemType,
-                TimePeriod timePeriod, LocalDate beginDate, LocalDate endDate, Integer weeklyDow,
-                Integer everOtherWeekDow, Integer biMonthlyDay1, Integer biMonthlyDay2, Integer monthlyDom,
-                Integer quarterly1Month, Integer quarterly1Day, Integer quarterly2Month, Integer quarterly2Day,
-                Integer quarterly3Month, Integer quarterly3Day, Integer quarterly4Month, Integer quarterly4Day,
-                Integer semiAnnual1Month, Integer semiAnnual1Day, Integer semiAnnual2Month,
-                Integer semiAnnual2Day, Integer annualMoy, Integer annualDom, Boolean dateRangeReq) {
-        //Id                = id;
+    public Item(Long id, UUID userId, String name, Double amount, ItemType itemType, TimePeriod timePeriod,
+                LocalDate beginDate, LocalDate endDate, Integer weeklyDow, Integer everOtherWeekDow,
+                Integer biMonthlyDay1, Integer biMonthlyDay2, Integer monthlyDom, Integer quarterly1Month,
+                Integer quarterly1Day, Integer quarterly2Month, Integer quarterly2Day, Integer quarterly3Month,
+                Integer quarterly3Day, Integer quarterly4Month, Integer quarterly4Day, Integer semiAnnual1Month,
+                Integer semiAnnual1Day, Integer semiAnnual2Month, Integer semiAnnual2Day, Integer annualMoy,
+                Integer annualDom, Boolean dateRangeReq) {
+        Id                = id;
         UserId            = userId;
         Name              = name;
         Amount            = amount;
@@ -207,6 +207,4 @@ public class Item {
         AnnualDom         = annualDom;
         DateRangeReq      = dateRangeReq;
     }
-
-    public Item() {}
 }

@@ -5,16 +5,17 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 /**
- * Request object for updating the name of an item type.
- * This record encapsulates the necessary data to update the name of an existing item type.
- * It enforces non-blank constraints and a maximum character limit on the provided name.
- * Validation rules:
+ * Represents a request object for updating the name of an item type.
+ * This record encapsulates the necessary data to perform an update operation
+ * on the name of an existing item type. Validation rules are enforced to ensure
+ * that the provided name adheres to domain constraints.
+ * Constraints:
  * - {@code name} must not be blank.
  * - {@code name} must not exceed 75 characters.
- * If the validation constraints are violated, an {@code DomainValidationException} will
- * be thrown at the time of object construction.
+ * If the validation constraints are violated, a {@code DomainValidationException}
+ * will be thrown during the construction of the object.
  *
- * @param name The new name for the item type.
+ * @param name The updated name of the item type.
  */
 public record UpdateItemTypeNameRequest(@NotBlank @Size(max = 75) String name) {
     public UpdateItemTypeNameRequest {

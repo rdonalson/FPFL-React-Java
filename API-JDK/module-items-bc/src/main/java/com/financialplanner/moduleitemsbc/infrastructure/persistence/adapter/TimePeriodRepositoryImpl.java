@@ -13,12 +13,35 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementation of the {@code TimePeriodRepository} interface that provides
+ * methods for managing {@code TimePeriod} entities. This class acts as a bridge
+ * between the domain logic and the underlying JPA-based persistence layer.
+ * Responsibilities:
+ * - Delegates CRUD operations to the {@code JpaTimePeriodRepository}.
+ * - Wraps operations with error handling to manage exceptions and translate them
+ * into domain-specific exceptions such as {@code RepositoryException},
+ * {@code DuplicateItemException}, and {@code ItemNotFoundException}.
+ * Dependencies:
+ * - {@code JpaTimePeriodRepository}: Provides access to underlying persistence logic.
+ * Methods:
+ * - {@code findAll()}: Retrieves all {@code TimePeriod} entities from the database.
+ * - {@code findById(Long id)}: Finds a {@code TimePeriod} by its unique ID.
+ * - {@code getReferenceById(Long id)}: Retrieves a reference to a {@code TimePeriod}
+ * entity by its ID without fully loading it.
+ * - {@code save(TimePeriod timePeriod)}: Persists a new or updated {@code TimePeriod}
+ * entity to the database.
+ * - {@code deleteById(Long id)}: Deletes a {@code TimePeriod} entity by its unique ID.
+ * Error Handling:
+ * - Translates database-specific exceptions (e.g., {@code DataAccessException},
+ * {@code DataIntegrityViolationException}) into domain-specific exceptions.
+ * - Ensures consistent and meaningful exception reporting across repository operations.
+ */
 @Component
 public class TimePeriodRepositoryImpl implements TimePeriodRepository {
 
     private final JpaTimePeriodRepository jpa;
 
-    // Constructor
     public TimePeriodRepositoryImpl(JpaTimePeriodRepository jpa) {
         this.jpa = jpa;
     }

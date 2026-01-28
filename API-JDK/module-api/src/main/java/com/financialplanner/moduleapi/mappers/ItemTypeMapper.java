@@ -7,19 +7,23 @@ import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.Item
 import org.springframework.stereotype.Component;
 
 /**
- * Maps between ItemType entity and its corresponding request and response DTOs.
- * This class is responsible for converting ItemType entities to ItemTypeResponse DTOs
- * and vice versa. It applies data sanitization before performing the conversion
- * to ensure input and output data meet defined constraints.
+ * The ItemTypeMapper class is responsible for mapping between domain entities and DTOs
+ * related to item types in the system. It converts ItemType entities to their
+ * corresponding response DTOs (ItemTypeResponse) and vice versa, while ensuring that
+ * the inputs are sanitized before processing.
+ *
+ * This class utilizes the {@code Sanitizer} to sanitize the input data and adheres to
+ * the principle of clean data handling, ensuring that any potentially unsafe or invalid
+ * input is appropriately cleaned before further operations.
+ *
  * Responsibilities:
- * - Convert an ItemType entity to a corresponding ItemTypeResponse DTO.
- * - Convert an ItemTypeRequest DTO to a corresponding ItemType entity.
- * - Sanitize input objects before processing using the Sanitizer component.
- * Dependencies:
- * - Sanitizer: Used to sanitize data for both entities and DTOs to ensure integrity.
- * Thread Safety:
- * - Instances of this class are thread-safe as long as the provided Sanitizer
- * implementation is thread-safe.
+ * - Map a domain {@code ItemType} entity to {@code ItemTypeResponse}.
+ * - Map a {@code ItemTypeRequest} DTO to a domain {@code ItemType} entity.
+ * - Ensure input data to these methods is sanitized before further processing.
+ *
+ * Dependency:
+ * - {@code Sanitizer}: A component that sanitizes inputs to ensure data conforms to constraints
+ *   and prevents issues related to unsafe or invalid data.
  */
 @Component
 public class ItemTypeMapper {

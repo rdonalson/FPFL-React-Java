@@ -13,6 +13,24 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementation of the {@link ItemRepository} interface that provides
+ * data access logic for {@link Item} entities. This class acts as a bridge
+ * between the service layer and the database repository layer.
+ * This implementation uses {@link JpaItemRepository} as the underlying
+ * repository to interact with the database and handles exception scenarios
+ * for repository operations.
+ * Responsibilities:
+ * - Fetch all {@link Item} entities from the database.
+ * - Retrieve a single {@link Item} entity by its ID.
+ * - Save a new or updated {@link Item} entity to the database.
+ * - Delete an {@link Item} entity by its ID.
+ * Exception Handling:
+ * - Wraps {@link DataAccessException} into custom exceptions where appropriate.
+ * - Throws {@link RepositoryException} for generic database-related errors.
+ * - Throws {@link DuplicateItemException} when attempting to save a duplicate {@link Item}.
+ * - Throws {@link ItemNotFoundException} when attempting to delete a non-existent {@link Item}.
+ */
 @Component
 public class ItemRepositoryImpl implements ItemRepository {
 
