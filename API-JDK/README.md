@@ -231,6 +231,7 @@ The **API module is the only runnable entrypoint**.
 
 ## 📄 License
 
-This project is licensed under the `[Looks like the result wasn't safe to show. Let's switch things up and try something else!]`.
+This project is licensed under the [MIT License](../LICENSE).
+
 ```
 
