@@ -3,8 +3,8 @@
 A full‑stack financial planning system built with a **React UI**, a **Java 25 / Spring Boot 4 API**, and a **PostgreSQL** database.  
 The project is organized into two top‑level applications:
 
-- **UI‑JSX** → React front‑end
-- **API‑JDK** → Modular Java API (multi‑module, DDD‑based)
+- **[UI-JSX](./UI-JSX/README.md)** → React front‑end
+- **[API-JDK](./API-JDK/README.md)** → Modular Java API (multi‑module, DDD‑based)
 
 This repository serves as the **parent project**, containing both applications and their shared development workflow.
 
