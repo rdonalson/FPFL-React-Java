@@ -1,4 +1,4 @@
-# Financial Planner – Modular API System
+# Financial Planner: Forecast Ledger – Modular API System
 
 A clean, enterprise‑grade, multi‑module Java platform built with **Java 25**,  
 **Spring Boot 4.x**, and **Maven**. The system is organized into four  
@@ -17,53 +17,49 @@ This project is designed for clarity, modularity, and long‑term maintainabilit
 
 Each module is packaged as a **JAR** and built under a unified parent POM.
 
-my-system/ ├── api/
-
-# REST API, controllers, DTOs ├── items/
-
-# Domain + persistence for source data ├── display/
-
-# Read models, projections, query handlers ├── common/
-
-# Shared utilities, exceptions, config └── pom.xml
-
-# Parent POM (dependency mgmt + modules)
+my-system/
+ ├── api/            # REST API, controllers, DTOs
+ ├── items/          # Domain + persistence for source data
+ ├── display/        # Read models, projections, query handlers
+ ├── common/         # Shared utilities, exceptions, config
+ └── pom.xml         # Parent POM (dependency mgmt + modules)
 
 ---
 
 ## 🧭 Module Responsibilities
 
 ### **api**
-
-- Exposes REST endpoints
-- Defines DTOs and client‑facing contracts
-- Delegates write operations to **items**
-- Delegates read operations to **display**
+- Exposes REST endpoints  
+- Defines DTOs and client‑facing contracts  
+- Delegates write operations to **items**  
+- Delegates read operations to **display**  
+- Owns the Spring Boot application, datasource, and JPA configuration  
 
 ### **items**
-
-- Owns the domain model for “items”
-- Handles CRUD operations
-- Implements repositories (JPA/R2DBC)
-- Contains domain services and aggregates
+- Owns the domain model for “items”  
+- Handles CRUD operations  
+- Implements repositories (Spring Data JPA)  
+- Contains domain services and aggregates  
 
 ### **display**
-
-- Provides read‑optimized models
-- Query handlers and projections
-- Shapes data for UI consumption
+- Provides read‑optimized models  
+- Query handlers and projections  
+- Shapes data for UI consumption  
 
 ### **common**
-
-- Shared utilities
-- Custom exceptions
-- Reusable config and annotations
+- Shared utilities  
+- Custom exceptions  
+- Reusable config and annotations  
 
 ---
 
 ## 🔗 Dependency Rules
 
-No cross‑context leakage. No circular dependencies.
+- No cross‑context leakage  
+- No circular dependencies  
+- `api` is the only runnable module  
+- `items` and `display` depend on `common`  
+- `api` depends on all bounded contexts  
 
 ---
 
@@ -71,33 +67,119 @@ No cross‑context leakage. No circular dependencies.
 
 ![Modular Dependency Diagram](docs/FPFL-API-JDK.png)
 
-## 🚀 Getting Started
+---
 
-### Prerequisites
+# 🗄️ PostgreSQL Database Structure
 
-- Java 25
-- Maven 3.9+
-- Git
+The API module connects to a PostgreSQL database that stores financial planning items, their types, and their recurrence periods.  
+Below is a summary of the schema represented in the ER diagram.
 
-### Build the entire system
+---
 
-To build the entire system, navigate to the project root directory and run:
+## **📌 Tables Overview**
+
+### **items**
+Stores all user‑defined financial items, including scheduling metadata.
+
+| Column | Description |
+|--------|-------------|
+| id | Primary key |
+| user_id | Owner of the item |
+| name | Item name |
+| amount | Monetary value |
+| fk_item_type | Foreign key → `item_types.id` |
+| fk_time_period | Foreign key → `time_periods.id` |
+| begin_date | Start date |
+| end_date | End date |
+| weekly_dow | Weekly day‑of‑week |
+| every_other_week_dow | Bi‑weekly day‑of‑week |
+| bi_monthly_day_1 | First bi‑monthly day |
+| bi_monthly_day_2 | Second bi‑monthly day |
+| monthly_dom | Monthly day‑of‑month |
+| quarterly_1_month | Q1 month |
+| quarterly_1_day | Q1 day |
+| quarterly_2_month | Q2 month |
+| quarterly_2_day | Q2 day |
+| quarterly_3_month | Q3 month |
+| quarterly_3_day | Q3 day |
+| quarterly_4_month | Q4 month |
+| quarterly_4_day | Q4 day |
+| semi_annual_1_month | First semi‑annual month |
+| semi_annual_1_day | First semi‑annual day |
+| semi_annual_2_month | Second semi‑annual month |
+| semi_annual_2_day | Second semi‑annual day |
+| annual_moy | Annual month‑of‑year |
+| annual_dom | Annual day‑of‑month |
+| date_range_req | Whether a date range is required |
+
+---
+
+### **item_types**
+Defines the type/category of an item.
+
+| Column | Description |
+|--------|-------------|
+| id | Primary key |
+| name | Type name |
+
+---
+
+### **time_periods**
+Defines the recurrence period for an item.
+
+| Column | Description |
+|--------|-------------|
+| id | Primary key |
+| name | Period name |
+
+---
+
+## **🔗 Relationships**
+
+```
+item_types (1) ────< (many) items >──── (1) time_periods
+```
+
+- `items.fk_item_type` → `item_types.id`
+- `items.fk_time_period` → `time_periods.id`
+
+![Modular Dependency Diagram](docs/FPFL-JDK-API-ER.png)
+
+The API module exposes endpoints that operate on these tables through the domain logic in the `items` bounded context.
+
+---
+
+# 🚀 Getting Started
+
+## Prerequisites
+- Java 25  
+- Maven 3.9+  
+- Git  
+- PostgreSQL 16+  
+
+Ensure your `application.yml` contains valid datasource credentials.
+
+---
+
+## Build the entire system
 
 ```bash
 mvn clean install
 ```
 
-This command will compile, test, and package all modules into JAR files.
+This compiles, tests, and packages all modules into JAR files.
 
-### Run the API module
+---
 
-To run the API module, navigate to the `api` directory and execute:
+## Run the API module
+
+From the `api` directory:
 
 ```bash
 mvn spring-boot:run
 ```
 
-or directly from the command line:
+Or from the project root:
 
 ```bash
 mvn -pl api spring-boot:run
@@ -109,7 +191,7 @@ Or run the packaged JAR:
 java -jar target/api-0.0.1-SNAPSHOT.jar
 ```
 
-These commands will start the API server on the default port (8000).
+The API starts on port **8000** by default.
 
 ---
 
@@ -127,32 +209,28 @@ Each module contains its own isolated test suite.
 
 Each bounded context produces a JAR:
 
-```bash
-mvn package
-
 ```
-
-This command will compile, test, and package each module into a JAR file.
 api/target/api-<version>.jar
 items/target/items-<version>.jar
 display/target/display-<version>.jar
 common/target/common-<version>.jar
+```
 
----
-The API module is the only runnable entrypoint.
+The **API module is the only runnable entrypoint**.
 
 ---
 
 ## 🧰 Development Notes
 
-- Use `application-local.yml` for local overrides (ignored by Git)
-- Keep domain logic inside the bounded context that owns it
-- Avoid placing business logic in controllers
-- Use `common` sparingly — only for true cross‑cutting concerns
+- Use `application-local.yml` for local overrides (ignored by Git)  
+- Keep domain logic inside the bounded context that owns it  
+- Avoid placing business logic in controllers  
+- Use `common` sparingly — only for true cross‑cutting concerns  
 
 ---
 
 ## 📄 License
 
-This project is licensed under the [MIT License](../LICENSE).
+This project is licensed under the `[Looks like the result wasn't safe to show. Let's switch things up and try something else!]`.
+```
 
