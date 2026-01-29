@@ -48,7 +48,7 @@ public class Item {
      * and defines a mandatory association with the ItemType entity.
      * The association is lazily fetched, meaning the data is loaded only when accessed.
      */
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "fk_item_type", nullable = false)
     private ItemType ItemType;
 
@@ -60,7 +60,7 @@ public class Item {
      * This variable is mapped to the database column "fk_time_period"
      * using the @JoinColumn annotation.
      */
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "fk_time_period")
     private TimePeriod TimePeriod;
 
