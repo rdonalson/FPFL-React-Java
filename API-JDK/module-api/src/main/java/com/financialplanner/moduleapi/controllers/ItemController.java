@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Controller responsible for handling API requests related to item management.
@@ -71,6 +72,20 @@ public class ItemController {
         ItemResponse item = mapper.toResponse(service.get(id));
         // Build sanitized ApiResponse using ResponseFactory
         ApiResponse<ItemResponse> body = responseFactory.success(item, "Item " + id + " retrieved successfully");
+        // Return 200 Success + sanitized body
+        return ResponseEntity.ok(body);
+    }
+
+    @GetMapping("/{userId}/{itemType}")
+    public ResponseEntity<ApiResponse<List<ItemResponse>>> get(@PathVariable("userId") UUID userId, @PathVariable("itemType") Long itemType) {
+        // Retrieve time period entity from the repository
+        List<Item> items = service.findByUserIdAndItemTypeId(userId, itemType);
+        // Map each entity to its corresponding response object
+        List<ItemResponse> responseList = items.stream()
+                                               .map(mapper::toResponse)
+                                               .toList();
+        // Build sanitized ApiResponse using ResponseFactory
+        ApiResponse<List<ItemResponse>> body = responseFactory.success(responseList, "Items retrieved successfully");
         // Return 200 Success + sanitized body
         return ResponseEntity.ok(body);
     }

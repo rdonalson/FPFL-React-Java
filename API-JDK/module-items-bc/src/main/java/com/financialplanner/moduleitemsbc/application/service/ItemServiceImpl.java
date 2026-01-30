@@ -9,6 +9,7 @@ import com.financialplanner.moduleitemsbc.infrastructure.persistence.mapper.Item
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class ItemServiceImpl implements ItemService {
@@ -38,6 +39,19 @@ public class ItemServiceImpl implements ItemService {
         // Return the domain model
         return repo.findById(id)
                    .orElseThrow(() -> new ItemNotFoundException("Item " + id + " not found"));
+    }
+
+    @Override
+    public List<Item> findByUserIdAndItemTypeId(UUID userId, Long itemTypeId) {
+        // Validate input
+        if (userId == null) {
+            throw new DomainValidationException("UserId cannot be null");
+        }
+        if (itemTypeId == null || itemTypeId <= 0) {
+            throw new DomainValidationException("ItemType id must be a positive integer");
+        }
+        // Return the domain model
+        return repo.findByUserIdAndItemTypeId(userId, itemTypeId);
     }
 
     @Override

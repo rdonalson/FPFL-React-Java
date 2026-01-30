@@ -27,12 +27,8 @@ import java.util.Optional;
  */
 public interface ItemTypeRepository {
     List<ItemType> findAll();
-
     Optional<ItemType> findById(Long id);
-
     ItemType getReferenceById(Long id);
-
     ItemType save(ItemType entity);
-
     void deleteById(Long id);
 }

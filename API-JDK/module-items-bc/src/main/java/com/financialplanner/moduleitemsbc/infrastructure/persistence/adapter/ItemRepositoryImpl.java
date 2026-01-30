@@ -5,13 +5,14 @@ import com.financialplanner.modulecommonbc.exception.ItemNotFoundException;
 import com.financialplanner.modulecommonbc.exception.RepositoryException;
 import com.financialplanner.moduleitemsbc.domain.repository.ItemRepository;
 import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.Item;
-import com.financialplanner.moduleitemsbc.infrastructure.persistence.repository.JpaItemRepository;
+import com.financialplanner.moduleitemsbc.infrastructure.persistence.repository.entity.JpaItemRepository;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Implementation of the {@link ItemRepository} interface that provides
@@ -46,7 +47,7 @@ public class ItemRepositoryImpl implements ItemRepository {
         try {
             return jpa.findAll();
         } catch (DataAccessException ex) {
-            throw new RepositoryException("Database failure while fetching ItemTypes", ex);
+            throw new RepositoryException("Database failure while fetching Items", ex);
         }
     }
 
@@ -55,7 +56,16 @@ public class ItemRepositoryImpl implements ItemRepository {
         try {
             return jpa.findById(id);
         } catch (DataAccessException ex) {
-            throw new RepositoryException("Database failure while fetching ItemType " + id, ex);
+            throw new RepositoryException("Database failure while fetching Items" + id, ex);
+        }
+    }
+
+    @Override
+    public List<Item> findByUserIdAndItemTypeId(UUID userId, Long itemTypeId) {
+        try {
+            return jpa.findByUserIdAndItemTypeId(userId, itemTypeId);
+        } catch (DataAccessException ex) {
+            throw new RepositoryException("Database failure while fetching Items", ex);
         }
     }
 

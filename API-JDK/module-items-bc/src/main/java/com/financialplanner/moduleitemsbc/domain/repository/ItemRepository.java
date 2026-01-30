@@ -4,6 +4,7 @@ import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.Item
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Repository interface for managing {@link Item} entities.
@@ -18,10 +19,8 @@ import java.util.Optional;
  */
 public interface ItemRepository {
     List<Item> findAll();
-
     Optional<Item> findById(Long id);
-
+    List<Item> findByUserIdAndItemTypeId(UUID userId, Long itemTypeId);
     Item save(Item entity);
-
     void deleteById(Long id);
 }
