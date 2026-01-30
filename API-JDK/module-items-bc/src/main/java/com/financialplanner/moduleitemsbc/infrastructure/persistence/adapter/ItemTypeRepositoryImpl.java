@@ -5,7 +5,7 @@ import com.financialplanner.modulecommonbc.exception.ItemNotFoundException;
 import com.financialplanner.modulecommonbc.exception.RepositoryException;
 import com.financialplanner.moduleitemsbc.domain.repository.ItemTypeRepository;
 import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.ItemType;
-import com.financialplanner.moduleitemsbc.infrastructure.persistence.repository.JpaItemTypeRepository;
+import com.financialplanner.moduleitemsbc.infrastructure.persistence.repository.entity.JpaItemTypeRepository;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;

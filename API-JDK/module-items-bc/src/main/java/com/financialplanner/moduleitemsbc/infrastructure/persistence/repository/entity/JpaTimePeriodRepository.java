@@ -1,4 +1,4 @@
-package com.financialplanner.moduleitemsbc.infrastructure.persistence.repository;
+package com.financialplanner.moduleitemsbc.infrastructure.persistence.repository.entity;
 
 import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.TimePeriod;
 import org.springframework.data.jpa.repository.JpaRepository;
