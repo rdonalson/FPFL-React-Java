@@ -11,6 +11,9 @@ bounded contexts following Domain‑Driven Design principles:
 
 This project is designed for clarity, modularity, and long‑term maintainability.
 
+![API_Welcome_Page.png](docs/API_Welcome_Page.png)
+![API_Swagger_Page.png](docs/API_Swagger_Page.png)
+
 ---
 
 ## 🧱 Project Structure
