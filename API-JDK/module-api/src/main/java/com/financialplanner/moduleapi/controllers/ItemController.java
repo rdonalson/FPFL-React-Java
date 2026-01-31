@@ -15,8 +15,10 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Controller responsible for handling API requests related to item management.
- * Provides endpoints for CRUD operations and managing item resources.
+ * REST controller for managing items. Provides endpoints for listing, retrieving,
+ * creating, updating, and deleting items.
+ * This controller interacts with the service layer for business logic and utilizes
+ * a mapper for converting between entities and DTOs.
  */
 @RestController
 @RequestMapping("/items")
@@ -76,6 +78,13 @@ public class ItemController {
         return ResponseEntity.ok(body);
     }
 
+    /**
+     * Retrieves a list of items for a given user and item type.
+     *
+     * @param userId the UUID of the user whose items are to be retrieved
+     * @param itemType the ID of the item type to filter the items by
+     * @return ResponseEntity containing an ApiResponse with a list of ItemResponse objects
+     */
     @GetMapping("/{userId}/{itemType}")
     public ResponseEntity<ApiResponse<List<ItemResponse>>> get(@PathVariable("userId") UUID userId, @PathVariable("itemType") Long itemType) {
         // Retrieve time period entity from the repository
