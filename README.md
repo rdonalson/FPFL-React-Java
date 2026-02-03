@@ -100,7 +100,7 @@ A full database breakdown is included in the API README.
 - [ItemTypeMapper](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/mappers/ItemTypeMapper.java)
 - [TimePeriodMapper](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/mappers/TimePeriodMapper.java)
 
-## Exceptions
+### Exceptions
 - [GlobalExceptionHandler](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/exception/GlobalExceptionHandler.java)
 
 ## Module-Items
