@@ -22,8 +22,8 @@ FPFL-React-Java/
 
 ### 🔗 Direct Links
 
-- **React UI** → `[Looks like the result wasn't safe to show. Let's switch things up and try something else!]`
-- **Java API** → `[Looks like the result wasn't safe to show. Let's switch things up and try something else!]`
+- **React UI** → [https://github.com/rdonalson/FPFL-React-Java/tree/main/API-JDK](https://github.com/rdonalson/FPFL-React-Java/tree/main/API-JDK)
+- **Java API** → [https://github.com/rdonalson/FPFL-React-Java/tree/main/API-JDK](https://github.com/rdonalson/FPFL-React-Java/tree/main/API-JDK)
 
 Each subproject contains its own dedicated README with deeper details.
 
@@ -50,7 +50,7 @@ The FPFL system is designed as a **modular, maintainable, enterprise‑grade ful
 - Exposes a clean, versioned REST API for the UI
 
 For full backend details, see the API README:  
-👉 `[Looks like the result wasn't safe to show. Let's switch things up and try something else!]`
+👉 [https://github.com/rdonalson/FPFL-React-Java/blob/main/API-JDK/README.md](https://github.com/rdonalson/FPFL-React-Java/blob/main/API-JDK/README.md)
 
 ---
 
@@ -68,6 +68,85 @@ The API handles all CRUD operations and business rules for these tables.
 A full database breakdown is included in the API README.
 
 ---
+---
+# Portfolio Samples
+# Front End — React 18+ (In progress)
+
+### Overall
+- [UI-JSX](https://github.com/rdonalson/FPFL-React-Java/tree/main/UI-JSX)
+
+---
+
+# Back End — Java Maven API (In progress)
+- [pom.xml](API-JDK/pom.xml)
+
+## Module-API
+### POM
+- [module-api/pom.xml](API-JDK/module-api/pom.xml)
+### Controllers
+- [ItemController](https://github.com/rdonalson/FPFL-React-Java/blob/main/API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/controllers/ItemController.java) 
+- [ItemTypeController](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/controllers/ItemTypeController.java)
+- [TimePeriodController](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/controllers/TimePeriodController.java)
+
+### DTOs
+- [ItemRequest](https://github.com/rdonalson/FPFL-React-Java/blob/main/API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/dtos/item/ItemRequest.java)
+- [ItemResponse](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/dtos/item/ItemResponse.java)
+- [ItemTypeRequest](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/dtos/itemtype/ItemTypeRequest.java)
+- [ItemTypeResponse](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/dtos/itemtype/ItemTypeResponse.java)
+- [TimePeriodRequest](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/dtos/timeperiod/TimePeriodRequest.java)
+- [TimePeriodResponse](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/dtos/timeperiod/TimePeriodResponse.java)
+### Mappers 
+- [ItemMapper](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/mappers/ItemMapper.java)
+- [ItemTypeMapper](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/mappers/ItemTypeMapper.java)
+- [TimePeriodMapper](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/mappers/TimePeriodMapper.java)
+
+## Exceptions
+- [GlobalExceptionHandler](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/exception/GlobalExceptionHandler.java)
+
+## Module-Items
+### POM
+- [module-items/pom.xml](API-JDK/pom.xml)
+### Services
+- [ItemServiceImpl](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/application/service/ItemServiceImpl.java)
+- [ItemTypeServiceImpl](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/application/service/ItemTypeServiceImpl.java)
+- [TimePeriodServiceImpl](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/application/service/TimePeriodServiceImpl.java)
+### Repositories
+#### Item
+- [ItemRepositoryImpl](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/adapter/ItemRepositoryImpl.java) 
+- [JpaItemRepository](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/repository/entity/JpaItemRepository.java)
+- [JpaItemRepositoryCustomImpl](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/repository/custom/JpaItemRepositoryCustomImpl.java)
+
+#### ItemType
+- [ItemTypeRepositoryImpl](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/adapter/ItemTypeRepositoryImpl.java)
+- [JpaItemTypeRepository](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/repository/entity/JpaItemTypeRepository.java)
+
+#### TimePeriod
+- [TimePeriodRepositoryImpl](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/adapter/TimePeriodRepositoryImpl.java)
+- [JpaTimePeriodRepository](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/repository/entity/JpaTimePeriodRepository.java)
+
+### Entities
+- [Item](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/entity/Item.java)
+- [ItemType](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/entity/ItemType.java)
+- [TimePeriod](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/entity/TimePeriod.java)
+
+## Module-Common
+### POM
+- [module-common/pom.xml](API-JDK/module-common/pom.xml)
+### Converters
+- [BooleanToBitConverter](API-JDK/module-common-bc/src/main/java/com/financialplanner/modulecommonbc/converters/BooleanToBitConverter.java)
+### Exceptions
+- [DomainException](API-JDK/module-common-bc/src/main/java/com/financialplanner/modulecommonbc/exception/DomainException.java)
+- [NotFoundException](API-JDK/module-common-bc/src/main/java/com/financialplanner/modulecommonbc/exception/NotFoundException.java)
+- [DuplicateItemException](API-JDK/module-common-bc/src/main/java/com/financialplanner/modulecommonbc/exception/DuplicateItemException.java)
+- [DomainValidationException](API-JDK/module-common-bc/src/main/java/com/financialplanner/modulecommonbc/exception/DomainValidationException.java)
+- [RepositoryException](API-JDK/module-common-bc/src/main/java/com/financialplanner/modulecommonbc/exception/RepositoryException.java)
+- [SanitizationException](API-JDK/module-common-bc/src/main/java/com/financialplanner/modulecommonbc/exception/SanitizationException.java)
+### Logging
+- [ErrorLogger](API-JDK/module-common-bc/src/main/java/com/financialplanner/modulecommonbc/logging/ErrorLogger.java)
+### Sanitizer
+- [SanitizerImpl](API-JDK/module-common-bc/src/main/java/com/financialplanner/modulecommonbc/sanitizer/SanitizerImpl.java)
+---
+---
 
 # **⚙️ Running the Full Stack**
 
@@ -77,10 +156,11 @@ From the root:
 
 ```bash
 mvn -pl API-JDK -am clean install
-mvn -pl API-JDK/api spring-boot:run
+mvn -pl module-api spring-boot:run
 ```
 
-The API runs on **http://localhost:8000**.
+The API runs locally on **http://localhost:8000**.
+Docker on **http://localhost:9000**.
 
 ---
 
@@ -94,7 +174,7 @@ npm install
 npm start
 ```
 
-The UI runs on **http://localhost:3000** and communicates with the API.
+The UI runs on **http://localhost:4000** and communicates with the API on Docke.
 
 ---
 

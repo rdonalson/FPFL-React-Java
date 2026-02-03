@@ -25,11 +25,11 @@
     </build>
 
     <dependencies>
+    
 <!--        <dependency>-->
 <!--            <groupId>com.fasterxml.jackson.datatype</groupId>-->
 <!--            <artifactId>jackson-datatype-hibernate5</artifactId>-->
 <!--        </dependency>-->
-
 
         <!-- BC modules -->
         <dependency>
