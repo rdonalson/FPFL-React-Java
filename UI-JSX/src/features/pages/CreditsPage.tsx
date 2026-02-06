@@ -28,13 +28,13 @@ export default function CreditsPage() {
     async function loadCredits() {
       try {
         const response = await fetch(`${API_BASE}/items/${USER_ID}/${ITEM_TYPE}`);
-
+        
         if (!response.ok) {
           throw new Error(`Failed to load credits: ${response.status}`);
         }
 
-        const data = await response.json();
-        const credits: Item[] = data.data || [];
+        const apiResponse = await response.json();
+        const credits: Item[] = apiResponse.data || [];
         setCredits(credits);
       } catch (err) {
         console.error(err);
