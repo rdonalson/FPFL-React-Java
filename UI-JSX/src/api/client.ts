@@ -17,24 +17,10 @@ function createClient(): AxiosInstance {
     return config;
   });
 
-  // Auto‑unwrap ApiResponse<T>
+  // Return full ApiResponse<T>
   instance.interceptors.response.use(
     (response) => {
-      const body = response;
-
-      // Detect your ApiResponse<T> shape
-      if (
-        body &&
-        typeof body === "object" &&
-        "data" in body &&
-        "status" in body &&
-        "statusText" in body
-      ) {
-        return body.data; // return ONLY the inner data
-      }
-
-      // Otherwise return raw body
-      return body;
+      return response.data; // <-- THIS is your ApiResponse<T>
     },
     (error: AxiosError) => {
       const normalized = {

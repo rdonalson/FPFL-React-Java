@@ -2,20 +2,13 @@ import { ListBox } from "primereact/listbox";
 import { useItemTypes } from "../hooks/useItemType";
 
 export function ItemTypeListPage() {
-  const { data, isLoading, error } = useItemTypes();
-
-  console.log("[ItemTypeListPage] data:", data, "error:", error, "loading:", isLoading);
+  const { data, isLoading } = useItemTypes();
 
   if (isLoading) return <p>Loading Item Types…</p>;
 
-  if (error) {
-    console.error("[ItemTypeListPage] Error:", error);
-    return <p style={{ color: "red" }}>Error loading Item Types: {error.message}</p>;
-  }
-
-  const options = (data ?? []).map((it) => ({
+  const options = (data?.data ?? []).map((it) => ({
     label: it.name,
-    value: it.id,
+    value: it.id.toString(),
   }));
 
   return (
