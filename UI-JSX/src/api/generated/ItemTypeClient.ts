@@ -1,35 +1,27 @@
-// src/api/generated/ItemTypeClient.ts
-import { apiClient } from '../client';
+import { apiClient } from '@/api/client';
 import type { ItemType } from '@/features/itemType/types/ItemType';
+import type { ApiResponse } from '@/api/models/ApiResponse';
 
 const BASE = '/item-types';
 
-/**
- * Low-level typed client for the ItemType API.
- * Mirrors your Java controller exactly.
- */
 export const ItemTypeClient = {
-  async getAll(): Promise<ItemType[]> {
-    const res = await apiClient.get(BASE);
-    return res.data;
+  async getAll(): Promise<ApiResponse<ItemType[]>> {
+    return apiClient.get<ApiResponse<ItemType[]>>(`${BASE}`).then();
   },
 
-  async getById(id: number): Promise<ItemType> {
-    const res = await apiClient.get(`${BASE}/${id}`);
-    return res.data;
+  async getById(id: number): Promise<ApiResponse<ItemType>> {
+    return apiClient.get<ApiResponse<ItemType>>(`${BASE}/${id}`).then();
   },
 
-  async create(payload: ItemType): Promise<ItemType> {
-    const res = await apiClient.post(BASE, payload);
-    return res.data;
+  async create(payload: { name: string }): Promise<ApiResponse<ItemType>> {
+    return apiClient.post<ApiResponse<ItemType>>(`${BASE}`, payload).then();
   },
 
-  async update(id: number, payload: Partial<ItemType>): Promise<ItemType> {
-    const res = await apiClient.put(`${BASE}/${id}`, payload);
-    return res.data;
+  async update(id: number, payload: { name: string }): Promise<ApiResponse<ItemType>> {
+    return apiClient.put<ApiResponse<ItemType>>(`${BASE}/${id}`, payload).then();
   },
 
-  async remove(id: number): Promise<void> {
-    await apiClient.delete(`${BASE}/${id}`);
+  async delete(id: number): Promise<ApiResponse<void>> {
+    return apiClient.delete<ApiResponse<void>>(`${BASE}/${id}`).then();
   },
 };
