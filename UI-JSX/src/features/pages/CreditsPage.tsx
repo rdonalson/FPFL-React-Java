@@ -59,10 +59,7 @@ export default function CreditsPage() {
       <ul>
         {credits.map(c => (
           <li key={c.id} style={{ marginBottom: '1rem' }}>
-            <strong>{c.name}</strong> — {c.amount}
-            {/* <div style={{ fontSize: "0.8rem", opacity: 0.7 }}>
-                            {new Date(c.beginDate).toLocaleString()}
-                        </div> */}
+            <strong>{c.id}</strong> — {c.name}, {c.amount}
           </li>
         ))}
       </ul>

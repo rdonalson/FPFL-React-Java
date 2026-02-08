@@ -1,0 +1,15 @@
+export interface Item {
+  id: number;
+  userId: string;
+  name: string;
+  amount: number;
+  itemType: {
+    id: number;
+    name: string;
+  };
+  TimePeriod: {
+    id: number;
+    name: string;
+  };
+  beginDate: string | null;
+}
