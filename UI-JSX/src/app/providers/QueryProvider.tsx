@@ -4,25 +4,32 @@ import { Toaster, toast } from "react-hot-toast";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
-    onError: (error: unknown) => {
-      const message =
-        (error as any)?.message ?? "An unexpected error occurred while fetching data";
-      toast.error(message);
+    onError: (error: any) => {
+      const status = error?.status ?? 0;
+
+      // Only global-toast server failures
+      if (status >= 500 || status === 0) {
+        toast.error(error.message ?? "A server error occurred");
+      }
     },
   }),
+
   mutationCache: new MutationCache({
-    onError: (error: unknown) => {
-      const message =
-        (error as any)?.message ?? "An unexpected error occurred while saving changes";
-      toast.error(message);
+    onError: (error: any) => {
+      const status = error?.status ?? 0;
+
+      // Only global-toast server failures
+      if (status >= 500 || status === 0) {
+        toast.error(error.message ?? "A server error occurred");
+      }
     },
   }),
+
   defaultOptions: {
-    queries: {
-      retry: false,
-    },
+    queries: { retry: false },
   },
 });
+
 
 export function QueryProvider({ children }: { children: React.ReactNode }) {
   return (
