@@ -13,14 +13,30 @@ function createClient(): AxiosInstance {
 
   // Add correlation ID for tracing
   instance.interceptors.request.use((config) => {
-    config.headers["X-Correlation-ID"] = crypto.randomUUID();
+    const correlationId = crypto.randomUUID();
+    config.headers["X-Correlation-ID"] = correlationId;
+
+    // Log outgoing request
+    console.log("[API REQUEST]", {
+      url: config.url,
+      method: config.method,
+      correlationId,
+      payload: config.data,
+    });
+
     return config;
   });
 
-  // Return full ApiResponse<T>
   instance.interceptors.response.use(
     (response) => {
-      return response.data; // <-- THIS is your ApiResponse<T>
+      // Log successful response
+      console.log("[API RESPONSE]", {
+        url: response.config.url,
+        status: response.status,
+        correlationId: response.config.headers["X-Correlation-ID"],
+      });
+
+      return response.data;
     },
     (error: AxiosError) => {
       const normalized = {
@@ -30,7 +46,17 @@ function createClient(): AxiosInstance {
           error.message ??
           "Unknown error",
         details: error.response?.data ?? null,
+        correlationId: error.config?.headers?.["X-Correlation-ID"],
       };
+
+      // Log error
+      console.error("[API ERROR]", {
+        url: error.config?.url,
+        status: normalized.status,
+        message: normalized.message,
+        correlationId: normalized.correlationId,
+        details: normalized.details,
+      });
 
       return Promise.reject(normalized);
     }
