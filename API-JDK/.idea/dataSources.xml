@@ -23,5 +23,13 @@
       <jdbc-url>jdbc:postgresql://localhost:5432/FPFL-V2</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="jdbc:postgresql://localhost:5432/FPFL-V2 [DEBUG]" group="​ModuleApiApplication" uuid="821b383e-741a-40a4-92e7-25641a017040">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <imported>true</imported>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5432/FPFL-V2</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

@@ -1,5 +1,10 @@
 <configuration>
+    <!-- Existing log root -->
     <property name="LOG_ROOT" value="../logs"/>
+
+    <!-- ========================= -->
+    <!-- Main Application Log File -->
+    <!-- ========================= -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${LOG_ROOT}/app.%d{yyyy-MM-dd}.log</fileNamePattern>
@@ -9,7 +14,33 @@
             <pattern>%d %-5level [%thread] %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
+
+    <!-- ========================= -->
+    <!-- Client-Side Logging File  -->
+    <!-- ========================= -->
+    <appender name="CLIENT_LOGS" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_ROOT}/client-logs.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d %-5level [%thread] %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- ========================= -->
+    <!-- Route Client Logs Only    -->
+    <!-- ========================= -->
+    <logger name="com.example.logging.api.ClientLogController"
+            level="INFO"
+            additivity="false">
+        <appender-ref ref="CLIENT_LOGS"/>
+    </logger>
+
+    <!-- Existing application logger -->
     <logger name="com.financialplanner" level="DEBUG"/>
+
+    <!-- Root logger -->
     <root level="INFO">
         <appender-ref ref="FILE"/>
     </root>
