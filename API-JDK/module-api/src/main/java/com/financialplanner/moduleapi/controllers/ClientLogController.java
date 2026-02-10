@@ -5,6 +5,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Controller responsible for handling client log submissions.
+ * Provides an endpoint for receiving log information from client applications
+ * and logging it to the server's log system at the appropriate log level.
+ */
 @RestController
 @RequestMapping("/client-logs")
 public class ClientLogController {
