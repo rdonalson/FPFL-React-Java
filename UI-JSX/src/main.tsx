@@ -1,20 +1,22 @@
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './app/App';
 import { QueryProvider } from './app/providers/QueryProvider';
+import { AppErrorBoundary } from './app/providers/AppErrorBoundary';
 
 import './index.css';
-import App from './app/App';
+
+// PrimeReact global styles
 import 'primereact/resources/themes/lara-light-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
-import { AppErrorBoundary } from './app/providers/AppErrorBoundary';
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  //<React.StrictMode>
     <AppErrorBoundary>
       <QueryProvider>
         <App />
       </QueryProvider>
     </AppErrorBoundary>
-  </StrictMode>,
+  //</React.StrictMode>,
 );
