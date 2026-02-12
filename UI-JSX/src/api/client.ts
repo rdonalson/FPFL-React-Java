@@ -1,14 +1,14 @@
 // src/api/client.ts
-import axios, { AxiosError, AxiosInstance } from "axios";
-import { apiConfig } from "./config";
+import axios, { AxiosError, AxiosInstance } from 'axios';
+import { apiConfig } from './config';
 
 // Fire-and-forget log sender
-function sendLogToServer(log: any) {
+function sendLogToServer({ log }: { log: any }): void {
   // Do NOT block the UI — fire and forget
   fetch(`${apiConfig.baseUrl}/client-logs`, {
-    method: "POST",
+    method: 'POST',
     body: JSON.stringify(log),
-    headers: { "Content-Type": "application/json" },
+    headers: { 'Content-Type': 'application/json' },
   }).catch(() => {
     // Intentionally ignore failures — logging must never break the app
   });
@@ -19,19 +19,19 @@ function createClient(): AxiosInstance {
     baseURL: apiConfig.baseUrl,
     timeout: apiConfig.timeout,
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
   });
 
   // ============================
   // REQUEST INTERCEPTOR
   // ============================
-  instance.interceptors.request.use((config) => {
+  instance.interceptors.request.use(config => {
     const correlationId = crypto.randomUUID();
-    config.headers["X-Correlation-ID"] = correlationId;
+    config.headers['X-Correlation-ID'] = correlationId;
 
     // Local DevTools log
-    console.log("[API REQUEST]", {
+    console.log('[API REQUEST]', {
       url: config.url,
       method: config.method,
       correlationId,
@@ -45,12 +45,12 @@ function createClient(): AxiosInstance {
   // RESPONSE INTERCEPTOR
   // ============================
   instance.interceptors.response.use(
-    (response) => {
+    response => {
       // Local DevTools log
-      console.log("[API RESPONSE]", {
+      console.log('[API RESPONSE]', {
         url: response.config.url,
         status: response.status,
-        correlationId: response.config.headers["X-Correlation-ID"],
+        correlationId: response.config.headers['X-Correlation-ID'],
       });
 
       return response.data;
@@ -62,17 +62,14 @@ function createClient(): AxiosInstance {
     (error: AxiosError) => {
       const normalized = {
         status: error.response?.status ?? 0,
-        message:
-          (error.response?.data as any)?.message ??
-          error.message ??
-          "Unknown error",
+        message: (error.response?.data as any)?.message ?? error.message ?? 'Unknown error',
         details: error.response?.data ?? null,
-        correlationId: error.config?.headers?.["X-Correlation-ID"],
+        correlationId: error.config?.headers?.['X-Correlation-ID'],
         url: error.config?.url,
       };
 
       // Local DevTools log
-      console.error("[API ERROR]", {
+      console.error('[API ERROR]', {
         url: normalized.url,
         status: normalized.status,
         message: normalized.message,
@@ -82,16 +79,18 @@ function createClient(): AxiosInstance {
 
       // Send to backend logging API
       sendLogToServer({
-        level: "error",
-        url: normalized.url,
-        status: normalized.status,
-        message: normalized.message,
-        correlationId: normalized.correlationId,
-        details: normalized.details,
+        log: {
+          level: 'error',
+          url: normalized.url,
+          status: normalized.status,
+          message: normalized.message,
+          correlationId: normalized.correlationId,
+          details: normalized.details,
+        },
       });
 
       return Promise.reject(normalized);
-    }
+    },
   );
 
   return instance;

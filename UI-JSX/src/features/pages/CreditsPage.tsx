@@ -28,7 +28,7 @@ export default function CreditsPage() {
     async function loadCredits() {
       try {
         const response = await fetch(`${API_BASE}/items/${USER_ID}/${ITEM_TYPE}`);
-        
+
         if (!response.ok) {
           throw new Error(`Failed to load credits: ${response.status}`);
         }

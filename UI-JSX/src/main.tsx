@@ -12,11 +12,11 @@ import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  //<React.StrictMode>
+  <React.StrictMode>
     <AppErrorBoundary>
       <QueryProvider>
         <App />
       </QueryProvider>
     </AppErrorBoundary>
-  //</React.StrictMode>,
+  </React.StrictMode>,
 );
