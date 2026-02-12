@@ -1,6 +1,6 @@
 // src/app/providers/QueryProvider.tsx
-import { QueryClient, QueryClientProvider, QueryCache, MutationCache } from "@tanstack/react-query";
-import { Toaster, toast } from "react-hot-toast";
+import { QueryClient, QueryClientProvider, QueryCache, MutationCache } from '@tanstack/react-query';
+import { Toaster, toast } from 'react-hot-toast';
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -9,7 +9,7 @@ const queryClient = new QueryClient({
 
       // Only global-toast server failures
       if (status >= 500 || status === 0) {
-        toast.error(error.message ?? "A server error occurred");
+        toast.error(error.message ?? 'A server error occurred');
       }
     },
   }),
@@ -20,7 +20,7 @@ const queryClient = new QueryClient({
 
       // Only global-toast server failures
       if (status >= 500 || status === 0) {
-        toast.error(error.message ?? "A server error occurred");
+        toast.error(error.message ?? 'A server error occurred');
       }
     },
   }),
@@ -29,7 +29,6 @@ const queryClient = new QueryClient({
     queries: { retry: false },
   },
 });
-
 
 export function QueryProvider({ children }: { children: React.ReactNode }) {
   return (

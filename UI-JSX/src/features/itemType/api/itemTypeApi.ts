@@ -1,6 +1,6 @@
-import { ItemTypeClient } from "@/api/generated/ItemTypeClient";
-import type { ApiResponse } from "@/api/models/ApiResponse";
-import type { ItemType } from "../types/ItemType";
+import { ItemTypeClient } from '@/api/generated/ItemTypeClient';
+import type { ApiResponse } from '@/api/models/ApiResponse';
+import type { ItemType } from '../types/ItemType';
 
 export const itemTypeApi = {
   async fetchAll(): Promise<ApiResponse<ItemType[]>> {

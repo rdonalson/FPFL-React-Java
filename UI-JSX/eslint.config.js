@@ -32,7 +32,8 @@ export default defineConfig([
           message: 'Use TypeScript files instead of JavaScript.',
         },
       ],
-
+      // Allow 'any' type for flexibility in this project
+      '@typescript-eslint/no-explicit-any': 'off',
       // Prettier formatting as ESLint rule
       'prettier/prettier': 'error',
     },

@@ -29,6 +29,16 @@
     </appender>
 
     <!-- ========================= -->
+    <!-- Console Logging API Only  -->
+    <!-- ========================= -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d %-5level [%thread] %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+
+    <!-- ========================= -->
     <!-- Route Client Logs Only    -->
     <!-- ========================= -->
     <logger name="com.example.logging.api.ClientLogController"
@@ -43,5 +53,6 @@
     <!-- Root logger -->
     <root level="INFO">
         <appender-ref ref="FILE"/>
+        <appender-ref ref="CONSOLE"/>
     </root>
 </configuration>

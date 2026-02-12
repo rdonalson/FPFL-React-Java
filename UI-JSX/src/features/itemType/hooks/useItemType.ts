@@ -6,7 +6,7 @@ const ITEM_TYPE_KEY = ['item-types'];
 
 export function useItemTypes() {
   return useQuery({
-    queryKey: ITEM_TYPE_KEY,    
+    queryKey: ITEM_TYPE_KEY,
     queryFn: itemTypeApi.fetchAll,
   });
 }

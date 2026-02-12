@@ -31,7 +31,7 @@ export class AppErrorBoundary extends React.Component<
 
   render() {
     if (this.state.hasError) {
-      return <div style={{ padding: '2rem', color: 'red' }}>Something went wrong in the UI.</div>;
+      return <div className="error-boundary">Something went wrong in the UI.</div>;
     }
 
     return this.props.children;

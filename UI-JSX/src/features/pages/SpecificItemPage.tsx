@@ -30,12 +30,6 @@ export default function SpecificItemPage() {
       try {
         const response = await fetch(`${API_BASE}/items/${ID}`);
 
-
-        // if (!response.ok) {
-        //   return <InlineError message={`Failed to load item: ${response.status}`} />;
-        //   //throw new Error(`Failed to load credits: ${response.status}`);
-        // }
-
         const apiResponse = await response.json();
         const credit: Item = apiResponse.data || null;
         setCredit(credit);
@@ -57,10 +51,12 @@ export default function SpecificItemPage() {
     <div style={{ padding: '2rem' }}>
       <h1>User Credit</h1>
 
-      {credit === null && 
-      <p>No credit found.
-        { <InlineError message={'No credit found.'} /> }
-      </p>}
+      {credit === null && (
+        <p>
+          No credit found.
+          {<InlineError message={'No credit found.'} />}
+        </p>
+      )}
 
       {credit && (
         <ul>
@@ -68,7 +64,6 @@ export default function SpecificItemPage() {
             <strong>{credit.id}</strong> — {credit.name}, {credit.amount}
           </li>
         </ul>
-        
       )}
     </div>
   );
