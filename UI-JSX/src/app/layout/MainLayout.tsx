@@ -13,38 +13,22 @@ export function MainLayout() {
     {
       label: 'Home',
       icon: 'pi pi-home',
-      template: () => (
-        <Link to="/" className="p-menuitem-link">
-          Home
-        </Link>
-      ),
+      template: () => <Link to="/" className="p-menuitem-link">Home</Link>,
     },
     {
       label: 'Item Types',
       icon: 'pi pi-list',
-      template: () => (
-        <Link to="/item-types" className="p-menuitem-link">
-          Item Types
-        </Link>
-      ),
+      template: () => <Link to="/item-types" className="p-menuitem-link">Item Types</Link>,
     },
     {
       label: 'Status',
       icon: 'pi pi-server',
-      template: () => (
-        <Link to="/status" className="p-menuitem-link">
-          Status
-        </Link>
-      ),
+      template: () => <Link to="/status" className="p-menuitem-link">Status</Link>,
     },
     {
       label: 'Docs',
       icon: 'pi pi-book',
-      template: () => (
-        <Link to="/docs" className="p-menuitem-link">
-          Docs
-        </Link>
-      ),
+      template: () => <Link to="/docs" className="p-menuitem-link">Docs</Link>,
     },
   ];
 
@@ -53,45 +37,48 @@ export function MainLayout() {
   );
 
   return (
-    <div className="min-h-screen flex flex-column surface-ground">
-      {/* Top Navigation */}
-      <Menubar model={menuItems} start={start} className="border-none shadow-1" />
+    <>
+      {/* GLOBAL TOAST */}
+      <Toast ref={toastRef} position="top-right" />
 
-      {/* Sidebar Navigation */}
-      <Sidebar
-        visible={sidebarVisible}
-        onHide={() => setSidebarVisible(false)}
-        className="p-sidebar-sm"
-      >
-        <h3 className="mb-3">Navigation</h3>
-        <ul className="list-none p-0 m-0 flex flex-column gap-3">
-          <li>
-            <Link to="/" onClick={() => setSidebarVisible(false)}>
-              <i className="pi pi-home mr-2" /> Home
-            </Link>
-          </li>
-          <li>
-            <Link to="/item-types" onClick={() => setSidebarVisible(false)}>
-              <i className="pi pi-list mr-2" /> Item Types
-            </Link>
-          </li>
-          <li>
-            <Link to="/status" onClick={() => setSidebarVisible(false)}>
-              <i className="pi pi-server mr-2" /> Status
-            </Link>
-          </li>
-          <li>
-            <Link to="/docs" onClick={() => setSidebarVisible(false)}>
-              <i className="pi pi-book mr-2" /> Docs
-            </Link>
-          </li>
-        </ul>
-      </Sidebar>
+      <div className="min-h-screen flex flex-column surface-ground">
+        <Menubar model={menuItems} start={start} className="border-none shadow-1" />
 
-      {/* Main Content */}
-      <main className="flex-1 p-4">
-        <Outlet />
-      </main>
-    </div>
+        <Sidebar
+          visible={sidebarVisible}
+          onHide={() => setSidebarVisible(false)}
+          className="p-sidebar-sm"
+        >
+          <h3 className="mb-3">Navigation</h3>
+          <ul className="list-none p-0 m-0 flex flex-column gap-3">
+            <li>
+              <Link to="/" onClick={() => setSidebarVisible(false)}>
+                <i className="pi pi-home mr-2" /> Home
+              </Link>
+            </li>
+            <li>
+              <Link to="/item-types" onClick={() => setSidebarVisible(false)}>
+                <i className="pi pi-list mr-2" /> Item Types
+              </Link>
+            </li>
+            <li>
+              <Link to="/status" onClick={() => setSidebarVisible(false)}>
+                <i className="pi pi-server mr-2" /> Status
+              </Link>
+            </li>
+            <li>
+              <Link to="/docs" onClick={() => setSidebarVisible(false)}>
+                <i className="pi pi-book mr-2" /> Docs
+              </Link>
+            </li>
+          </ul>
+        </Sidebar>
+
+        <main className="flex-1 p-4">
+          {/* FIX: PASS TOAST CONTEXT */}
+          <Outlet context={{ toastRef }} />
+        </main>
+      </div>
+    </>
   );
 }

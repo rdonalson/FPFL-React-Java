@@ -3,7 +3,7 @@ import { Button } from 'primereact/button';
 import { Panel } from 'primereact/panel';
 import { useNavigate } from 'react-router-dom';
 
-export function Home() {
+export function HomePage() {
   const navigate = useNavigate();
 
   return (
