@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Outlet, Link } from 'react-router-dom';
 import { Menubar } from 'primereact/menubar';
 import { Sidebar } from 'primereact/sidebar';
 import { Button } from 'primereact/button';
+import { Toast } from 'primereact/toast';
 
 export function MainLayout() {
   const [sidebarVisible, setSidebarVisible] = useState(false);
+  const toastRef = useRef<Toast>(null);
 
   const menuItems = [
     {

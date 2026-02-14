@@ -44,11 +44,11 @@ export default function SpecificItemPage() {
   }, []);
 
   if (loading) {
-    return <div style={{ padding: '2rem' }}>Loading credits…</div>;
+    return <div className="specific-item-loading">Loading credits…</div>;
   }
 
   return (
-    <div style={{ padding: '2rem' }}>
+    <div className="specific-item-container">
       <h1>User Credit</h1>
 
       {credit === null && (
@@ -60,7 +60,7 @@ export default function SpecificItemPage() {
 
       {credit && (
         <ul>
-          <li key={credit.id} style={{ marginBottom: '1rem' }}>
+          <li key={credit.id} className="specific-item-list-item">
             <strong>{credit.id}</strong> — {credit.name}, {credit.amount}
           </li>
         </ul>
