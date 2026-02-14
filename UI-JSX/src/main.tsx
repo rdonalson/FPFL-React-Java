@@ -9,27 +9,25 @@ import { PrimeReactProvider } from 'primereact/api';
 
 // PrimeReact global styles
 //import 'primereact/resources/themes/lara-light-blue/theme.css';
-import 'primereact/resources/themes/bootstrap4-light-purple/theme.css';
+import 'primereact/resources/themes/arya-orange/theme.css';
+//import 'primereact/resources/themes/lara-dark-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 
-// PrimeFlex (optional but recommended)
-import 'primeflex/primeflex.min.css';
+// PrimeFlex
+import 'primeflex/primeflex.css';
 
-// Your global styles
-import "./index.css";
+// Tailwind + your global styles
+import './index.css';
 
-const root = document.getElementById('root')!;
-if (root) {
-  ReactDOM.createRoot(root).render(
-    <React.StrictMode>
-      <PrimeReactProvider>
-        <AppErrorBoundary>
-          <QueryProvider>
-            <App />
-          </QueryProvider>
-        </AppErrorBoundary>
-      </PrimeReactProvider>
-    </React.StrictMode>,
-  );
-}
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <PrimeReactProvider value={{ ripple: true }}>
+      <AppErrorBoundary>
+        <QueryProvider>
+          <App />
+        </QueryProvider>
+      </AppErrorBoundary>
+    </PrimeReactProvider>
+  </React.StrictMode>,
+);
