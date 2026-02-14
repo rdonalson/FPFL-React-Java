@@ -52,3 +52,4 @@ This keeps the UI modular, scalable, and easy to onboard.
 ```bash
 npm install
 npm run dev
+```

@@ -29,5 +29,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         </QueryProvider>
       </AppErrorBoundary>
     </PrimeReactProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );
