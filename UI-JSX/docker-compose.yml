@@ -6,8 +6,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: ui
+    container_name: FPFL-UI-JSX-V2
     ports:
-      - "3000:80"
+      - "9500:9500"
     env_file:
       - .env.docker
