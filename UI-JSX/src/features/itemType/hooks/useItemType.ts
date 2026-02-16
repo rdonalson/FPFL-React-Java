@@ -15,7 +15,6 @@ export function useItemType(id: number) {
   return useQuery({
     queryKey: [...ITEM_TYPE_KEY, id],
     queryFn: () => itemTypeApi.fetchById(id),
-    enabled: !!id,
   });
 }
 
