@@ -1,4 +1,4 @@
-import { InlineError } from '@/components/InLineError';
+import { InLineMessage } from '@/components/InLineMessage';
 import { useEffect, useState } from 'react';
 
 interface Item {
@@ -54,7 +54,7 @@ export default function SpecificItemPage() {
       {credit === null && (
         <p>
           No credit found.
-          {<InlineError message={'No credit found.'} />}
+          {/* {<InlineError message={'No credit found.'} />} */}
         </p>
       )}
 
