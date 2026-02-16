@@ -1,3 +1,4 @@
+// src/app/providers/AppErrorBoundary.tsx
 import React from 'react';
 import { apiConfig } from '@/api/config';
 
@@ -15,6 +16,7 @@ export class AppErrorBoundary extends React.Component<
 
     fetch(`${apiConfig.baseUrl}/client-logs`, {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         level: 'error',
         url: 'UI_RENDER',
@@ -23,7 +25,6 @@ export class AppErrorBoundary extends React.Component<
         correlationId: crypto.randomUUID(),
         details: { componentStack: info?.componentStack },
       }),
-      headers: { 'Content-Type': 'application/json' },
     }).catch(e => console.log('🔥 UI LOGGING FAILED', e));
 
     this.setState({ hasError: true });

@@ -13,22 +13,38 @@ export function MainLayout() {
     {
       label: 'Home',
       icon: 'pi pi-home',
-      template: () => <Link to="/" className="p-menuitem-link">Home</Link>,
+      template: () => (
+        <Link to="/" className="p-menuitem-link">
+          Home
+        </Link>
+      ),
     },
     {
       label: 'Item Types',
       icon: 'pi pi-list',
-      template: () => <Link to="/item-types" className="p-menuitem-link">Item Types</Link>,
+      template: () => (
+        <Link to="/item-types" className="p-menuitem-link">
+          Item Types
+        </Link>
+      ),
     },
     {
       label: 'Status',
       icon: 'pi pi-server',
-      template: () => <Link to="/status" className="p-menuitem-link">Status</Link>,
+      template: () => (
+        <Link to="/status" className="p-menuitem-link">
+          Status
+        </Link>
+      ),
     },
     {
       label: 'Docs',
       icon: 'pi pi-book',
-      template: () => <Link to="/docs" className="p-menuitem-link">Docs</Link>,
+      template: () => (
+        <Link to="/docs" className="p-menuitem-link">
+          Docs
+        </Link>
+      ),
     },
   ];
 
