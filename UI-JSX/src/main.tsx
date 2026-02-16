@@ -1,19 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './app/App';
-
-// Providers
-import { QueryProvider } from './app/providers/QueryProvider';
-import { AppErrorBoundary } from './app/providers/AppErrorBoundary';
-import { PrimeReactProvider } from 'primereact/api';
-import { ToastProvider } from './app/providers/ToastProvider.tsx';
+import { AppProviders } from './app/providers/AppProviders.tsx';
 
 // PrimeReact global styles
 //import 'primereact/resources/themes/lara-light-purple/theme.css';
-//import 'primereact/resources/themes/md-light-indigo/theme.css';
+import 'primereact/resources/themes/md-light-indigo/theme.css';
 //import 'primereact/resources/themes/arya-orange/theme.css';
 //import 'primereact/resources/themes/bootstrap4-dark-blue/theme.css';
-import 'primereact/resources/themes/lara-dark-blue/theme.css';
+//import 'primereact/resources/themes/lara-dark-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 
@@ -25,14 +20,8 @@ import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <PrimeReactProvider value={{ ripple: true }}>
-      <ToastProvider>
-        <AppErrorBoundary>
-          <QueryProvider>
-            <App />
-          </QueryProvider>
-        </AppErrorBoundary>
-      </ToastProvider>
-    </PrimeReactProvider>
+    <AppProviders>
+      <App />
+    </AppProviders>
   </React.StrictMode>,
 );
