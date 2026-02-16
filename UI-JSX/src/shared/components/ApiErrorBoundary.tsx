@@ -1,5 +1,5 @@
 // src/shared/components/ApiErrorBoundary.tsx
-import { InlineError } from '@/components/InLineError';
+import { InLineMessage } from '@/components/InLineMessage';
 
 interface ApiErrorBoundaryProps {
   error: any;
@@ -17,7 +17,7 @@ export function ApiErrorBoundary({ error, children }: ApiErrorBoundaryProps) {
   if (status > 0 && status < 500) {
     return (
       <div className="api-error-inline">
-        <InlineError status={status} message={error.message} />
+        <InLineMessage severity="warn" status={error.status} message={error.message} />
       </div>
     );
   }

@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { InlineError } from '@/components/InLineError';
+import { InLineMessage } from '@/components/InLineMessage';
 import { useItemType } from '../hooks/useItemType';
 import { ApiErrorBoundary } from '@/shared/components/ApiErrorBoundary';
 
@@ -19,8 +19,6 @@ export function ItemTypeDetailPage() {
     <ApiErrorBoundary error={error}>
       <div className="item-type-detail">
         <h2>Item Type Details</h2>
-
-        {!itemType && <InlineError message="Item type not found." />}
 
         {itemType && (
           <ul>
