@@ -1,0 +1,5 @@
+[
+    { "label": "Home", "icon": "pi pi-home", "url": "/" },
+    { "label": "Dashboard", "icon": "pi pi-chart-bar", "url": "/dashboard" },
+    { "label": "Settings", "icon": "pi pi-cog", "url": "/settings" }
+]

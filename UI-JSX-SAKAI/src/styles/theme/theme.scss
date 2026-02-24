@@ -1,0 +1,8 @@
+@use '../variables' as *;
+@use '../app/styles/layout/' as *;
+
+.card {
+  background: var(--surface-card);
+  padding: 1.5rem;
+  border-radius: 8px;
+}
