@@ -1,6 +1,7 @@
 import './globals.scss';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
+import { PrimeReactProvider } from 'primereact/api';
 
 import '../assets/layout/styles/lara-dark-teal/theme.css';
 import '../assets/layout/styles/layout.scss';
@@ -21,8 +22,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     return (
         <html lang="en">
             <head>
-                {/* Favicon */}
-
                 {/* Optional: SVG version */}
                 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
@@ -35,7 +34,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </head>
 
             <body>
-                <AppLayout>{children}</AppLayout>
+                <PrimeReactProvider>
+                    <AppLayout>{children}</AppLayout>
+                </PrimeReactProvider>
             </body>
         </html>
     );
