@@ -11,7 +11,8 @@ import AppConfig from './AppConfig';
 import { LayoutContext } from './context/layoutcontext';
 //import { PrimeReactContext } from 'primereact/api';
 import { LayoutState, AppTopbarRef } from '@/types';
-import { usePathname, useSearchParams } from 'next/navigation';
+//import { usePathname, seSearchParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
     const { layoutConfig, layoutState, setLayoutState } = useContext(LayoutContext);
@@ -35,11 +36,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     });
 
     const pathname = usePathname();
-    const searchParams = useSearchParams();
+    //const searchParams = useSearchParams();
     useEffect(() => {
         hideMenu();
         hideProfileMenu();
-    }, [pathname, searchParams]);
+    }, [pathname]);
+
+    //}, [pathname, searchParams]);
 
     const [bindProfileMenuOutsideClickListener, unbindProfileMenuOutsideClickListener] = useEventListener({
         type: 'click',
