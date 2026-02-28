@@ -11,14 +11,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     const toggleSidebar = () => setSidebarActive(prev => !prev);
     const hideSidebar = () => setSidebarActive(false);
 
-    useEffect(() => {
-        const handler = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') hideSidebar();
-        };
-        window.addEventListener('keydown', handler);
-        return () => window.removeEventListener('keydown', handler);
-    }, []);
-
     return (
         <div className={`layout-wrapper layout-static ${sidebarActive ? '' : 'layout-static-inactive'}`}>
             <AppTopbar onToggleSidebar={toggleSidebar} />
