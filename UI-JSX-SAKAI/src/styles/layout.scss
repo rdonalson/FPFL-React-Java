@@ -1,1 +1,3 @@
-@import './_variables';
+@use './_variables' as vars;
+@use './_mixins' as mixins;
+@use './theme/theme.scss' as theme;

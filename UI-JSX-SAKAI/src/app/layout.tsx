@@ -1,27 +1,24 @@
-import './globals.scss';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import { PrimeReactProvider } from 'primereact/api';
+import './globals.scss';
 
-import '../assets/layout/styles/lara-dark-teal/theme.css';
-import '../assets/layout/styles/layout.scss';
-
-//import ClientLayout from './layout/ClientLayout';
 import ClientLayout from './ClientLayout';
 
 export const metadata = {
     title: 'UI-JSX-SAKAI',
     description: 'A clean React + PrimeReact application',
     icons: {
-        icon: '/favicon.ico',
-        shortcut: '/favicon.ico',
-        apple: '/favicon.png'
+        icon: '/favicon.ico'
     }
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
         <html lang="en">
+            <head>
+                <link id="theme-css" href={`/themes/lara-light-indigo/theme.css`} rel="stylesheet"></link>
+            </head>
             <body>
                 <PrimeReactProvider>
                     <ClientLayout>{children}</ClientLayout>

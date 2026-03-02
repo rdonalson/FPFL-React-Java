@@ -5,6 +5,7 @@ import { classNames } from 'primereact/utils';
 import { forwardRef, useContext, useImperativeHandle, useRef } from 'react';
 import { AppTopbarRef } from '@/types';
 import { LayoutContext } from './context/layoutcontext';
+//import '../../assets/layout/images'
 
 const AppTopbar = forwardRef<AppTopbarRef>((_, ref) => {
     const { layoutConfig, layoutState, onMenuToggle, showProfileSidebar } = useContext(LayoutContext);
