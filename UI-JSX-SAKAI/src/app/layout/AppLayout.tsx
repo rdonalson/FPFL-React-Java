@@ -13,6 +13,8 @@ import { LayoutContext } from './context/layoutcontext';
 import { LayoutState, AppTopbarRef } from '@/types';
 //import { usePathname, seSearchParams } from 'next/navigation';
 import { usePathname } from 'next/navigation';
+//import '../../assets/layout/images/logo-dark.svg';
+//import '../../assets/layout/images/logo-white.svg';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
     const { layoutConfig, layoutState, setLayoutState } = useContext(LayoutContext);
