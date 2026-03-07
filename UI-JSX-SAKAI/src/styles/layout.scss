@@ -1,5 +1,204 @@
 @use './_variables' as vars;
 @use './_mixins' as mixins;
-@use './theme/theme.scss' as theme;
+@use './theme/theme' as theme;
 
+/* ----------------------------------------------------------------- */
+/* 1. Theme Slideout Specific Styles  (grid, flex, spacing, sizing)  */
+/* ----------------------------------------------------------------- */
 
+/* Grid */
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -0.5rem;
+  margin-left: -0.5rem;
+  margin-top: -0.5rem;
+}
+
+.col-3 {
+  flex: 0 0 auto;
+  padding: 0.5rem;
+  width: 25%;
+}
+
+/* Responsive column utilities */
+@media screen and (min-width: 576px) {
+  .sm\:col-3 {
+    flex: 0 0 auto;
+    padding: 0.5rem;
+    width: 25%;
+  }
+}
+@media screen and (min-width: 768px) {
+  .md\:col-3 {
+    flex: 0 0 auto;
+    padding: 0.5rem;
+    width: 25%;
+  }
+}
+@media screen and (min-width: 992px) {
+  .lg\:col-3 {
+    flex: 0 0 auto;
+    padding: 0.5rem;
+    width: 25%;
+  }
+}
+@media screen and (min-width: 1200px) {
+  .xl\:col-3 {
+    flex: 0 0 auto;
+    padding: 0.5rem;
+    width: 25%;
+  }
+}
+
+/* Flex utilities */
+.flex {
+  display: flex !important;
+}
+
+.flex-1 {
+  flex: 1 1 !important;
+}
+
+/* Spacing utilities */
+.gap-2 {
+  gap: 0.5rem !important;
+}
+
+.mr-2 {
+  margin-right: 0.5rem !important;
+}
+
+.ml-2 {
+  margin-left: 0.5rem !important;
+}
+
+/* Sizing utilities */
+.h-2rem {
+  height: 2rem !important;
+}
+
+.w-2rem {
+  width: 2rem !important;
+}
+
+/* Responsive width utilities */
+@media screen and (min-width: 576px) {
+  .sm\:w-2rem {
+    width: 2rem !important;
+  }
+}
+@media screen and (min-width: 768px) {
+  .md\:w-2rem {
+    width: 2rem !important;
+  }
+}
+@media screen and (min-width: 992px) {
+  .lg\:w-2rem {
+    width: 2rem !important;
+  }
+}
+@media screen and (min-width: 1200px) {
+  .xl\:w-2rem {
+    width: 2rem !important;
+  }
+}
+
+/* -------------------------------------------------- */
+/* 2. Form & Alignment Utilities                      */
+/* -------------------------------------------------- */
+
+.align-items-center {
+  align-items: center !important;
+}
+
+/* Responsive alignment utilities */
+@media screen and (min-width: 576px) {
+  .sm\:align-items-center {
+    align-items: center !important;
+  }
+}
+@media screen and (min-width: 768px) {
+  .md\:align-items-center {
+    align-items: center !important;
+  }
+}
+@media screen and (min-width: 992px) {
+  .lg\:align-items-center {
+    align-items: center !important;
+  }
+}
+@media screen and (min-width: 1200px) {
+  .xl\:align-items-center {
+    align-items: center !important;
+  }
+}
+
+/* Form field utilities */
+.field.grid .col-3,
+.formgrid.grid .col-3 {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.field-checkbox,
+.field-radiobutton {
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.field-checkbox > label,
+.field-radiobutton > label {
+  margin-left: 0.5rem;
+  line-height: 1;
+}
+
+/* -------------------------------------------------- */
+/* 3. Component Overrides (PrimeReact + Sakai)        */
+/* -------------------------------------------------- */
+
+/* Layout config sidebar */
+.layout-config-sidebar {
+  &.p-sidebar {
+    .p-sidebar-content {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
+}
+
+/* PrimeIcons base */
+.pi {
+  font-family: 'primeicons';
+  font-style: normal;
+  font-weight: normal;
+  font-feature-settings: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  display: inline-block;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* PrimeIcons glyphs */
+.pi-plus:before {
+  content: "\e90d";
+}
+
+.pi-plus-circle:before {
+  content: "\e90e";
+}
+
+.pi-circle-fill:before {
+  content: "\e9dd";
+}
+
+.pi-minus:before {
+  content: "\e90f";
+}
+
+.pi-minus-circle:before {
+  content: "\e910";
+}
