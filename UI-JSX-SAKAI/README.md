@@ -181,8 +181,4 @@ npm start
 
 ## License
 
-MIT License. Free to use, modify, and distribute.
-
----
-
-If you want, I can also format this into a **GitHub‑optimized version with a table of contents**, or help you add **status badges**, **screenshots**, or **demo GIFs**.
+This project is licensed under the [MIT License](../LICENSE).
