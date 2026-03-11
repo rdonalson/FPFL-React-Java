@@ -1,6 +1,5 @@
 'use client';
 
-//import { useRouter } from 'next/navigation';
 import { useEventListener, useUnmountEffect } from 'primereact/hooks';
 import React, { useContext, useEffect, useRef } from 'react';
 import { classNames } from 'primereact/utils';
@@ -9,12 +8,8 @@ import AppSidebar from './AppSidebar';
 import AppTopbar from './AppTopbar';
 import AppConfig from './AppConfig';
 import { LayoutContext } from './context/layoutcontext';
-//import { PrimeReactContext } from 'primereact/api';
-import { LayoutState, AppTopbarRef } from '@/types';
-//import { usePathname, seSearchParams } from 'next/navigation';
+import { LayoutState, AppTopbarRef } from '@/lib/types';
 import { usePathname } from 'next/navigation';
-//import '../../assets/layout/images/logo-dark.svg';
-//import '../../assets/layout/images/logo-white.svg';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
     const { layoutConfig, layoutState, setLayoutState } = useContext(LayoutContext);
