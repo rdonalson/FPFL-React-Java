@@ -1,6 +1,6 @@
 'use client';
 import { useState, createContext } from 'react';
-import { LayoutState, ChildContainerProps, LayoutConfig, LayoutContextProps } from '@/types';
+import { LayoutState, ChildContainerProps, LayoutConfig, LayoutContextProps } from '@/lib/types';
 export const LayoutContext = createContext({} as LayoutContextProps);
 
 export const LayoutProvider = ({ children }: ChildContainerProps) => {
