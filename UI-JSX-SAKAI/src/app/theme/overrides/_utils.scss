@@ -1,18 +1,60 @@
-@use "./_main";
-@use "./_topbar";
-@use "./_menu";
-@use "./_config";
-@use "./_content";
-@use "./_footer";    
-@use "./_responsive";
-@use "./_utils";
-@use "./_typography";
-@use './theme/theme' as theme;
+/* Utils */
+
+@use '../variables/_variables' as var;
+
+.clearfix:after {
+    content: " ";
+    display: block;
+    clear: both;
+}
+
+.card {
+    background: var(--surface-card);
+    border: 1px solid var(--surface-border);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--card-shadow);
+    border-radius: var.$borderRadius;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.p-toast {
+    &.p-toast-top-right,
+    &.p-toast-top-left,
+    &.p-toast-top-center {
+        top: 100px;
+    }
+}
 
 
 /* ----------------------------------------------------------------- */
 /* 1. Theme Slideout Specific Styles  (grid, flex, spacing, sizing)  */
 /* ----------------------------------------------------------------- */
+
+/* Text color utilities */
+.text-300 {
+  color: var(--surface-300) !important;
+}
+
+.focus\:text-300:focus {
+  color: var(--surface-300) !important;
+}
+
+.hover\:text-300:hover {
+  color: var(--surface-300) !important;
+}
+
+.active\:text-300:active {
+  color: var(--surface-300) !important;
+}
+
+.text-primary-500 {
+  color: var(--primary-500) !important;
+}
+
 
 /* Grid */
 .grid {
