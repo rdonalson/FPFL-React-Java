@@ -1,6 +1,4 @@
-@import url('../assets/layout/styles/layout.scss');
-@import url('../styles/layout.scss'); 
-    
+@use './theme/layout/layout.scss';
 
 html,
 body {

@@ -1,5 +1,5 @@
-@use './_variables' as var;
-@use "./_mixins" as mix;
+@use '../variables/_variables' as var;
+@use "../overrides/_mixins" as mix;
 
 .layout-sidebar {
     position: fixed;
