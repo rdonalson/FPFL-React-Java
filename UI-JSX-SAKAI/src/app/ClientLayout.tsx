@@ -1,7 +1,7 @@
 'use client';
 
-import AppLayout from './(main)/layout/AppLayout';
-import { LayoutProvider } from './(main)/layout/context/layoutcontext'; // adjust import to your actual provider
+import AppLayout from '../components/layout/AppLayout';
+import { LayoutProvider } from '../components/layout/context/layoutcontext'; // adjust import to your actual provider
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
     return (
