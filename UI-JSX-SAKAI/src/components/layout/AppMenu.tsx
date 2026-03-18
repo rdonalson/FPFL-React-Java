@@ -5,7 +5,7 @@ import AppMenuitem from './AppMenuitem';
 import { LayoutContext } from './context/layoutcontext';
 import { MenuProvider } from './context/menucontext';
 import Link from 'next/link';
-import { AppMenuItem } from '@/lib/types';
+import { AppMenuItem } from '@/types';
 
 const AppMenu = () => {
     const { layoutConfig } = useContext(LayoutContext);
@@ -16,7 +16,7 @@ const AppMenu = () => {
             items: [
                 { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' },
                 { label: 'About', icon: 'pi pi-fw pi-info-circle', to: '/about' },
-                { label: 'Item Types', icon: 'pi pi-fw pi-tags', to: '/item-types' }
+                { label: 'Item Types', icon: 'pi pi-fw pi-tags', to: '/inventory/item-types' }
             ]
         },
         {

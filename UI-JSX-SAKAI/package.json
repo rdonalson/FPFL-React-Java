@@ -12,9 +12,13 @@
         "preview": "next preview"
     },
     "dependencies": {
+        "@tanstack/react-query": "^5.90.21",
+        "@tanstack/react-query-devtools": "^5.91.3",
+        "@tanstack/react-table": "^8.21.3",
         "@types/node": "20.3.1",
         "@types/react": "18.2.12",
         "@types/react-dom": "18.2.5",
+        "axios": "^1.13.6",
         "chart.js": "4.2.1",
         "next": "^16.1.6",
         "primeflex": "^3.3.1",

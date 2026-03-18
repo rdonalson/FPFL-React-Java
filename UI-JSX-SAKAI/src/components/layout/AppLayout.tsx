@@ -8,7 +8,7 @@ import AppSidebar from './AppSidebar';
 import AppTopbar from './AppTopbar';
 import AppConfig from './AppConfig';
 import { LayoutContext } from './context/layoutcontext';
-import { LayoutState, AppTopbarRef } from '@/lib/types';
+import { LayoutState, AppTopbarRef } from '@/types';
 import { usePathname } from 'next/navigation';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {

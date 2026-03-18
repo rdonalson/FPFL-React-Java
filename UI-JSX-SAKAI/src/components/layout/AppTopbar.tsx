@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { classNames } from 'primereact/utils';
 import { forwardRef, useContext, useImperativeHandle, useRef } from 'react';
-import { AppTopbarRef } from '@/lib/types';
+import { AppTopbarRef } from '@/types';
 import { LayoutContext } from './context/layoutcontext';
 //import '../../assets/layout/images'
 
