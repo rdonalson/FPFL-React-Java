@@ -32,6 +32,7 @@ my-system/
 ## 🧭 Module Responsibilities
 
 ### **api**
+
 - Exposes REST endpoints  
 - Defines DTOs and client‑facing contracts  
 - Delegates write operations to **items**  
@@ -39,17 +40,20 @@ my-system/
 - Owns the Spring Boot application, datasource, and JPA configuration  
 
 ### **items**
+
 - Owns the domain model for “items”  
 - Handles CRUD operations  
 - Implements repositories (Spring Data JPA)  
 - Contains domain services and aggregates  
 
 ### **display**
+
 - Provides read‑optimized models  
 - Query handlers and projections  
 - Shapes data for UI consumption  
 
 ### **common**
+
 - Shared utilities  
 - Custom exceptions  
 - Reusable config and annotations  
@@ -82,6 +86,7 @@ Below is a summary of the schema represented in the ER diagram.
 ## **📌 Tables Overview**
 
 ### **items**
+
 Stores all user‑defined financial items, including scheduling metadata.
 
 | Column | Description |
@@ -118,6 +123,7 @@ Stores all user‑defined financial items, including scheduling metadata.
 ---
 
 ### **item_types**
+
 Defines the type/category of an item.
 
 | Column | Description |
@@ -128,6 +134,7 @@ Defines the type/category of an item.
 ---
 
 ### **time_periods**
+
 Defines the recurrence period for an item.
 
 | Column | Description |
@@ -139,9 +146,10 @@ Defines the recurrence period for an item.
 
 ## **🔗 Relationships**
 
-```
+---
+
 item_types (1) ────< (many) items >──── (1) time_periods
-```
+---
 
 - `items.fk_item_type` → `item_types.id`
 - `items.fk_time_period` → `time_periods.id`
@@ -155,6 +163,7 @@ The API module exposes endpoints that operate on these tables through the domain
 # 🚀 Getting Started
 
 ## Prerequisites
+
 - Java 25  
 - Maven 3.9+  
 - Git  
@@ -166,9 +175,9 @@ Ensure your `application.yml` contains valid datasource credentials.
 
 ## Build the entire system
 
-```bash
+---bash
 mvn clean install
-```
+---
 
 This compiles, tests, and packages all modules into JAR files.
 
@@ -178,21 +187,21 @@ This compiles, tests, and packages all modules into JAR files.
 
 From the `api` directory:
 
-```bash
+---bash
 mvn spring-boot:run
-```
+---
 
 Or from the project root:
 
-```bash
+---bash
 mvn -pl api spring-boot:run
-```
+---
 
 Or run the packaged JAR:
 
-```bash
+---bash
 java -jar target/api-0.0.1-SNAPSHOT.jar
-```
+---
 
 The API starts on port **8000** by default.
 
@@ -200,9 +209,9 @@ The API starts on port **8000** by default.
 
 ## 🧪 Running Tests
 
-```bash
+---bash
 mvn test
-```
+---
 
 Each module contains its own isolated test suite.
 
@@ -212,12 +221,13 @@ Each module contains its own isolated test suite.
 
 Each bounded context produces a JAR:
 
-```
+---
+
 api/target/api-<version>.jar
 items/target/items-<version>.jar
 display/target/display-<version>.jar
 common/target/common-<version>.jar
-```
+---
 
 The **API module is the only runnable entrypoint**.
 
@@ -236,7 +246,9 @@ The **API module is the only runnable entrypoint**.
 
 This project is licensed under the [MIT License](../LICENSE).
 
-```
+---
+---
+
 # 🔒 Patch AssertJ CVE Across Maven Modules
 
 This document outlines the controlled process for identifying, standardizing, and remediating CVE findings related to `org.assertj:assertj-core` across the API‑JDK multi‑module Maven project.
@@ -347,4 +359,3 @@ Evaluate:
 - Upgrading the Spring BOM  
 - Upgrading the parent dependency strategy
 
----
