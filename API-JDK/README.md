@@ -237,4 +237,114 @@ The **API module is the only runnable entrypoint**.
 This project is licensed under the [MIT License](../LICENSE).
 
 ```
+# 🔒 Patch AssertJ CVE Across Maven Modules
 
+This document outlines the controlled process for identifying, standardizing, and remediating CVE findings related to `org.assertj:assertj-core` across the API‑JDK multi‑module Maven project.
+
+## 📌 Plan Overview
+The goal is to baseline current AssertJ CVE findings, align all module versions, apply a patched version centrally, and verify the fix through CVE validation and a full reactor build.
+
+## 🧭 Steps
+
+### 1. Capture Baseline CVE Findings
+Run:
+
+```
+validate_cves_for_java
+```
+
+Record all findings related to:
+
+```
+org.assertj:assertj-core
+```
+
+This establishes the before‑state for comparison.
+
+---
+
+### 2. Locate All AssertJ Declarations
+Inspect the following module POMs:
+
+- `module-common-bc/pom.xml`
+- `module-display-bc/pom.xml`
+- `module-items-bc/pom.xml`
+
+Identify:
+- Direct `assertj-core` declarations  
+- Any inherited versions coming from `dependencyManagement`
+
+---
+
+### 3. Confirm Effective Versions
+Use:
+
+```
+mvn help:effective-pom
+```
+
+Verify:
+- Which modules inherit the parent version  
+- Which modules override it  
+- Whether any transitive dependencies introduce older AssertJ versions
+
+---
+
+### 4. Standardize the AssertJ Version
+Choose a single patched version and apply it consistently.
+
+**Preferred approach:**  
+✔ Add the version once in the root `dependencyManagement`  
+✔ Remove module‑level overrides
+
+This ensures:
+- Version consistency  
+- Easier future upgrades  
+- Cleaner module POMs
+
+---
+
+### 5. Re‑Run CVE Validation
+Run:
+
+```
+validate_cves_for_java
+```
+
+Compare before/after results to confirm the AssertJ CVE is resolved.
+
+---
+
+### 6. Verify Build & Test Stability
+Execute a full reactor build from the project root:
+
+```
+mvn clean verify
+```
+
+Confirm:
+- All modules compile  
+- Tests pass  
+- No regressions introduced by the dependency update
+
+---
+
+## 🧩 Further Considerations
+
+### ✔ Which patched version should we target?
+Options include:
+- **Latest stable AssertJ release**  
+- **Version aligned with Spring Boot BOM**  
+- **Security‑team mandated minimum version**
+
+### ✔ Where should the version be controlled?
+- **Option A (recommended):** Centralize in parent `dependencyManagement`  
+- **Option B:** Explicitly pin per module (only if module isolation is required)
+
+### ✔ What if the CVE persists transitively?
+Evaluate:
+- Adding exclusions  
+- Upgrading the Spring BOM  
+- Upgrading the parent dependency strategy
+
+---
