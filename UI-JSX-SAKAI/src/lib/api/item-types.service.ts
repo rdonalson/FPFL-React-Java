@@ -1,3 +1,5 @@
+"use client";
+
 import http from "./http";
 import { ItemType } from "@/types/item-type";
 

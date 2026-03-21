@@ -4,6 +4,7 @@ import { PrimeReactProvider } from 'primereact/api';
 import './globals.scss';
 
 import ClientLayout from './ClientLayout';
+import QueryProvider from './providers/QueryProvider';
 
 export const metadata = {
     title: 'UI-JSX-SAKAI',
@@ -14,15 +15,21 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+    console.log('Running in:', process.env.NODE_ENV);
+    console.log('Env file:', process.env.NEXT_PUBLIC_ENV);
+    console.log('API URL:', process.env.NEXT_PUBLIC_API_URL);
+
     return (
         <html lang="en">
             <head>
                 <link id="theme-css" href={`/themes/lara-light-teal/theme.css`} rel="stylesheet"></link>
             </head>
             <body>
-                <PrimeReactProvider>
-                    <ClientLayout>{children}</ClientLayout>
-                </PrimeReactProvider>
+                <QueryProvider>
+                    <PrimeReactProvider>
+                        <ClientLayout>{children}</ClientLayout>
+                    </PrimeReactProvider>
+                </QueryProvider>
             </body>
         </html>
     );
