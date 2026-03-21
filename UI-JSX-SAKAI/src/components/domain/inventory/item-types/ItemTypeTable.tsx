@@ -1,18 +1,19 @@
 "use client";
 
+import { ApiResponse } from "@/types/api-response";
 import { ItemType } from "@/types/item-type";
 import Link from "next/link";
 
 export default function ItemTypeTable({
-  itemTypes,
+  response,
   loading,
 }: {
-  itemTypes: ItemType[];
+  response: ApiResponse<ItemType[]> | null;
   loading: boolean;
 }) {
   if (loading) return <p>Loading item types...</p>;
 
-  if (!itemTypes.length) return <p>No item types found.</p>;
+  if (!response || !response.data.length) return <p>No item types found.</p>;
 
   return (
     <table>
@@ -24,7 +25,7 @@ export default function ItemTypeTable({
         </tr>
       </thead>
       <tbody>
-        {itemTypes.map((it) => (
+        {response.data.map((it) => (
           <tr key={it.id}>
             <td>{it.id}</td>
             <td>{it.name}</td>

@@ -8,8 +8,8 @@ export default function ItemTypeDetail({ id }: { id: string }) {
 
   return (
     <div>
-      <h1>{data ? `Edit Item Type #${data.id}` : "Item Type"}</h1>
-      <ItemTypeForm itemType={data ?? null} loading={isLoading} />
+      <h1>{data ? `Edit Item Type #${data.data.id}` : "Item Type"}</h1>
+      <ItemTypeForm itemType={data?.data ?? null} loading={isLoading} />
     </div>
   );
 }

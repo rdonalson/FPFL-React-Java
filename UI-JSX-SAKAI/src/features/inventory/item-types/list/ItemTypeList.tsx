@@ -11,7 +11,7 @@ export default function ItemTypeList() {
     <div>
       <h1>Item Types</h1>
       <Link href="/inventory/item-types/new">Create Item Type</Link>
-      <ItemTypeTable itemTypes={data ?? []} loading={isLoading} />
+      <ItemTypeTable response={data ?? null} loading={isLoading} />
     </div>
   );
 }

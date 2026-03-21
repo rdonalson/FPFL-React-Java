@@ -3,9 +3,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { getItemTypes } from "@/lib/api/item-types.service";
 import { ItemType } from "@/types/item-type";
+import { ApiResponse } from "@/types/api-response";
 
 export function useItemTypes() {
-  const query = useQuery<ItemType[]>({
+  const query = useQuery<ApiResponse<ItemType[]>>({
     queryKey: ["item-types"],
     queryFn: getItemTypes,
   });
