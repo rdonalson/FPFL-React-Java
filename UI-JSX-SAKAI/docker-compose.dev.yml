@@ -1,0 +1,34 @@
+#version: "3.9"
+
+services:
+  ui:
+    image: node:20-alpine
+    container_name: ui-jsx-sakai-dev
+    working_dir: /app
+
+    # Mount your project into the container
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+    # Install deps (first run) then start Next.js dev server
+    command: sh -c "npm install && npm run dev"
+
+    env_file:
+      - .env.docker
+
+    environment:
+      # Ensure Next.js binds to all interfaces
+      HOST: 0.0.0.0
+      PORT: 4000
+
+      # Override API URL for Docker network (your API compose handles the API)
+      #NEXT_PUBLIC_API_URL: http://localhost:9000
+
+    ports:
+      - "4000:4000"
+
+
+# networks:
+#     default:
+#         name: fpfl-network

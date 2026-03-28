@@ -1,3 +1,5 @@
+"use client";
+
 import type { AxiosInstance } from "axios";
 
 export function attachInterceptors(http: AxiosInstance) {
