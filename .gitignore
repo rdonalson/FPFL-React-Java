@@ -10,6 +10,7 @@ target/
 # Eclipse / IntelliJ / VSCode
 # -------------------------
 .idea/
+.next/
 *.iml
 *.ipr
 *.iws
@@ -57,3 +58,6 @@ log/
 surefire-reports/
 failsafe-reports/
 test-output/
+
+# UI-JSX-SAKAI/package-lock.json
+package-lock.json
