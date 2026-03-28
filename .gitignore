@@ -19,6 +19,7 @@ target/
 .project
 .settings/
 out/
+package-lock.json
 
 # -------------------------
 # OS files
@@ -59,5 +60,4 @@ surefire-reports/
 failsafe-reports/
 test-output/
 
-# UI-JSX-SAKAI/package-lock.json
-package-lock.json
+

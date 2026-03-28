@@ -48,6 +48,7 @@ coverage/
 ehthumbs.db
 Thumbs.db
 Desktop.ini
+package-lock.json
 
 # Logs
 logs

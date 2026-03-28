@@ -1,0 +1,9 @@
+@use '../sakai/styles/layout.scss';
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-family);
+    background: var(--surface-ground);
+}
