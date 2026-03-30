@@ -2,9 +2,10 @@
 @use "./topbar";
 @use "./menu";
 @use './variables/config';
+@use './variables/variables';
 @use "./content";
 @use "./footer";    
 @use "./responsive";
-@use "../../styles/utils";
+@use "./utils";
 @use "./typography";
 

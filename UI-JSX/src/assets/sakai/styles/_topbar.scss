@@ -1,5 +1,5 @@
 @use './variables/variables' as var;
-@use '../../styles/mixins' as mix;
+@use './mixins' as mix;
 
 .layout-topbar {
     position: fixed;
