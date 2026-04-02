@@ -1,15 +1,12 @@
-// 1. Sakai layout
-@use './styles/layout' as *;
+/* Sakai.scss */
 
-// PrimeReact global styles
-//import 'primereact/resources/themes/lara-light-purple/theme.css';
-//import 'primereact/resources/themes/md-light-indigo/theme.css';
-//import 'primereact/resources/themes/arya-orange/theme.css';
-//import 'primereact/resources/themes/bootstrap4-dark-blue/theme.css';
-//import 'primereact/resources/themes/lara-dark-blue/theme.css';
-// 2. PrimeReact base variables (optional but recommended)
-//@import 'primereact/resources/themes/lara-light-blue/theme.css';
-@import 'primereact/resources/themes/lara-dark-blue/theme.css';
+/* 1. Load the Sakai layout engine */
+//@import './styles/layout.scss';
+
+
+/* 2. Load PrimeReact core (required) */
+@import 'primereact/resources/primereact.min.css';
+@import 'primeicons/primeicons.css';
 
 
 

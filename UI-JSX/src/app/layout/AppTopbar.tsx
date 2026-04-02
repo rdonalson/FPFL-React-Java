@@ -1,29 +1,44 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { forwardRef, useContext, useImperativeHandle, useRef } from 'react';
-import { Link } from 'react-router-dom';
 import { classNames } from 'primereact/utils';
-
 import { LayoutContext } from './context/layoutcontext';
+import { Link } from 'react-router-dom';
 import { AppTopbarRef } from '@/types';
 
 const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
-    const { layoutConfig, layoutState, onMenuToggle, showProfileSidebar } = useContext(LayoutContext);
+    const { layoutConfig, layoutState, setLayoutState } = useContext(LayoutContext);
 
     const menubuttonRef = useRef<HTMLButtonElement>(null);
     const topbarmenuRef = useRef<HTMLDivElement>(null);
     const topbarmenubuttonRef = useRef<HTMLButtonElement>(null);
 
-    // Expose refs to parent (Layout.tsx)
+    // Expose refs to AppLayout (for outside-click detection)
     useImperativeHandle(ref, () => ({
         menubutton: menubuttonRef.current,
         topbarmenu: topbarmenuRef.current,
         topbarmenubutton: topbarmenubuttonRef.current
     }));
 
+    const onMenuToggle = () => {
+        setLayoutState((prev) => ({
+            ...prev,
+            overlayMenuActive: !prev.overlayMenuActive
+        }));
+    };
+
+    const showProfileSidebar = () => {
+        setLayoutState((prev) => ({
+            ...prev,
+            profileSidebarVisible: !prev.profileSidebarVisible
+        }));
+    };
+
     return (
         <div className="layout-topbar">
+            {/* LOGO */}
             <Link to="/" className="layout-topbar-logo">
                 <img
-                    src={`/layout/images/logo-${layoutConfig.colorScheme !== 'light' ? 'white' : 'dark'}.svg`}
+                    src={`/images/logo-${layoutConfig.colorScheme === 'light' ? 'dark' : 'white'}.svg`}
                     width="47.22"
                     height="35"
                     alt="logo"
@@ -31,6 +46,7 @@ const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
                 <span>SAKAI</span>
             </Link>
 
+            {/* MENU BUTTON (hamburger) */}
             <button
                 ref={menubuttonRef}
                 type="button"
@@ -41,6 +57,7 @@ const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
                 <i className="pi pi-bars" />
             </button>
 
+            {/* PROFILE MENU BUTTON (ellipsis) */}
             <button
                 ref={topbarmenubuttonRef}
                 type="button"
@@ -51,6 +68,7 @@ const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
                 <i className="pi pi-ellipsis-v" />
             </button>
 
+            {/* TOPBAR MENU (Calendar, Profile, Settings) */}
             <div
                 ref={topbarmenuRef}
                 className={classNames('layout-topbar-menu', {

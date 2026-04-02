@@ -1,34 +1,33 @@
 import React, { useContext, useEffect, useRef } from 'react';
 import { useEventListener, useUnmountEffect } from 'primereact/hooks';
 import { classNames } from 'primereact/utils';
-import { PrimeReactContext } from 'primereact/api';
-import { useLocation } from 'react-router-dom';
+import { LayoutContext } from './context/layoutcontext';
+import { LayoutState, AppTopbarRef } from '@/types';
+import { useLocation, Outlet } from 'react-router-dom';
 
-import AppFooter from './AppFooter';
-import AppSidebar from './AppSidebar';
 import AppTopbar from './AppTopbar';
+import AppSidebar from './AppSidebar';
+import AppFooter from './AppFooter';
 import AppConfig from './AppConfig';
 
-import { LayoutContext } from './context/layoutcontext';
-import { ChildContainerProps, LayoutState, AppTopbarRef } from '@/types';
-
-const Layout = ({ children }: ChildContainerProps) => {
+export default function AppLayout() {
     const { layoutConfig, layoutState, setLayoutState } = useContext(LayoutContext);
-    const { setRipple } = useContext(PrimeReactContext);
 
     const topbarRef = useRef<AppTopbarRef>(null);
     const sidebarRef = useRef<HTMLDivElement>(null);
 
-    const location = useLocation(); // <-- replaces Next.js pathname/searchParams
+    const location = useLocation();
 
     // -----------------------------
-    // Outside click listeners
+    // MENU OUTSIDE CLICK LISTENER
     // -----------------------------
     const [bindMenuOutsideClickListener, unbindMenuOutsideClickListener] = useEventListener({
         type: 'click',
         listener: (event) => {
             const isOutsideClicked = !(
+                sidebarRef.current?.isSameNode(event.target as Node) ||
                 sidebarRef.current?.contains(event.target as Node) ||
+                topbarRef.current?.menubutton?.isSameNode(event.target as Node) ||
                 topbarRef.current?.menubutton?.contains(event.target as Node)
             );
 
@@ -36,11 +35,16 @@ const Layout = ({ children }: ChildContainerProps) => {
         }
     });
 
+    // -----------------------------
+    // PROFILE MENU OUTSIDE CLICK
+    // -----------------------------
     const [bindProfileMenuOutsideClickListener, unbindProfileMenuOutsideClickListener] = useEventListener({
         type: 'click',
         listener: (event) => {
             const isOutsideClicked = !(
+                topbarRef.current?.topbarmenu?.isSameNode(event.target as Node) ||
                 topbarRef.current?.topbarmenu?.contains(event.target as Node) ||
+                topbarRef.current?.topbarmenubutton?.isSameNode(event.target as Node) ||
                 topbarRef.current?.topbarmenubutton?.contains(event.target as Node)
             );
 
@@ -49,15 +53,15 @@ const Layout = ({ children }: ChildContainerProps) => {
     });
 
     // -----------------------------
-    // Hide menus on route change
+    // ROUTE CHANGE → CLOSE MENUS
     // -----------------------------
     useEffect(() => {
         hideMenu();
         hideProfileMenu();
-    }, [location.pathname, location.search]);
+    }, [location.pathname]);
 
     // -----------------------------
-    // Menu hide helpers
+    // MENU CONTROL FUNCTIONS
     // -----------------------------
     const hideMenu = () => {
         setLayoutState((prev: LayoutState) => ({
@@ -66,7 +70,6 @@ const Layout = ({ children }: ChildContainerProps) => {
             staticMenuMobileActive: false,
             menuHoverActive: false
         }));
-
         unbindMenuOutsideClickListener();
         unblockBodyScroll();
     };
@@ -76,40 +79,49 @@ const Layout = ({ children }: ChildContainerProps) => {
             ...prev,
             profileSidebarVisible: false
         }));
-
         unbindProfileMenuOutsideClickListener();
     };
 
-    // -----------------------------
-    // Scroll blocking
-    // -----------------------------
-    const blockBodyScroll = () => document.body.classList.add('blocked-scroll');
-    const unblockBodyScroll = () => document.body.classList.remove('blocked-scroll');
+    const blockBodyScroll = () => {
+        document.body.classList.add('blocked-scroll');
+    };
+
+    const unblockBodyScroll = () => {
+        document.body.classList.remove('blocked-scroll');
+    };
 
     // -----------------------------
-    // Bind listeners when menus open
+    // MENU ACTIVE EFFECTS
     // -----------------------------
     useEffect(() => {
         if (layoutState.overlayMenuActive || layoutState.staticMenuMobileActive) {
             bindMenuOutsideClickListener();
         }
 
-        if (layoutState.staticMenuMobileActive) blockBodyScroll();
+        if (layoutState.staticMenuMobileActive) {
+            blockBodyScroll();
+        }
     }, [layoutState.overlayMenuActive, layoutState.staticMenuMobileActive]);
 
+    // -----------------------------
+    // PROFILE MENU EFFECTS
+    // -----------------------------
     useEffect(() => {
         if (layoutState.profileSidebarVisible) {
             bindProfileMenuOutsideClickListener();
         }
     }, [layoutState.profileSidebarVisible]);
 
+    // -----------------------------
+    // CLEANUP
+    // -----------------------------
     useUnmountEffect(() => {
         unbindMenuOutsideClickListener();
         unbindProfileMenuOutsideClickListener();
     });
 
     // -----------------------------
-    // Container classes
+    // LAYOUT CSS CLASSES
     // -----------------------------
     const containerClass = classNames('layout-wrapper', {
         'layout-overlay': layoutConfig.menuMode === 'overlay',
@@ -130,14 +142,15 @@ const Layout = ({ children }: ChildContainerProps) => {
             </div>
 
             <div className="layout-main-container">
-                <div className="layout-main">{children}</div>
+                <div className="layout-main">
+                    <Outlet />
+                </div>
                 <AppFooter />
             </div>
 
             <AppConfig />
+
             <div className="layout-mask"></div>
         </div>
     );
-};
-
-export default Layout;
+}
