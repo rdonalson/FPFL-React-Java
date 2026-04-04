@@ -4,7 +4,9 @@
       "path": ".",
     },
   ],
-  "settings": {},
+  "settings": {
+    "css.lint.unknownAtRules": "ignore",
+  },
   "launch": {
     "configurations": [
       {

@@ -1,8 +1,16 @@
 /** @type {import('tailwindcss').Config} */
+import { tailwindcss } from 'tailwindcss';
+import primeui from 'tailwindcss-primeui';
+
 export default {
-  content: ['./index.html', './src/**/*.{ts,tsx}'],
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [
+    primeui, // enables PrimeReact Tailwind mode
+  ],
 };
