@@ -1,19 +1,37 @@
-# --- Build Stage ---
-FROM node:18-alpine AS build
+# -----------------------------
+# 1. Build Stage
+# -----------------------------
+FROM node:20-alpine AS builder
+
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install
+# Install dependencies first (better caching)
+COPY package.json package-lock.json* ./
+RUN npm ci
 
+# Copy source
 COPY . .
+
+# Build Vite production bundle
 RUN npm run build
 
-# --- Runtime Stage ---
-FROM nginx:alpine
-COPY --from=build /app/dist /usr/share/nginx/html
 
-# Optional: custom nginx config for SPA routing
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# -----------------------------
+# 2. Runtime Stage
+# -----------------------------
+FROM node:20-alpine AS runner
 
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+# Copy only what we need
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/dist ./dist
+
+# Expose the port your compose file maps
 EXPOSE 9500
-CMD ["nginx", "-g", "daemon off;"]
+
+# Run Vite preview server on the correct port
+CMD ["npm", "run", "preview", "--", "--port", "9500", "--host"]
