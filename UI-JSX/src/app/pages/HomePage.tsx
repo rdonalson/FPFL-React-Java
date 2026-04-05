@@ -19,30 +19,6 @@ export function HomePage() {
         <Button label="Get Started" icon="pi pi-arrow-right" onClick={() => navigate('/docs')} />
       </Card>
 
-      {/* Stats Row */}
-      <div className="grid">
-        <div className="col-12 md:col-4">
-          <Card className="shadow-1">
-            <div className="text-2xl font-bold mb-1">12</div>
-            <div className="text-color-secondary">Item Types</div>
-          </Card>
-        </div>
-
-        <div className="col-12 md:col-4">
-          <Card className="shadow-1">
-            <div className="text-2xl font-bold mb-1">OK</div>
-            <div className="text-color-secondary">API Status</div>
-          </Card>
-        </div>
-
-        <div className="col-12 md:col-4">
-          <Card className="shadow-1">
-            <div className="text-2xl font-bold mb-1">4</div>
-            <div className="text-color-secondary">Modules</div>
-          </Card>
-        </div>
-      </div>
-
       {/* Quick Actions */}
       <Panel header="Quick Actions" className="shadow-1">
         <div className="flex flex-column gap-3">
