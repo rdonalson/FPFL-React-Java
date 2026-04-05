@@ -14,11 +14,12 @@ target/
 *.iml
 *.ipr
 *.iws
-.vscode/
+#.vscode/
 .classpath
 .project
 .settings/
 out/
+package-lock.json
 
 # -------------------------
 # OS files
@@ -59,6 +60,5 @@ surefire-reports/
 failsafe-reports/
 test-output/
 
-# UI-JSX-SAKAI/package-lock.json
-package-lock.json
-#I-JSX/package-lock.json
+
+
