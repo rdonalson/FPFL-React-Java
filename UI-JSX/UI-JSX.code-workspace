@@ -7,44 +7,4 @@
   "settings": {
     "css.lint.unknownAtRules": "ignore",
   },
-  "launch": {
-    "configurations": [
-    {
-      "name": "Vite + Chrome Debug",
-      "type": "pwa-chrome",
-      "request": "launch",
-      "url": "http://localhost:4000",
-      "webRoot": "${workspaceFolder}/src",
-      "sourceMaps": true
-    },
-    {
-      "name": "Vite + Edge Debug",
-      "type": "pwa-msedge",
-      "request": "launch",
-      "url": "http://localhost:4000",
-      "webRoot": "${workspaceFolder}/src",
-      "sourceMaps": true
-    }
-      {
-        "type": "vscode-edge-devtools.debug",
-        "name": "Open Edge DevTools",
-        "request": "attach",
-        "url": "c:\\Users\\rickd\\.vscode\\extensions\\ms-edgedevtools.vscode-edge-devtools-2.1.10\\out\\startpage\\index.html",
-        "presentation": {
-          "hidden": true,
-        },
-      },
-    ],
-    "compounds": [
-      
-      {
-        "name": "Launch Edge Headless and attach DevTools",
-        "configurations": ["Launch Microsoft Edge in headless mode", "Open Edge DevTools"],
-      },
-      {
-        "name": "Launch Edge and attach DevTools",
-        "configurations": ["Launch Microsoft Edge", "Open Edge DevTools"],
-      },
-    ],
-  },
 }
