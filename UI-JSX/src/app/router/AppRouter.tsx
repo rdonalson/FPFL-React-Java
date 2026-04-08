@@ -13,7 +13,6 @@ export function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-
         {/* All pages wrapped in AppLayout */}
         <Route element={<AppLayout />}>
           <Route path="/" element={<HomePage />} />
