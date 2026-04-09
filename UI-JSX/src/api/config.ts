@@ -5,8 +5,9 @@
  * This keeps all environment handling in one place.
  */
 export const apiConfig = {
-  // Base URL for the docker API, defaults to localhost if not set
-  //baseUrl: import.meta.env.VITE_API_URL ?? 'http://localhost:8000',
   baseUrl: import.meta.env.VITE_API_URL ?? 'http://localhost:9000',
   timeout: 10_000,
 };
+
+console.log('Axios baseURL:', import.meta.env.VITE_API_URL);
+console.log('Node Environment:', import.meta.env.VITE_NODE_ENV);

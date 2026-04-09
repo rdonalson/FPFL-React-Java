@@ -4,10 +4,9 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import AppLayout from '../layout/AppLayout';
 
 import { HomePage } from '../pages/HomePage';
-import { ItemTypeDetailPage } from '@/features/itemType/components/itemTypeDetailPage';
-import { ItemTypeListPage } from '@/features/itemType/components/ItemTypeListPage';
 import CreditsPage from '@/features/pages/CreditsPage';
 import SpecificItemPage from '@/features/pages/SpecificItemPage';
+import { ItemTypeTablePage } from '@/features/itemType/components/ItemTypeTablePage';
 
 export function AppRouter() {
   return (
@@ -18,8 +17,7 @@ export function AppRouter() {
           <Route path="/" element={<HomePage />} />
 
           {/* Item Types */}
-          <Route path="/item-types" element={<ItemTypeListPage />} />
-          <Route path="/item-types/:id" element={<ItemTypeDetailPage />} />
+          <Route path="/item-types" element={<ItemTypeTablePage />} />
 
           {/* Other pages */}
           <Route path="/credits" element={<CreditsPage />} />
