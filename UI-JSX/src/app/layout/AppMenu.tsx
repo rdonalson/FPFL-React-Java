@@ -11,11 +11,7 @@ export default function AppMenu() {
     {
       label: 'Item Types',
       icon: 'pi pi-tags',
-      items: [
-        { label: 'All Item Types', icon: 'pi pi-list', to: '/item-types' },
-        { label: 'Item Type Details', icon: 'pi pi-list', to: '/item-types/1' },
-        { label: 'Create Item Type', icon: 'pi pi-plus', to: '/item-types/create' },
-      ],
+      to: '/item-types',
     },
     {
       label: 'Status',
