@@ -1,36 +1,33 @@
-// src/layout/AppTopMenu.tsx
+// src/app/layout/AppTopMenu.tsx
 import { Button } from 'primereact/button';
 import { useState } from 'react';
+import { APP_TITLE } from '../config/appConfig';
 
-interface AppTopMenuProps {
+interface Props {
   onToggleSidebar: () => void;
 }
 
-export function AppTopMenu({ onToggleSidebar }: AppTopMenuProps) {
+export default function AppTopMenu({ onToggleSidebar }: Props) {
   const [dark, setDark] = useState(false);
 
   const toggleTheme = () => {
     const next = !dark;
     setDark(next);
 
-    // Swap PrimeReact theme (Vite-friendly)
     const themeLink = document.getElementById('theme-css') as HTMLLinkElement;
-    themeLink.href = next
-      ? '/themes/lara-dark-indigo/theme.css'
-      : '/themes/lara-light-indigo/theme.css';
+    const base = import.meta.env.BASE_URL;
 
-    console.log('Switched theme to:', next ? 'Dark' : 'Light');
-    console.log('Updated theme link href to:', themeLink.href);
+    themeLink.href = next
+      ? `${base}themes/lara-dark-indigo/theme.css`
+      : `${base}themes/lara-light-indigo/theme.css`;
   };
 
   return (
     <div className="flex items-center justify-between px-4 py-2 shadow-1 surface-card">
-      {/* HAMBURGER */}
-      <Button icon="pi pi-bars" text rounded onClick={onToggleSidebar} className="mr-2" />
+      <Button icon="pi pi-bars" text rounded onClick={onToggleSidebar} />
 
-      <h2 className="text-lg font-semibold">My App</h2>
+      <h2 className="text-lg font-semibold">{APP_TITLE}</h2>
 
-      {/* LIGHT / DARK TOGGLE */}
       <Button icon={dark ? 'pi pi-sun' : 'pi pi-moon'} text rounded onClick={toggleTheme} />
     </div>
   );

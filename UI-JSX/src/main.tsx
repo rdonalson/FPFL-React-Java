@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './app/App';
-import { AppProviders } from './app/providers/AppProviders.tsx';
+import { AppProviders } from './app/providers/AppProviders';
 
 // PrimeReact global styles
 import 'primereact/resources/primereact.min.css';

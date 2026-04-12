@@ -1,16 +1,18 @@
-// src/app/layout/MenuContext.tsx
+// src/app/layout/context/MenuContext.tsx
 import { createContext, useContext } from 'react';
 
 export interface MenuContextType {
-  activeIndex: number | null;
-  setActiveIndex: (index: number | null) => void;
+  activeIndex: string | null;
+  setActiveIndex: (index: string | null) => void;
   onMenuToggle: () => void;
 }
 
-export const MenuContext = createContext<MenuContextType | null>(null);
+export const MenuContext = createContext<MenuContextType>({
+  activeIndex: null,
+  setActiveIndex: () => {},
+  onMenuToggle: () => {},
+});
 
 export function useMenuContext() {
-  const ctx = useContext(MenuContext);
-  if (!ctx) throw new Error('MenuContext missing');
-  return ctx;
+  return useContext(MenuContext);
 }

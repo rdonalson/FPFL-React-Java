@@ -1,32 +1,43 @@
+// src/app/layout/AppMenuitem.tsx
+
 import { Link, useLocation } from 'react-router-dom';
 import { useMenuContext } from './context/MenuContext';
-import { useState } from 'react';
+import { useEffect } from 'react';
+import type { MenuItem } from './model/menuModel';
 
-interface AppMenuitemProps {
-  item: any;
-  index: number;
+interface Props {
+  item: MenuItem;
+  index: string;
   root?: boolean;
 }
 
-export default function AppMenuitem({ item, index }: AppMenuitemProps) {
+export default function AppMenuitem({ item, index }: Props) {
   const location = useLocation();
   const { activeIndex, setActiveIndex, onMenuToggle } = useMenuContext();
-  const [expanded, setExpanded] = useState(false);
 
-  const isActiveRoute = item.to && location.pathname === item.to;
+  const isActiveRoute = item.to === location.pathname;
   const isActive = activeIndex === index;
+  const expanded = isActive;
+
+  useEffect(() => {
+    if (isActiveRoute) {
+      setActiveIndex(index);
+    }
+  }, [isActiveRoute, index, setActiveIndex]);
 
   const onItemClick = () => {
     if (item.items) {
-      setExpanded(!expanded);
       setActiveIndex(isActive ? null : index);
     } else {
-      onMenuToggle(); // close sidebar
+      onMenuToggle();
     }
   };
 
   const content = (
-    <div className="p-menuitem-link flex items-center cursor-pointer">
+    <div
+      className="p-menuitem-link flex items-center cursor-pointer"
+      aria-expanded={expanded ? 'true' : 'false'}
+    >
       {item.icon && <i className={`${item.icon} mr-2`} />}
       <span>{item.label}</span>
       {item.items && <i className={`pi pi-chevron-${expanded ? 'down' : 'right'} ml-auto`} />}
@@ -35,7 +46,6 @@ export default function AppMenuitem({ item, index }: AppMenuitemProps) {
 
   return (
     <li className={isActiveRoute ? 'active-menuitem' : ''}>
-      {/* If the item has a route, wrap the content in a Link */}
       {item.to ? (
         <Link to={item.to} onClick={onItemClick}>
           {content}
@@ -44,11 +54,10 @@ export default function AppMenuitem({ item, index }: AppMenuitemProps) {
         <div onClick={onItemClick}>{content}</div>
       )}
 
-      {/* CHILDREN */}
       {item.items && expanded && (
         <ul className="ml-4 mt-2">
-          {item.items.map((child: any, i: number) => (
-            <AppMenuitem item={child} index={i} key={child.label} />
+          {item.items.map((child, i) => (
+            <AppMenuitem key={child.label} item={child} index={`${index}-${i}`} />
           ))}
         </ul>
       )}
