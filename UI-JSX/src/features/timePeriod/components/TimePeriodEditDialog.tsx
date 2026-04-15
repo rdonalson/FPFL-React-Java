@@ -2,23 +2,23 @@ import { useState } from 'react';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
-import type { ItemType } from '../types/ItemType';
+import type { TimePeriod } from '../types/TimePeriod';
 
 interface Props {
   visible: boolean;
   onHide: () => void;
-  itemType: ItemType | null;
-  onUpdate: (value: ItemType) => void;
+  timePeriod: TimePeriod | null;
+  onUpdate: (value: TimePeriod) => void;
 }
 
-export function ItemTypeEditDialog({ visible, onHide, itemType, onUpdate }: Props) {
+export function TimePeriodEditDialog({ visible, onHide, timePeriod, onUpdate }: Props) {
   const [id, setId] = useState<number | null>(null);
   const [name, setName] = useState('');
 
   // Initialize form state when dialog becomes visible
-  if (visible && itemType && id === null) {
-    setId(itemType.id);
-    setName(itemType.name);
+  if (visible && timePeriod && id === null) {
+    setId(timePeriod.id);
+    setName(timePeriod.name);
   }
 
   const reset = () => {
@@ -27,16 +27,16 @@ export function ItemTypeEditDialog({ visible, onHide, itemType, onUpdate }: Prop
   };
 
   const handleSubmit = () => {
-    if (!name.trim() || !itemType) return;
+    if (!name.trim() || !timePeriod) return;
 
-    onUpdate({ id: itemType.id, name });
+    onUpdate({ id: timePeriod.id, name });
     onHide();
     reset();
   };
 
   return (
     <Dialog
-      header="Edit Item Type"
+      header="Edit Time Period"
       visible={visible}
       onHide={() => {
         onHide();

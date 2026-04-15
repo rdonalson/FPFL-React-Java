@@ -1,54 +1,48 @@
 import { useState } from 'react';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
+import { InputNumber } from 'primereact/inputnumber';
 import { Button } from 'primereact/button';
-import type { ItemType } from '../types/ItemType';
+import type { TimePeriod } from '../types/TimePeriod';
 
 interface Props {
   visible: boolean;
   onHide: () => void;
-  itemType: ItemType | null;
-  onUpdate: (value: ItemType) => void;
+  onCreate: (value: TimePeriod) => void;
 }
 
-export function ItemTypeEditDialog({ visible, onHide, itemType, onUpdate }: Props) {
+export function TimePeriodCreateDialog({ visible, onHide, onCreate }: Props) {
   const [id, setId] = useState<number | null>(null);
   const [name, setName] = useState('');
 
-  // Initialize form state when dialog becomes visible
-  if (visible && itemType && id === null) {
-    setId(itemType.id);
-    setName(itemType.name);
-  }
+  const handleSubmit = () => {
+    if (!id || id <= 0) return; // validation
+    if (!name.trim()) return;
 
-  const reset = () => {
+    onCreate({ id, name });
     setId(null);
     setName('');
-  };
-
-  const handleSubmit = () => {
-    if (!name.trim() || !itemType) return;
-
-    onUpdate({ id: itemType.id, name });
     onHide();
-    reset();
   };
 
   return (
     <Dialog
-      header="Edit Item Type"
+      header="Create Time Period"
       visible={visible}
-      onHide={() => {
-        onHide();
-        reset();
-      }}
+      onHide={onHide}
       style={{ width: '30rem' }}
       modal
     >
       <div className="flex flex-column gap-3">
         <div>
           <label className="block mb-1">ID</label>
-          <div className="p-2 border-round surface-100">{id}</div>
+          <InputNumber
+            value={id}
+            onValueChange={e => setId(e.value ?? null)}
+            min={1}
+            placeholder="Enter positive integer"
+            className="w-full"
+          />
         </div>
 
         <div>
@@ -56,7 +50,7 @@ export function ItemTypeEditDialog({ visible, onHide, itemType, onUpdate }: Prop
           <InputText value={name} onChange={e => setName(e.target.value)} className="w-full" />
         </div>
 
-        <Button label="Update" icon="pi pi-check" onClick={handleSubmit} />
+        <Button label="Create" icon="pi pi-check" onClick={handleSubmit} />
       </div>
     </Dialog>
   );

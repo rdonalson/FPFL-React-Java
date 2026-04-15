@@ -10,6 +10,7 @@ export interface MenuItem {
 export const menuModel: MenuItem[] = [
   { label: 'Home', icon: 'pi pi-home', to: '/' },
   { label: 'Item Types', icon: 'pi pi-tags', to: '/item-types' },
+  { label: 'Time Periods', icon: 'pi pi-calendar', to: '/time-periods' },
   { label: 'Status', icon: 'pi pi-server', to: '/status' },
   { label: 'Docs', icon: 'pi pi-book', to: '/docs' },
 ];
