@@ -19,7 +19,32 @@ It communicates with the Java 25 / Spring Boot 4 API and provides a clean, modul
 
 ## 📁 Project Structure
 
-![API_Welcome_Page.png](./docs/UI-JSK-Project-Structure.png)
+![API_Welcome_Page.png](./docs/images/UI-JSX%20Overview.png)
+
+
+### 🟦 public/
+
+![API_Welcome_Page.png](./docs/images/Public.png)
+
+### 🟩 src/
+
+![API_Welcome_Page.png](./docs/images/Src-Root.png)
+
+### 🔌 API Layer (`src/api`)
+
+![API_Welcome_Page.png](./docs/images/Src-Api.png)
+
+### 🧩 Application Layer (`src/app`)
+
+![API_Welcome_Page.png](./docs/images/Src-App.png)
+
+### 🧱 Shared Components (`src/components` + `src/shared`)
+
+![API_Welcome_Page.png](./docs/images/Src-Shared.png)
+
+### 🟨 Feature Modules (`src/features`)
+
+![API_Welcome_Page.png](./docs/images/Src-Features.png)
 
 The structure mirrors the backend’s bounded contexts for clarity and onboarding.
 
@@ -53,3 +78,4 @@ This keeps the UI modular, scalable, and easy to onboard.
 npm install
 npm run dev
 ```
+
