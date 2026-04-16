@@ -14,6 +14,7 @@ It communicates with the Java 25 / Spring Boot 4 API and provides a clean, modul
 - React Router
 - Axios (with interceptors)
 - ESLint + Prettier (strict mode)
+- PrimeReact / PrimeIcons / PrimeFlex
 
 ---
 
