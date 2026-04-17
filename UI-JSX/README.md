@@ -26,7 +26,6 @@ The folder layout mirrors backend bounded contexts to keep the system consistent
 
 ![API_Welcome_Page.png](./docs/images/UI-JSX%20Overview.png)
 
-
 ### 🟦 public/
 
 ![API_Welcome_Page.png](./docs/images/Public.png)
