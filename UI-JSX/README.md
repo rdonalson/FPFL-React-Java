@@ -51,7 +51,6 @@ The folder layout mirrors backend bounded contexts to keep the system consistent
 
 ![API_Welcome_Page.png](./docs/images/Src-Features.png)
 
-
 ---
 
 ## 🔌 API Client
