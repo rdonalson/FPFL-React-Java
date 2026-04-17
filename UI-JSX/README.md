@@ -59,31 +59,6 @@ The structure mirrors the backend’s bounded contexts for clarity and onboardin
 
 All HTTP requests go through `src/api/client.ts`, which provides:
 
-- Base URL handling
-- JSON headers
-- Correlation IDs
-- Normalized error responses
-
-Domain modules never talk to Axios directly.
-
-<!-- ---
-
-## 📦 Features
-
-Each domain lives in:
-src/features/<domain>/ api/ hooks/ types/ components/
-
-This keeps the UI modular, scalable, and easy to onboard. -->
-
----
-## 🔌 API Client
-
-All HTTP communication flows through:
-src/api/client.ts
-
-
-The client provides:
-
 - Base URL + environment handling  
 - JSON headers  
 - Correlation IDs  
