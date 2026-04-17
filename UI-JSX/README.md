@@ -51,7 +51,6 @@ The folder layout mirrors backend bounded contexts to keep the system consistent
 
 ![API_Welcome_Page.png](./docs/images/Src-Features.png)
 
-The structure mirrors the backend’s bounded contexts for clarity and onboarding.
 
 ---
 
