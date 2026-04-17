@@ -13,7 +13,7 @@ It is built with Vite, follows a modular domain‑driven structure, and integrat
 - **React Query (TanStack Query)** for async state + caching
 - **React Router** for routing
 - **Axios** with centralized interceptors
-- **Pime Components** PrimeReact / PrimeFlex / PrimeIcons
+- **Components** PrimeReact / PrimeFlex / PrimeIcons
 - **ESLint + Prettier** (strict formatting + linting)
 
 ---
