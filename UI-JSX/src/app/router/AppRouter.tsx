@@ -8,6 +8,7 @@ import CreditsPage from '@/features/pages/CreditsPage';
 import SpecificItemPage from '@/features/pages/SpecificItemPage';
 import { ItemTypeTablePage } from '@/features/catalog-command/admin/itemType/components/ItemTypeTablePage';
 import { TimePeriodTablePage } from '@/features/catalog-command/admin/timePeriod/components/TimePeriodTablePage';
+import InitialAmountPage from '@/features/catalog-command/transactions/components/initial-amount/InitialAmountPage';
 
 export function AppRouter() {
   return (
@@ -21,6 +22,9 @@ export function AppRouter() {
           <Route path="/command/admin/item-types" element={<ItemTypeTablePage />} />
           {/* Time Periods */}
           <Route path="/command/admin/time-periods" element={<TimePeriodTablePage />} />
+
+          {/* Initial Amount */}
+          <Route path="/command/transactions/initial-amount" element={<InitialAmountPage />} />
 
           {/* Other pages */}
           <Route path="/credits" element={<CreditsPage />} />
