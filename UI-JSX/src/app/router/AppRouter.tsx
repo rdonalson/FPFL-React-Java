@@ -6,8 +6,8 @@ import AppLayout from '../layout/AppLayout';
 import { HomePage } from '../pages/HomePage';
 import CreditsPage from '@/features/pages/CreditsPage';
 import SpecificItemPage from '@/features/pages/SpecificItemPage';
-import { ItemTypeTablePage } from '@/features/itemType/components/ItemTypeTablePage';
-import { TimePeriodTablePage } from '@/features/timePeriod/components/TimePeriodTablePage';
+import { ItemTypeTablePage } from '@/features/catalog-command/admin/itemType/components/ItemTypeTablePage';
+import { TimePeriodTablePage } from '@/features/catalog-command/admin/timePeriod/components/TimePeriodTablePage';
 
 export function AppRouter() {
   return (
@@ -18,9 +18,9 @@ export function AppRouter() {
           <Route path="/" element={<HomePage />} />
 
           {/* Item Types */}
-          <Route path="/item-types" element={<ItemTypeTablePage />} />
+          <Route path="/command/admin/item-types" element={<ItemTypeTablePage />} />
           {/* Time Periods */}
-          <Route path="/time-periods" element={<TimePeriodTablePage />} />
+          <Route path="/command/admin/time-periods" element={<TimePeriodTablePage />} />
 
           {/* Other pages */}
           <Route path="/credits" element={<CreditsPage />} />

@@ -9,8 +9,8 @@ export interface MenuItem {
 
 export const menuModel: MenuItem[] = [
   { label: 'Home', icon: 'pi pi-home', to: '/' },
-  { label: 'Item Types', icon: 'pi pi-tags', to: '/item-types' },
-  { label: 'Time Periods', icon: 'pi pi-calendar', to: '/time-periods' },
+  { label: 'Item Types', icon: 'pi pi-tags', to: '/command/admin/item-types' },
+  { label: 'Time Periods', icon: 'pi pi-calendar', to: '/command/admin/time-periods' },
   { label: 'Status', icon: 'pi pi-server', to: '/status' },
   { label: 'Docs', icon: 'pi pi-book', to: '/docs' },
 ];

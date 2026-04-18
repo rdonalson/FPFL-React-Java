@@ -7,7 +7,7 @@ It is built with Vite, follows a modular domain‑driven structure, and integrat
 
 ## 🚀 Tech Stack
 
-- **React 18**  
+- **React 18**
 - **TypeScript**
 - **Vite**
 - **React Query (TanStack Query)** for async state + caching
@@ -56,11 +56,11 @@ The folder layout mirrors backend bounded contexts to keep the system consistent
 
 All HTTP requests go through `src/api/client.ts`, which provides:
 
-- Base URL + environment handling  
-- JSON headers  
-- Correlation IDs  
-- Normalized error responses  
-- Centralized request/response interceptors  
+- Base URL + environment handling
+- JSON headers
+- Correlation IDs
+- Normalized error responses
+- Centralized request/response interceptors
 
 Domain modules **never** call Axios directly.
 
@@ -70,12 +70,12 @@ Domain modules **never** call Axios directly.
 
 Each domain module encapsulates:
 
-- API functions  
-- React Query hooks  
-- UI components  
-- Type definitions  
+- API functions
+- React Query hooks
+- UI components
+- Type definitions
 
-This ensures strong separation of concerns and predictable growth as new features are added.
+The folder layout mirrors backend bounded contexts to keep the system consistent, modular, and easy to onboard.
 
 ---
 
@@ -85,3 +85,4 @@ This ensures strong separation of concerns and predictable growth as new feature
 npm install
 npm run dev
 
+```

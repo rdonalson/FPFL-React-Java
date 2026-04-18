@@ -1,5 +1,5 @@
 import { apiClient } from '@/api/client';
-import type { TimePeriod } from '@/features/timePeriod/types/TimePeriod';
+import type { TimePeriod } from '@/features/catalog-command/admin/timePeriod/types/TimePeriod';
 import type { ApiResponse } from '@/api/models/ApiResponse';
 
 const BASE = '/time-periods';
