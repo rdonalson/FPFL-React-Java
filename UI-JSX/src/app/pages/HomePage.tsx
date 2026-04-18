@@ -25,12 +25,12 @@ export function HomePage() {
           <Button
             label="Manage Item Types"
             icon="pi pi-list"
-            onClick={() => navigate('/item-types')}
+            onClick={() => navigate('/command/admin/item-types')}
           />
           <Button
             label="Manage Time Periods"
             icon="pi pi-list"
-            onClick={() => navigate('/time-periods')}
+            onClick={() => navigate('/command/admin/time-periods')}
           />
           <Button
             label="Check API Status"
