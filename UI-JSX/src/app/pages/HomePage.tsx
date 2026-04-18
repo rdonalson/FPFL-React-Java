@@ -33,6 +33,11 @@ export function HomePage() {
             onClick={() => navigate('/command/admin/time-periods')}
           />
           <Button
+            label="Manage Initial Amount"
+            icon="pi pi-dollar"
+            onClick={() => navigate('/command/transactions/initial-amount')}
+          />
+          <Button
             label="Check API Status"
             icon="pi pi-server"
             severity="secondary"
