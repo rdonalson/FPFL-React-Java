@@ -18,6 +18,7 @@ import { Item } from '../../types/Item';
  */
 
 export default function InitialAmountPage(): JSX.Element {
+  const didLoadRef = useRef(false);
   const [initialAmount, setInitialAmount] = useState<Item | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
@@ -26,9 +27,13 @@ export default function InitialAmountPage(): JSX.Element {
   const toast = useRef<Toast | null>(null);
 
   useEffect(() => {
+    if (didLoadRef.current) return; // guard: only run once
+    didLoadRef.current = true;
     load();
+    // no cleanup needed
   }, []);
 
+  // keep load as-is but do not call it directly from top-level useEffect
   async function load() {
     setLoading(true);
     try {

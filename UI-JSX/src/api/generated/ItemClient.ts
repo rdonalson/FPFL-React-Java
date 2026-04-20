@@ -1,4 +1,5 @@
 // api/itemClient.ts
+import { ApiResponse } from '../models/ApiResponse';
 import {
   Item,
   ItemTypeDto,
@@ -9,14 +10,6 @@ const BASE = 'http://localhost:9000';
 const ITEMS = `${BASE}/items`;
 const ITEM_TYPES = `${BASE}/item-types`;
 const TIME_PERIODS = `${BASE}/time-periods`;
-
-export type ApiResponse<T> = {
-  correlationId?: string;
-  data?: T;
-  message?: string;
-  status?: number;
-  timestamp?: string;
-};
 
 async function parseApi<T>(res: Response): Promise<ApiResponse<T>> {
   const text = await res.text();
