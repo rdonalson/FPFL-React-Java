@@ -10,25 +10,36 @@ import { ItemTypeTablePage } from '@/features/catalog-command/admin/itemType/com
 import { TimePeriodTablePage } from '@/features/catalog-command/admin/timePeriod/components/TimePeriodTablePage';
 import InitialAmountPage from '@/features/catalog-command/transactions/components/initial-amount/InitialAmountPage';
 
+import AuthGate from './AuthGate';
+import Login from '@/app/pages/Login';
+import { Splash } from '@/app/pages/Splash';
+
 export function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* All pages wrapped in AppLayout */}
-        <Route element={<AppLayout />}>
-          <Route path="/" element={<HomePage />} />
+        {/* Public routes */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/splash" element={<Splash />} />
 
-          {/* Item Types */}
-          <Route path="/command/admin/item-types" element={<ItemTypeTablePage />} />
-          {/* Time Periods */}
-          <Route path="/command/admin/time-periods" element={<TimePeriodTablePage />} />
+        {/* Protected area: show Splash while checking, redirect to /login if not authenticated */}
+        <Route element={<AuthGate />}>
+          {/* All pages wrapped in AppLayout */}
+          <Route element={<AppLayout />}>
+            <Route path="/" element={<HomePage />} />
 
-          {/* Initial Amount */}
-          <Route path="/command/transactions/initial-amount" element={<InitialAmountPage />} />
+            {/* Item Types */}
+            <Route path="/command/admin/item-types" element={<ItemTypeTablePage />} />
+            {/* Time Periods */}
+            <Route path="/command/admin/time-periods" element={<TimePeriodTablePage />} />
 
-          {/* Other pages */}
-          <Route path="/credits" element={<CreditsPage />} />
-          <Route path="/items/:id" element={<SpecificItemPage />} />
+            {/* Initial Amount */}
+            <Route path="/command/transactions/initial-amount" element={<InitialAmountPage />} />
+
+            {/* Other pages */}
+            <Route path="/credits" element={<CreditsPage />} />
+            <Route path="/items/:id" element={<SpecificItemPage />} />
+          </Route>
         </Route>
 
         {/* Fallback */}
