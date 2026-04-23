@@ -1,29 +1,21 @@
 // src/app/layout/AppSidebar.tsx
+import React from 'react';
 import { Sidebar } from 'primereact/sidebar';
-import { useState } from 'react';
-import { MenuContext } from './context/MenuContext';
+import { useSessionStore } from '@/app/state/sessionStore';
 import AppMenu from './AppMenu';
+import { MenuProvider } from './context/MenuContext';
 
-interface Props {
-  visible: boolean;
-  onHide: () => void;
-}
+export default function AppSidebar({ visible, onHide }: { visible: boolean; onHide: () => void }) {
+  const { userId } = useSessionStore();
 
-export default function AppSidebar({ visible, onHide }: Props) {
-  const [activeIndex, setActiveIndex] = useState<string | null>(visible ? null : null);
+  if (!userId) return null;
 
   return (
-    <Sidebar
-      visible={visible}
-      onHide={onHide}
-      position="left"
-      modal
-      dismissable
-      className="p-sidebar-sm"
-    >
-      <MenuContext.Provider value={{ activeIndex, setActiveIndex, onMenuToggle: onHide }}>
+    <Sidebar visible={visible} onHide={onHide} modal>
+      {/* Provide the sidebar onHide to the menu context so menu items can close it */}
+      <MenuProvider onClose={onHide}>
         <AppMenu />
-      </MenuContext.Provider>
+      </MenuProvider>
     </Sidebar>
   );
 }

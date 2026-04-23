@@ -11,32 +11,22 @@ import { TimePeriodTablePage } from '@/features/catalog-command/admin/timePeriod
 import InitialAmountPage from '@/features/catalog-command/transactions/components/initial-amount/InitialAmountPage';
 
 import AuthGate from './AuthGate';
-import Login from '@/app/pages/Login';
-import { Splash } from '@/app/pages/Splash';
 
 export function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/splash" element={<Splash />} />
+        {/* AppLayout wraps all pages so topbar is always present */}
+        <Route element={<AppLayout />}>
+          {/* Public Home page (visible before login) */}
+          <Route path="/" element={<HomePage />} />
 
-        {/* Protected area: show Splash while checking, redirect to /login if not authenticated */}
-        <Route element={<AuthGate />}>
-          {/* All pages wrapped in AppLayout */}
-          <Route element={<AppLayout />}>
-            <Route path="/" element={<HomePage />} />
-
-            {/* Item Types */}
+          {/* Protected routes: only accessible when AuthGate allows */}
+          <Route element={<AuthGate />}>
             <Route path="/command/admin/item-types" element={<ItemTypeTablePage />} />
-            {/* Time Periods */}
             <Route path="/command/admin/time-periods" element={<TimePeriodTablePage />} />
-
-            {/* Initial Amount */}
             <Route path="/command/transactions/initial-amount" element={<InitialAmountPage />} />
 
-            {/* Other pages */}
             <Route path="/credits" element={<CreditsPage />} />
             <Route path="/items/:id" element={<SpecificItemPage />} />
           </Route>
