@@ -1,6 +1,7 @@
 // src/api/client.ts
 import axios, { AxiosError, AxiosInstance } from 'axios';
 import { apiConfig } from './config';
+import { useSessionStore } from '../app/state/sessionStore';
 
 // Fire-and-forget log sender
 function sendLogToServer({ log }: { log: any }): void {
@@ -30,11 +31,23 @@ function createClient(): AxiosInstance {
     const correlationId = crypto.randomUUID();
     config.headers['X-Correlation-ID'] = correlationId;
 
+    // Pull session values at request time (always fresh)
+    const { userId, token } = useSessionStore.getState();
+
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    if (userId) {
+      config.headers['X-User-Id'] = userId;
+    }
+
     // Local DevTools log
     console.log('[API REQUEST]', {
       url: config.url,
       method: config.method,
       correlationId,
+      userId,
       payload: config.data,
     });
 

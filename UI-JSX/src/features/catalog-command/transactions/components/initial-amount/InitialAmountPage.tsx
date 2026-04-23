@@ -206,13 +206,6 @@ export default function InitialAmountPage(): JSX.Element {
                   />
                 </label>
 
-                {/* <div>
-                  <small>
-                    <strong>User</strong>{' '}
-                    {sessionStorage.getItem('userId') ?? '00000000-0000-0000-0000-000000000000'}
-                  </small>
-                </div> */}
-
                 <div>
                   <Button
                     label={saving ? 'Creating...' : 'Create Initial Amount'}

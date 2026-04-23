@@ -1,5 +1,4 @@
 // src/app/layout/AppMenuitem.tsx
-
 import { Link, useLocation } from 'react-router-dom';
 import { useMenuContext } from './context/MenuContext';
 import { useEffect } from 'react';
@@ -29,6 +28,7 @@ export default function AppMenuitem({ item, index }: Props) {
     if (item.items) {
       setActiveIndex(isActive ? null : index);
     } else {
+      // Leaf item selected: trigger menu toggle which will close the sidebar
       onMenuToggle();
     }
   };

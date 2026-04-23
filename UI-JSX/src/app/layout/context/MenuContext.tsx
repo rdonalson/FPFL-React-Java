@@ -1,18 +1,42 @@
 // src/app/layout/context/MenuContext.tsx
-import { createContext, useContext } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
-export interface MenuContextType {
+type MenuContextType = {
   activeIndex: string | null;
-  setActiveIndex: (index: string | null) => void;
+  setActiveIndex: (idx: string | null) => void;
   onMenuToggle: () => void;
+};
+
+const MenuContext = createContext<MenuContextType | undefined>(undefined);
+
+export function MenuProvider({
+  children,
+  onClose,
+}: {
+  children: React.ReactNode;
+  onClose?: () => void;
+}) {
+  const [activeIndex, setActiveIndex] = useState<string | null>(null);
+
+  // onMenuToggle is called by menu items when a leaf is selected.
+  // It will close the sidebar if an onClose handler was provided.
+  const onMenuToggle = () => {
+    if (typeof onClose === 'function') {
+      onClose();
+    }
+  };
+
+  return (
+    <MenuContext.Provider value={{ activeIndex, setActiveIndex, onMenuToggle }}>
+      {children}
+    </MenuContext.Provider>
+  );
 }
 
-export const MenuContext = createContext<MenuContextType>({
-  activeIndex: null,
-  setActiveIndex: () => {},
-  onMenuToggle: () => {},
-});
-
 export function useMenuContext() {
-  return useContext(MenuContext);
+  const ctx = useContext(MenuContext);
+  if (!ctx) {
+    throw new Error('useMenuContext must be used within a MenuProvider');
+  }
+  return ctx;
 }

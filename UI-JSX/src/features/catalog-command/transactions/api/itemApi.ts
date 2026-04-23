@@ -1,6 +1,7 @@
 // transactions/itemApi.ts
 import { itemClient } from '@/api/generated/ItemClient';
 import { Item } from '../types/Item';
+import { useSessionStore } from '@/app/state/sessionStore';
 
 /**
  * Business-level API for Items used by transactions UI.
@@ -9,11 +10,25 @@ import { Item } from '../types/Item';
  */
 
 const DEFAULT_USER_KEY = 'userId';
-const ZERO_UUID = '00000000-0000-0000-0000-000000000000';
 const INITIAL_AMOUNT_ITEM_TYPE = 3;
 
+/**
+ * Resolve the current session user id.
+ * Priority:
+ *  1) Zustand session store (runtime, preferred)
+ *  2) sessionStorage (page reload fallback)
+ *  3) null (guest fallback)
+ */
 function getSessionUserId(): string {
-  return sessionStorage.getItem(DEFAULT_USER_KEY) ?? ZERO_UUID;
+  try {
+    const fromStore = useSessionStore.getState?.().userId;
+    if (fromStore) return fromStore;
+  } catch {
+    // ignore if Zustand isn't available for some reason
+  }
+
+  const fromStorage = sessionStorage.getItem(DEFAULT_USER_KEY);
+  return fromStorage ?? '';
 }
 
 /**
