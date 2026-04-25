@@ -1,30 +1,35 @@
+// src/api/generated/TimePeriodClient.ts
 import { apiClient } from '@/api/client';
-import type { TimePeriod } from '@/features/catalog-command/admin/timePeriod/types/TimePeriod';
 import type { ApiResponse } from '@/api/models/ApiResponse';
+import type { TimePeriodDto } from '@/features/catalog-command/transactions/types/Item';
+import { callAndParse } from '@/api/utils/apiParse';
 
 const BASE = '/time-periods';
 
 export const TimePeriodClient = {
-  async getAll(): Promise<ApiResponse<TimePeriod[]>> {
-    return apiClient.get<ApiResponse<TimePeriod[]>>(BASE).then();
+  async getAll(): Promise<ApiResponse<TimePeriodDto[]>> {
+    return callAndParse<TimePeriodDto[]>(() => apiClient.get<ApiResponse<TimePeriodDto[]>>(BASE));
   },
 
-  async getById(id: number): Promise<ApiResponse<TimePeriod>> {
-    return apiClient.get<ApiResponse<TimePeriod>>(`${BASE}/${id}`).then();
+  async getById(id: number): Promise<ApiResponse<TimePeriodDto>> {
+    return callAndParse<TimePeriodDto>(() =>
+      apiClient.get<ApiResponse<TimePeriodDto>>(`${BASE}/${id}`),
+    );
   },
 
-  async create(payload: { id: number; name: string }): Promise<ApiResponse<TimePeriod>> {
-    return apiClient.post<ApiResponse<TimePeriod>>(BASE, payload).then();
+  async create(payload: Partial<TimePeriodDto>): Promise<ApiResponse<TimePeriodDto>> {
+    return callAndParse<TimePeriodDto>(() =>
+      apiClient.post<ApiResponse<TimePeriodDto>>(BASE, payload),
+    );
   },
 
-  async update(
-    id: number,
-    payload: { id: number; name: string },
-  ): Promise<ApiResponse<TimePeriod>> {
-    return apiClient.put<ApiResponse<TimePeriod>>(`${BASE}/${id}`, payload).then();
+  async update(id: number, payload: Partial<TimePeriodDto>): Promise<ApiResponse<TimePeriodDto>> {
+    return callAndParse<TimePeriodDto>(() =>
+      apiClient.put<ApiResponse<TimePeriodDto>>(`${BASE}/${id}`, payload),
+    );
   },
 
   async delete(id: number): Promise<ApiResponse<void>> {
-    return apiClient.delete<ApiResponse<void>>(`${BASE}/${id}`).then();
+    return callAndParse<void>(() => apiClient.delete<ApiResponse<void>>(`${BASE}/${id}`));
   },
 };

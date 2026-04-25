@@ -1,118 +1,51 @@
 // src/api/generated/ItemClient.ts
-import { ApiResponse } from '../models/ApiResponse';
-import {
+import { apiClient } from '@/api/client';
+import type { ApiResponse } from '@/api/models/ApiResponse';
+import type {
   Item,
   ItemTypeDto,
   TimePeriodDto,
 } from '@/features/catalog-command/transactions/types/Item';
+import { callAndParse } from '@/api/utils/apiParse';
 
-const BASE = 'http://localhost:9000';
-const ITEMS = `${BASE}/items`;
-const ITEM_TYPES = `${BASE}/item-types`;
-const TIME_PERIODS = `${BASE}/time-periods`;
+const BASE_ITEMS = '/items';
+const BASE_ITEM_TYPES = '/item-types';
+const BASE_TIME_PERIODS = '/time-periods';
 
-async function parseApi<T>(res: Response): Promise<ApiResponse<T>> {
-  const text = await res.text();
-  if (!res.ok) {
-    try {
-      const parsed = JSON.parse(text);
-      throw new Error(parsed?.message ?? JSON.stringify(parsed) ?? res.statusText);
-    } catch {
-      throw new Error(text || res.statusText);
-    }
-  }
-  try {
-    return JSON.parse(text) as ApiResponse<T>;
-  } catch {
-    return { data: undefined } as ApiResponse<T>;
-  }
-}
-
-/**
- * Items endpoints
- */
-export const itemClient = {
-  /**
-   * Get items for a user and itemType (returns array in ApiResponse.data)
-   */
-  async getByUserAndType(userId: string, itemType: number): Promise<Item[]> {
-    const url = `${ITEMS}/${encodeURIComponent(userId)}/${itemType}`;
-    const res = await fetch(url, { method: 'GET', headers: { Accept: 'application/json' } });
-    const api = await parseApi<Item[]>(res);
-    return api.data ?? [];
+export const ItemClient = {
+  async getByUserAndType(userId: string, itemType: number): Promise<ApiResponse<Item[]>> {
+    return callAndParse<Item[]>(() =>
+      apiClient.get<ApiResponse<Item[]>>(`${BASE_ITEMS}/${encodeURIComponent(userId)}/${itemType}`),
+    );
   },
 
-  /**
-   * Get single item by id (assumes backend supports GET /items/{id})
-   */
-  async getById(id: number): Promise<Item | null> {
-    const url = `${ITEMS}/${id}`;
-    const res = await fetch(url, { method: 'GET', headers: { Accept: 'application/json' } });
-    const api = await parseApi<Item>(res);
-    return api.data ?? null;
+  async getById(id: number): Promise<ApiResponse<Item>> {
+    return callAndParse<Item>(() => apiClient.get<ApiResponse<Item>>(`${BASE_ITEMS}/${id}`));
   },
 
-  /**
-   * Create item (POST /items)
-   * Ensure payload includes fkItemType and fkPeriod as required by backend.
-   */
-  async create(payload: Item): Promise<Item> {
-    const res = await fetch(ITEMS, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    const api = await parseApi<Item>(res);
-    if (!api.data) throw new Error(api.message ?? 'No data returned from create');
-    return api.data;
+  async create(payload: Item): Promise<ApiResponse<Item>> {
+    return callAndParse<Item>(() => apiClient.post<ApiResponse<Item>>(BASE_ITEMS, payload));
   },
 
-  /**
-   * Update item (PUT /items/{id})
-   */
-  async update(id: number, payload: Item): Promise<Item> {
-    const res = await fetch(`${ITEMS}/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    const api = await parseApi<Item>(res);
-    if (!api.data) throw new Error(api.message ?? 'No data returned from update');
-    return api.data;
+  async update(id: number, payload: Item): Promise<ApiResponse<Item>> {
+    return callAndParse<Item>(() =>
+      apiClient.put<ApiResponse<Item>>(`${BASE_ITEMS}/${id}`, payload),
+    );
   },
 
-  /**
-   * Delete item (DELETE /items/{id})
-   */
-  async remove(id: number): Promise<void> {
-    const res = await fetch(`${ITEMS}/${id}`, {
-      method: 'DELETE',
-      headers: { Accept: 'application/json' },
-    });
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(text || res.statusText);
-    }
+  async remove(id: number): Promise<ApiResponse<void>> {
+    return callAndParse<void>(() => apiClient.delete<ApiResponse<void>>(`${BASE_ITEMS}/${id}`));
   },
 
-  /**
-   * Fetch ItemType list (used to populate dropdowns)
-   */
-  async fetchItemTypes(): Promise<ItemTypeDto[]> {
-    const res = await fetch(ITEM_TYPES, { method: 'GET', headers: { Accept: 'application/json' } });
-    const api = await parseApi<ItemTypeDto[]>(res);
-    return api.data ?? [];
+  async fetchItemTypes(): Promise<ApiResponse<ItemTypeDto[]>> {
+    return callAndParse<ItemTypeDto[]>(() =>
+      apiClient.get<ApiResponse<ItemTypeDto[]>>(BASE_ITEM_TYPES),
+    );
   },
 
-  /**
-   * Fetch TimePeriod list (used to populate dropdowns)
-   */
-  async fetchTimePeriods(): Promise<TimePeriodDto[]> {
-    const res = await fetch(TIME_PERIODS, {
-      method: 'GET',
-      headers: { Accept: 'application/json' },
-    });
-    const api = await parseApi<TimePeriodDto[]>(res);
-    return api.data ?? [];
+  async fetchTimePeriods(): Promise<ApiResponse<TimePeriodDto[]>> {
+    return callAndParse<TimePeriodDto[]>(() =>
+      apiClient.get<ApiResponse<TimePeriodDto[]>>(BASE_TIME_PERIODS),
+    );
   },
 };

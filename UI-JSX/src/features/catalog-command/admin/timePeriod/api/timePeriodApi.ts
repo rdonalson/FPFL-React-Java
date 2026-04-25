@@ -1,32 +1,32 @@
-// src/features/timePeriod/api/timePeriodApi.ts
+// src/features/catalog-command/transactions/api/timePeriodApi.ts
 import { TimePeriodClient } from '@/api/generated/TimePeriodClient';
-import type { ApiResponse } from '@/api/models/ApiResponse';
-import type { TimePeriod } from '../types/TimePeriod';
+import { unwrap } from '@/api/utils/responseHelpers';
+import type { TimePeriodDto } from '@/features/catalog-command/transactions/types/Item';
 
 export const timePeriodApi = {
-  async fetchAll(): Promise<ApiResponse<TimePeriod[]>> {
-    return TimePeriodClient.getAll();
+  async fetchAll(): Promise<TimePeriodDto[]> {
+    const res = await TimePeriodClient.getAll();
+    return unwrap<TimePeriodDto[]>(res, []) as TimePeriodDto[];
   },
 
-  async fetchById(id: number): Promise<ApiResponse<TimePeriod>> {
-    return TimePeriodClient.getById(id);
+  async fetchById(id: number): Promise<TimePeriodDto | null> {
+    const res = await TimePeriodClient.getById(id);
+    return unwrap<TimePeriodDto>(res, null);
   },
 
-  async create(item: TimePeriod): Promise<ApiResponse<TimePeriod>> {
-    return TimePeriodClient.create({
-      id: item.id,
-      name: item.name,
-    });
+  async create(tp: Partial<TimePeriodDto>): Promise<TimePeriodDto> {
+    const res = await TimePeriodClient.create(tp);
+    return unwrap<TimePeriodDto>(res, null, true) as TimePeriodDto;
   },
 
-  async update(item: TimePeriod): Promise<ApiResponse<TimePeriod>> {
-    return TimePeriodClient.update(item.id, {
-      id: item.id,
-      name: item.name,
-    });
+  // <-- CHANGED: accept the full item so callers can call update(item)
+  async update(item: TimePeriodDto): Promise<TimePeriodDto> {
+    const res = await TimePeriodClient.update(item.id, item);
+    return unwrap<TimePeriodDto>(res, null, true) as TimePeriodDto;
   },
 
-  async remove(id: number): Promise<ApiResponse<void>> {
-    return TimePeriodClient.delete(id);
+  async remove(id: number): Promise<void> {
+    const res = await TimePeriodClient.delete(id);
+    unwrap<void>(res, undefined, true);
   },
 };

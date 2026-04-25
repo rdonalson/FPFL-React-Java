@@ -1,30 +1,31 @@
-// src/api/generated/ItemTypeClient.ts`
+// src/api/generated/ItemTypeClient.ts
 import { apiClient } from '@/api/client';
 import type { ItemType } from '@/features/catalog-command/admin/itemType/types/ItemType';
 import type { ApiResponse } from '@/api/models/ApiResponse';
+import { callAndParse } from '@/api/utils/apiParse';
 
 const BASE = '/item-types';
 
 export const ItemTypeClient = {
   async getAll(): Promise<ApiResponse<ItemType[]>> {
-    return apiClient.get<ApiResponse<ItemType[]>>(BASE).then();
+    return callAndParse<ItemType[]>(() => apiClient.get<ApiResponse<ItemType[]>>(BASE));
   },
 
   async getById(id: number): Promise<ApiResponse<ItemType>> {
-    return apiClient.get<ApiResponse<ItemType>>(`${BASE}/${id}`).then();
+    return callAndParse<ItemType>(() => apiClient.get<ApiResponse<ItemType>>(`${BASE}/${id}`));
   },
 
-  // ⬇⬇⬇ UPDATED: id is now required and sent to backend
   async create(payload: { id: number; name: string }): Promise<ApiResponse<ItemType>> {
-    return apiClient.post<ApiResponse<ItemType>>(BASE, payload).then();
+    return callAndParse<ItemType>(() => apiClient.post<ApiResponse<ItemType>>(BASE, payload));
   },
 
-  // ⬇⬇⬇ UPDATED: id included in payload as well
   async update(id: number, payload: { id: number; name: string }): Promise<ApiResponse<ItemType>> {
-    return apiClient.put<ApiResponse<ItemType>>(`${BASE}/${id}`, payload).then();
+    return callAndParse<ItemType>(() =>
+      apiClient.put<ApiResponse<ItemType>>(`${BASE}/${id}`, payload),
+    );
   },
 
   async delete(id: number): Promise<ApiResponse<void>> {
-    return apiClient.delete<ApiResponse<void>>(`${BASE}/${id}`).then();
+    return callAndParse<void>(() => apiClient.delete<ApiResponse<void>>(`${BASE}/${id}`));
   },
 };
