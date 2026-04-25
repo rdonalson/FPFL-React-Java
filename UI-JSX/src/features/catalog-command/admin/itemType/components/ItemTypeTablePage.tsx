@@ -133,7 +133,7 @@ export function ItemTypeTablePage() {
       <Toolbar left={leftToolbar} right={rightToolbar} className="mb-3" />
 
       <DataTable
-        value={itemTypesQuery.data?.data ?? []} // unwrap ApiResponse<T>
+        value={itemTypesQuery.data ?? []} // unwrap ApiResponse<T>
         loading={itemTypesQuery.isLoading}
         paginator
         rows={10}

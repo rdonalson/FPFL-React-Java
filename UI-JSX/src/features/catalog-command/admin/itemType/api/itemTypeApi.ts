@@ -1,32 +1,31 @@
-// src/features/itemType/api/itemTypeApi.ts
+// src/features/catalog-command/admin/itemType/api/itemTypeApi.ts
 import { ItemTypeClient } from '@/api/generated/ItemTypeClient';
-import type { ApiResponse } from '@/api/models/ApiResponse';
+import { unwrap } from '@/api/utils/responseHelpers';
 import type { ItemType } from '../types/ItemType';
 
 export const itemTypeApi = {
-  async fetchAll(): Promise<ApiResponse<ItemType[]>> {
-    return ItemTypeClient.getAll();
+  async fetchAll(): Promise<ItemType[]> {
+    const res = await ItemTypeClient.getAll();
+    return unwrap<ItemType[]>(res, []) as ItemType[];
   },
 
-  async fetchById(id: number): Promise<ApiResponse<ItemType>> {
-    return ItemTypeClient.getById(id);
+  async fetchById(id: number): Promise<ItemType | null> {
+    const res = await ItemTypeClient.getById(id);
+    return unwrap<ItemType>(res, null);
   },
 
-  async create(item: ItemType): Promise<ApiResponse<ItemType>> {
-    return ItemTypeClient.create({
-      id: item.id,
-      name: item.name,
-    });
+  async create(item: ItemType): Promise<ItemType> {
+    const res = await ItemTypeClient.create({ id: item.id, name: item.name });
+    return unwrap<ItemType>(res, null, true) as ItemType;
   },
 
-  async update(item: ItemType): Promise<ApiResponse<ItemType>> {
-    return ItemTypeClient.update(item.id, {
-      id: item.id,
-      name: item.name,
-    });
+  async update(item: ItemType): Promise<ItemType> {
+    const res = await ItemTypeClient.update(item.id, { id: item.id, name: item.name });
+    return unwrap<ItemType>(res, null, true) as ItemType;
   },
 
-  async remove(id: number): Promise<ApiResponse<void>> {
-    return ItemTypeClient.delete(id);
+  async remove(id: number): Promise<void> {
+    const res = await ItemTypeClient.delete(id);
+    unwrap<void>(res, undefined, true);
   },
 };

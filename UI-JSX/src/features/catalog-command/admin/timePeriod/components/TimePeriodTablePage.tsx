@@ -133,7 +133,7 @@ export function TimePeriodTablePage() {
       <Toolbar left={leftToolbar} right={rightToolbar} className="mb-3" />
 
       <DataTable
-        value={timePeriodsQuery.data?.data ?? []} // unwrap ApiResponse<T>
+        value={timePeriodsQuery.data ?? []} // unwrap ApiResponse<T>
         loading={timePeriodsQuery.isLoading}
         paginator
         rows={10}

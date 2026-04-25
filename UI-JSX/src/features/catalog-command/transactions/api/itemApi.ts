@@ -1,13 +1,8 @@
-// transactions/itemApi.ts
-import { itemClient } from '@/api/generated/ItemClient';
+// src/features/catalog-command/transactions/api/itemApi.ts
+import { ItemClient } from '@/api/generated/ItemClient';
 import { Item } from '../types/Item';
 import { useSessionStore } from '@/app/state/sessionStore';
-
-/**
- * Business-level API for Items used by transactions UI.
- * - wraps itemClient and applies small business rules (defaults, session user).
- * - exposes functions for InitialAmount (special case) and general items (full CRUD).
- */
+import { unwrap } from '@/api/utils/responseHelpers';
 
 const DEFAULT_USER_KEY = 'userId';
 const INITIAL_AMOUNT_ITEM_TYPE = 3;
@@ -17,7 +12,7 @@ const INITIAL_AMOUNT_ITEM_TYPE = 3;
  * Priority:
  *  1) Zustand session store (runtime, preferred)
  *  2) sessionStorage (page reload fallback)
- *  3) null (guest fallback)
+ *  3) empty string (guest fallback)
  */
 function getSessionUserId(): string {
   try {
@@ -30,6 +25,8 @@ function getSessionUserId(): string {
   const fromStorage = sessionStorage.getItem(DEFAULT_USER_KEY);
   return fromStorage ?? '';
 }
+
+/* --- InitialAmount helpers --- */
 
 /**
  * Update InitialAmount for current user.
@@ -47,7 +44,9 @@ export async function updateInitialAmountForCurrentUser(id: number, amount: numb
     fkPeriod: 0,
     dateRangeReq: false,
   };
-  return itemClient.update(id, payload);
+
+  const res = await ItemClient.update(id, payload);
+  return unwrap<Item>(res, null, true) as Item;
 }
 
 /**
@@ -56,7 +55,8 @@ export async function updateInitialAmountForCurrentUser(id: number, amount: numb
  */
 export async function fetchInitialAmountForCurrentUser(): Promise<Item | null> {
   const userId = getSessionUserId();
-  const arr = await itemClient.getByUserAndType(userId, INITIAL_AMOUNT_ITEM_TYPE);
+  const res = await ItemClient.getByUserAndType(userId, INITIAL_AMOUNT_ITEM_TYPE);
+  const arr = unwrap<Item[]>(res, []); // fallback is non-null => returns Item[]
   return arr.length > 0 ? arr[0] : null;
 }
 
@@ -74,38 +74,48 @@ export async function createInitialAmountForCurrentUser(amount: number): Promise
     fkPeriod: 0,
     dateRangeReq: false,
   };
-  return itemClient.create(payload);
+
+  const res = await ItemClient.create(payload);
+  return unwrap<Item>(res, null, true) as Item;
 }
 
 /* --- Generic item operations (Credit/Debit and others) --- */
 
 export async function getItemsForUserAndType(userId: string, itemType: number): Promise<Item[]> {
-  return itemClient.getByUserAndType(userId, itemType);
+  const res = await ItemClient.getByUserAndType(userId, itemType);
+  return unwrap<Item[]>(res, []); // fallback non-null => returns Item[]
 }
 
 export async function getItemById(id: number): Promise<Item | null> {
-  return itemClient.getById(id);
+  const res = await ItemClient.getById(id);
+  return unwrap<Item>(res, null);
 }
 
 export async function createItem(payload: Item): Promise<Item> {
   // ensure required fields for backend
   if (!payload.fkItemType && payload.ItemType?.Id) payload.fkItemType = payload.ItemType.Id;
   if (!payload.userId) payload.userId = getSessionUserId();
-  return itemClient.create(payload);
+
+  const res = await ItemClient.create(payload);
+  return unwrap<Item>(res, null, true) as Item;
 }
 
 export async function updateItem(id: number, payload: Item): Promise<Item> {
-  return itemClient.update(id, payload);
+  const res = await ItemClient.update(id, payload);
+  return unwrap<Item>(res, null, true) as Item;
 }
 
 export async function deleteItem(id: number): Promise<void> {
-  return itemClient.remove(id);
+  const res = await ItemClient.remove(id);
+  unwrap<void>(res, undefined, true);
 }
 
 export async function fetchItemTypes() {
-  return itemClient.fetchItemTypes();
+  const res = await ItemClient.fetchItemTypes();
+  return unwrap(res, []);
 }
 
 export async function fetchTimePeriods() {
-  return itemClient.fetchTimePeriods();
+  const res = await ItemClient.fetchTimePeriods();
+  return unwrap(res, []);
 }
