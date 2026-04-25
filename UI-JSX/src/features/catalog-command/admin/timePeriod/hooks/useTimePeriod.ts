@@ -1,4 +1,4 @@
-// src/features/itemType/hooks/useItemType.ts
+// src/features/catalog-command/admin/timePeriod/hooks/useTimePeriod.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { timePeriodApi } from '../api/timePeriodApi';
 import type { TimePeriod } from '../types/TimePeriod';

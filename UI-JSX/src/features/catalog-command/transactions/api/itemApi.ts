@@ -1,4 +1,4 @@
-// transactions/itemApi.ts
+// src/features/catalog-command/transactions/api/itemApi.ts
 import { itemClient } from '@/api/generated/ItemClient';
 import { Item } from '../types/Item';
 import { useSessionStore } from '@/app/state/sessionStore';

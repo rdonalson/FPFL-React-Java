@@ -1,3 +1,4 @@
+// src/api/generated/ItemTypeClient.ts`
 import { apiClient } from '@/api/client';
 import type { ItemType } from '@/features/catalog-command/admin/itemType/types/ItemType';
 import type { ApiResponse } from '@/api/models/ApiResponse';

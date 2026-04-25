@@ -1,4 +1,4 @@
-// hooks/useItem.ts
+// src/features/catalog-command/transactions/hooks/useItem.ts
 import { useCallback, useState } from 'react';
 import { Item } from '../types/Item';
 import * as itemApi from '../api/itemApi';

@@ -1,4 +1,4 @@
-// api/itemClient.ts
+// src/api/generated/ItemClient.ts
 import { ApiResponse } from '../models/ApiResponse';
 import {
   Item,

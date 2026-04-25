@@ -1,4 +1,4 @@
-// src/features/itemType/hooks/useItemType.ts
+// src/features/catalog-command/admin/itemType/hooks/useItemType.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { itemTypeApi } from '../api/itemTypeApi';
 import type { ItemType } from '../types/ItemType';
