@@ -8,6 +8,9 @@ import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.Item
 import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.ItemType;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+import java.util.Date;
+
 /**
  * Maps between InitialAmount domain entity and API DTOs.
  * Follows the same sanitization and repository-lookup pattern used by ItemMapper.
@@ -32,8 +35,7 @@ public class InitialAmountMapper {
     public Item toEntity(InitialAmountRequest request) {
         sanitizer.sanitize(request);
 
-        ItemType itemType = itemTypeRepository.getReferenceById(request.fkItemType()
-                                                                       .longValue());
-        return new Item(null, request.userId(), request.name(), request.amount(), itemType, request.beginDate());
+        ItemType itemType = itemTypeRepository.getReferenceById(3L);
+        return new Item(null, request.userId(), "IA", request.amount(), itemType, LocalDate.now());
     }
 }

@@ -5,8 +5,13 @@ import com.financialplanner.moduleapi.dtos.initialamount.InitialAmountResponse;
 import com.financialplanner.moduleapi.mappers.InitialAmountMapper;
 import com.financialplanner.moduleapi.response.ApiResponse;
 import com.financialplanner.moduleapi.response.ApiResponseFactory;
+import com.financialplanner.modulecommonbc.exception.DuplicateItemException;
+import com.financialplanner.modulecommonbc.exception.RepositoryException;
 import com.financialplanner.moduleitemsbc.domain.service.ItemService;
 import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.Item;
+import org.apache.coyote.BadRequestException;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,15 +42,15 @@ public class InitialAmountController {
     /**
      * Retrieve InitialAmounts for a given user and item type.
      */
-    @GetMapping("/{userId}/{itemType}")
+    @GetMapping("/{userId}")
     public ResponseEntity<ApiResponse<List<InitialAmountResponse>>> getByUserAndType(
-        @PathVariable("userId") UUID userId, @PathVariable("itemType") Long itemType) {
-        List<Item> items = service.findByUserIdAndItemTypeId(userId, itemType);
+        @PathVariable("userId") UUID userId) {
+        List<Item> items = service.findByUserIdAndItemTypeId(userId, 3L);
         List<InitialAmountResponse> responseList = items.stream()
                                                         .map(mapper::toResponse)
                                                         .toList();
         ApiResponse<List<InitialAmountResponse>> body = responseFactory.success(responseList,
-                                                                                "InitialAmounts retrieved " +
+                                                                                "InitialAmount retrieved " +
                                                                                 "successfully");
         return ResponseEntity.ok(body);
     }
@@ -57,13 +62,24 @@ public class InitialAmountController {
     @PostMapping
     public ResponseEntity<ApiResponse<InitialAmountResponse>> create(@RequestBody InitialAmountRequest request) {
         Item entity = mapper.toEntity(request);
-        InitialAmountResponse response = mapper.toResponse(service.create(entity));
-        URI location = URI.create("/initial-amount/" + response.id());
-        ApiResponse<InitialAmountResponse> body = responseFactory.created(response,
-                                                                          "InitialAmount created successfully",
-                                                                          location.toString());
-        return ResponseEntity.created(location)
-                             .body(body);
+        final long INITIAL_AMOUNT_ITEM_TYPE_ID = 3L;
+
+        try {
+            List<Item> items = service.findByUserIdAndItemTypeId(entity.getUserId(), INITIAL_AMOUNT_ITEM_TYPE_ID);
+            InitialAmountResponse response = mapper.toResponse(service.create(entity));
+            if (!items.isEmpty()) {
+                throw new DuplicateItemException("User already has an initial amount: " + entity.getId(), null);
+            }
+            URI location = URI.create("/initial-amount/" + response.id());
+            ApiResponse<InitialAmountResponse> body = responseFactory.created(response,
+                                                                              "InitialAmount created successfully",
+                                                                              location.toString());
+            return ResponseEntity.created(location)
+                                 .body(body);
+
+        } catch (DataAccessException ex) {
+            throw new RepositoryException("Database failure while saving Item " + entity.getId(), ex);
+        }
     }
 
     /**

@@ -3,7 +3,6 @@ package com.financialplanner.moduleapi.dtos.initialamount;
 import com.financialplanner.modulecommonbc.exception.DomainValidationException;
 import jakarta.validation.constraints.NotNull;
 
-import java.time.LocalDate;
 import java.util.UUID;
 
 /**
@@ -11,10 +10,7 @@ import java.util.UUID;
  * Validation rules mirror the ItemRequest pattern: required userId, name and positive amount.
  */
 public record InitialAmountRequest(@NotNull UUID userId,
-                                   @NotNull String name,
-                                   @NotNull Double amount,
-                                   @NotNull Integer fkItemType,
-                                   LocalDate beginDate
+                                   @NotNull Double amount
 ) {
 
     public InitialAmountRequest {
