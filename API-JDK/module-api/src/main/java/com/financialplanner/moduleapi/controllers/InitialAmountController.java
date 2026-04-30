@@ -6,12 +6,11 @@ import com.financialplanner.moduleapi.mappers.InitialAmountMapper;
 import com.financialplanner.moduleapi.response.ApiResponse;
 import com.financialplanner.moduleapi.response.ApiResponseFactory;
 import com.financialplanner.modulecommonbc.exception.DuplicateItemException;
+import com.financialplanner.modulecommonbc.exception.ItemNotFoundException;
 import com.financialplanner.modulecommonbc.exception.RepositoryException;
 import com.financialplanner.moduleitemsbc.domain.service.ItemService;
 import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.Item;
-import org.apache.coyote.BadRequestException;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,6 +45,9 @@ public class InitialAmountController {
     public ResponseEntity<ApiResponse<List<InitialAmountResponse>>> getByUserAndType(
         @PathVariable("userId") UUID userId) {
         List<Item> items = service.findByUserIdAndItemTypeId(userId, 3L);
+        if (items.isEmpty()) {
+            throw new ItemNotFoundException("InitialAmount for " + userId + " not found");
+        }
         List<InitialAmountResponse> responseList = items.stream()
                                                         .map(mapper::toResponse)
                                                         .toList();
@@ -66,10 +68,10 @@ public class InitialAmountController {
 
         try {
             List<Item> items = service.findByUserIdAndItemTypeId(entity.getUserId(), INITIAL_AMOUNT_ITEM_TYPE_ID);
-            InitialAmountResponse response = mapper.toResponse(service.create(entity));
             if (!items.isEmpty()) {
-                throw new DuplicateItemException("User already has an initial amount: " + entity.getId(), null);
+                throw new DuplicateItemException("User already has an initial amount: " + entity.getUserId(), null);
             }
+            InitialAmountResponse response = mapper.toResponse(service.create(entity));
             URI location = URI.create("/initial-amount/" + response.id());
             ApiResponse<InitialAmountResponse> body = responseFactory.created(response,
                                                                               "InitialAmount created successfully",
