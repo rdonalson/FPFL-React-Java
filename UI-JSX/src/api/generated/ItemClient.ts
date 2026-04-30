@@ -7,13 +7,15 @@ import type {
   TimePeriodDto,
 } from '@/features/catalog-command/transactions/types/Item';
 import { callAndParse } from '@/api/utils/apiParse';
+import { getSessionUserId } from '@/api/utils/userId';
 
 const BASE_ITEMS = '/items';
 const BASE_ITEM_TYPES = '/item-types';
 const BASE_TIME_PERIODS = '/time-periods';
 
 export const ItemClient = {
-  async getByUserAndType(userId: string, itemType: number): Promise<ApiResponse<Item[]>> {
+  async fetchForCurrentUser(itemType: number): Promise<ApiResponse<Item[]>> {
+    const userId = getSessionUserId();
     return callAndParse<Item[]>(() =>
       apiClient.get<ApiResponse<Item[]>>(`${BASE_ITEMS}/${encodeURIComponent(userId)}/${itemType}`),
     );

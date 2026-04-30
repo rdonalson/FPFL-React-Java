@@ -4,17 +4,17 @@ import { Toast } from 'primereact/toast';
 import { InputNumber } from 'primereact/inputnumber';
 import { Button } from 'primereact/button';
 import {
-  fetchInitialAmountForCurrentUser,
-  createInitialAmountForCurrentUser,
-  updateInitialAmountForCurrentUser,
-} from '../../api/itemApi';
+  fetchInitialAmount,
+  createInitialAmount,
+  updateInitialAmount,
+} from '../../api/initialAmountApi';
 import { Item } from '../../types/Item';
 
 /**
  * InitialAmountPage (PrimeReact)
  * - Shows only the Amount field (currency) to the logged-in user.
  * - Uses PrimeReact InputNumber (mode="currency") for formatting and input.
- * - Uses transactions/itemApi helpers for GET/POST/PUT.
+ * - Uses transactions/initialAmountApi helpers for GET/POST/PUT.
  */
 
 export default function InitialAmountPage(): JSX.Element {
@@ -37,7 +37,7 @@ export default function InitialAmountPage(): JSX.Element {
   async function load() {
     setLoading(true);
     try {
-      const existing = await fetchInitialAmountForCurrentUser();
+      const existing = await fetchInitialAmount();
       setInitialAmount(existing);
       setAmount(existing?.amount ?? 0);
       setEditing(false);
@@ -60,7 +60,7 @@ export default function InitialAmountPage(): JSX.Element {
       if (!Number.isFinite(n) || n < 0) {
         throw new Error('Amount must be a number greater than or equal to 0.');
       }
-      const created = await createInitialAmountForCurrentUser(n);
+      const created = await createInitialAmount(n);
       setInitialAmount(created);
       setAmount(created.amount ?? n);
       toast.current?.show({
@@ -96,7 +96,7 @@ export default function InitialAmountPage(): JSX.Element {
       if (!Number.isFinite(n) || n < 0) {
         throw new Error('Amount must be a number greater than or equal to 0.');
       }
-      const updated = await updateInitialAmountForCurrentUser(initialAmount.id, n);
+      const updated = await updateInitialAmount(initialAmount.id, n);
       setInitialAmount(updated);
       setAmount(updated.amount ?? n);
       setEditing(false);

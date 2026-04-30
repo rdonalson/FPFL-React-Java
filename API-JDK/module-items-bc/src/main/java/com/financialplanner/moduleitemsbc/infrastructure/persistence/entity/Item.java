@@ -140,6 +140,28 @@ public class Item {
     public Item() {}
 
     /**
+     * Constructs an Item with the specified parameters intended for use in creating and updating specific type of
+     * item, InitialAmount. This version of Item can only have one entry and only needs the parameters listed below.
+     * It's amount can be zero, positive, or negative.
+     *
+     * @param id        the unique identifier of the item, can be null
+     * @param userId    the unique identifier of the user associated with the item, must not be null
+     * @param name      the name of the item, must not be null
+     * @param amount    the monetary amount for the item, must not be null
+     * @param itemType  the type of the item, can be null
+     * @param beginDate the start date for the item, can be null
+     */
+    public Item(Long id, @NotNull UUID userId, @NotNull String name, @NotNull Double amount, ItemType itemType,
+                LocalDate beginDate) {
+        Id        = id;
+        UserId    = userId;
+        Name      = name;
+        Amount    = amount;
+        ItemType  = itemType;
+        BeginDate = beginDate;
+    }
+
+    /**
      * Constructs a new Item with the given parameters.
      *
      * @param id               The unique identifier of the item.
@@ -207,4 +229,5 @@ public class Item {
         AnnualDom         = annualDom;
         DateRangeReq      = dateRangeReq;
     }
+
 }
