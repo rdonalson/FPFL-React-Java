@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -42,19 +43,24 @@ public class InitialAmountController {
      * Retrieve InitialAmounts for a given user and item type.
      */
     @GetMapping("/{userId}")
-    public ResponseEntity<ApiResponse<List<InitialAmountResponse>>> getByUserAndType(
-        @PathVariable("userId") UUID userId) {
-        List<Item> items = service.findByUserIdAndItemTypeId(userId, 3L);
-        if (items.isEmpty()) {
-            throw new ItemNotFoundException("InitialAmount for " + userId + " not found");
+    public ResponseEntity<ApiResponse<List<InitialAmountResponse>>> getByUserAndType(@PathVariable("userId") UUID userId) {
+        final long INITIAL_AMOUNT_ITEM_TYPE_ID = 3L;
+        try {
+            List<Item> items = service.findByUserIdAndItemTypeId(userId, INITIAL_AMOUNT_ITEM_TYPE_ID);
+            if (items.isEmpty()) {
+                throw new ItemNotFoundException("InitialAmount for UserId" + userId + " not found");
+            }
+            List<InitialAmountResponse> responseList = items.stream()
+                                                            .map(mapper::toResponse)
+                                                            .toList();
+            ApiResponse<List<InitialAmountResponse>> body = responseFactory.success(responseList,
+                                                                                    "InitialAmount retrieved " +
+                                                                                    "successfully");
+            return ResponseEntity.ok(body);
+
+        } catch (DataAccessException ex) {
+            throw new RepositoryException("Database failure while retrieving InitialAmount for user " + userId, ex);
         }
-        List<InitialAmountResponse> responseList = items.stream()
-                                                        .map(mapper::toResponse)
-                                                        .toList();
-        ApiResponse<List<InitialAmountResponse>> body = responseFactory.success(responseList,
-                                                                                "InitialAmount retrieved " +
-                                                                                "successfully");
-        return ResponseEntity.ok(body);
     }
 
     /**
@@ -90,10 +96,23 @@ public class InitialAmountController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<InitialAmountResponse>> update(@PathVariable("id") Long id,
                                                                      @RequestBody InitialAmountRequest request) {
-        Item entity = mapper.toEntity(request);
-        InitialAmountResponse response = mapper.toResponse(service.update(id, entity));
-        ApiResponse<InitialAmountResponse> body = responseFactory.success(response,
-                                                                          "InitialAmount updated successfully");
-        return ResponseEntity.ok(body);
+        final long INITIAL_AMOUNT_ITEM_TYPE_ID = 3L;
+        try {
+            List<Item> items = service.findByUserIdAndItemTypeId(request.userId(), INITIAL_AMOUNT_ITEM_TYPE_ID);
+            if (!items.isEmpty() && !Objects.equals(id, items.getFirst().getId())) {
+                throw new ItemNotFoundException("InitialAmount for UserId: " + request.userId() + " not found");
+            }
+            else if (items.isEmpty()) {
+                throw new ItemNotFoundException("InitialAmount for for UserId: " + request.userId() + " not found");
+            }
+            Item entity = mapper.toEntity(request);
+            InitialAmountResponse response = mapper.toResponse(service.update(id, entity));
+            ApiResponse<InitialAmountResponse> body = responseFactory.success(response,
+                                                                              "InitialAmount updated successfully");
+            return ResponseEntity.ok(body);
+
+        } catch (DataAccessException ex) {
+            throw new RepositoryException("Database failure while updating Item " + id, ex);
+        }
     }
 }
