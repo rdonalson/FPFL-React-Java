@@ -3,37 +3,39 @@ import React, { JSX, useEffect, useRef, useState } from 'react';
 import { Toast } from 'primereact/toast';
 import { InputNumber } from 'primereact/inputnumber';
 import { Button } from 'primereact/button';
+
 import {
   fetchInitialAmount,
   createInitialAmount,
   updateInitialAmount,
 } from '../../api/initialAmountApi';
-import { Item } from '../../types/Item';
+
+import { InitialAmountResponse } from '../../types/InitialAmount';
 
 /**
  * InitialAmountPage (PrimeReact)
  * - Shows only the Amount field (currency) to the logged-in user.
- * - Uses PrimeReact InputNumber (mode="currency") for formatting and input.
- * - Uses transactions/initialAmountApi helpers for GET/POST/PUT.
+ * - Uses PrimeReact InputNumber for formatting.
+ * - Uses initialAmountApi helpers for GET/POST/PUT.
  */
 
 export default function InitialAmountPage(): JSX.Element {
   const didLoadRef = useRef(false);
-  const [initialAmount, setInitialAmount] = useState<Item | null>(null);
+  const toast = useRef<Toast | null>(null);
+
+  const [initialAmount, setInitialAmount] = useState<InitialAmountResponse | null>(null);
+  const [amount, setAmount] = useState<number>(0);
+
   const [loading, setLoading] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
   const [editing, setEditing] = useState<boolean>(false);
-  const [amount, setAmount] = useState<number | null>(0);
-  const toast = useRef<Toast | null>(null);
 
   useEffect(() => {
-    if (didLoadRef.current) return; // guard: only run once
+    if (didLoadRef.current) return;
     didLoadRef.current = true;
     load();
-    // no cleanup needed
   }, []);
 
-  // keep load as-is but do not call it directly from top-level useEffect
   async function load() {
     setLoading(true);
     try {
@@ -56,19 +58,22 @@ export default function InitialAmountPage(): JSX.Element {
   async function handleCreate() {
     setSaving(true);
     try {
-      const n = amount ?? 0;
+      const n = amount;
       if (!Number.isFinite(n) || n < 0) {
         throw new Error('Amount must be a number greater than or equal to 0.');
       }
+
       const created = await createInitialAmount(n);
       setInitialAmount(created);
-      setAmount(created.amount ?? n);
+      setAmount(created.amount);
+
       toast.current?.show({
         severity: 'success',
         summary: 'Created',
         detail: 'Initial Amount created',
         life: 3000,
       });
+
       setEditing(false);
     } catch (err: any) {
       toast.current?.show({
@@ -84,22 +89,25 @@ export default function InitialAmountPage(): JSX.Element {
 
   function startEdit() {
     if (!initialAmount) return;
-    setAmount(initialAmount.amount ?? 0);
+    setAmount(initialAmount.amount);
     setEditing(true);
   }
 
   async function handleSaveEdit() {
     if (!initialAmount?.id) return;
+
     setSaving(true);
     try {
-      const n = amount ?? 0;
+      const n = amount;
       if (!Number.isFinite(n) || n < 0) {
         throw new Error('Amount must be a number greater than or equal to 0.');
       }
+
       const updated = await updateInitialAmount(initialAmount.id, n);
       setInitialAmount(updated);
-      setAmount(updated.amount ?? n);
+      setAmount(updated.amount);
       setEditing(false);
+
       toast.current?.show({
         severity: 'success',
         summary: 'Saved',
@@ -139,7 +147,7 @@ export default function InitialAmountPage(): JSX.Element {
                   <strong>Amount</strong>
                   <InputNumber
                     value={amount}
-                    onValueChange={e => setAmount(e.value as number)}
+                    onValueChange={e => setAmount((e.value as number | null) ?? 0)}
                     mode="currency"
                     currency="USD"
                     locale={navigator.language}
@@ -196,7 +204,7 @@ export default function InitialAmountPage(): JSX.Element {
                   <strong>Amount</strong>
                   <InputNumber
                     value={amount}
-                    onValueChange={e => setAmount(e.value as number)}
+                    onValueChange={e => setAmount((e.value as number | null) ?? 0)}
                     mode="currency"
                     currency="USD"
                     locale={navigator.language}

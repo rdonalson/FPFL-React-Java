@@ -43,7 +43,7 @@ public class InitialAmountController {
      * Retrieve InitialAmounts for a given user and item type.
      */
     @GetMapping("/{userId}")
-    public ResponseEntity<ApiResponse<List<InitialAmountResponse>>> getByUserAndType(@PathVariable("userId") UUID userId) {
+    public ResponseEntity<ApiResponse<InitialAmountResponse>> getByUserAndType(@PathVariable("userId") UUID userId) {
         final long INITIAL_AMOUNT_ITEM_TYPE_ID = 3L;
         try {
             List<Item> items = service.findByUserIdAndItemTypeId(userId, INITIAL_AMOUNT_ITEM_TYPE_ID);
@@ -53,7 +53,7 @@ public class InitialAmountController {
             List<InitialAmountResponse> responseList = items.stream()
                                                             .map(mapper::toResponse)
                                                             .toList();
-            ApiResponse<List<InitialAmountResponse>> body = responseFactory.success(responseList,
+            ApiResponse<InitialAmountResponse> body = responseFactory.success(responseList.getFirst(),
                                                                                     "InitialAmount retrieved " +
                                                                                     "successfully");
             return ResponseEntity.ok(body);
