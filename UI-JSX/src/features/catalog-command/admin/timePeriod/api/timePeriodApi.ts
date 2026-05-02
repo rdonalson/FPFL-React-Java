@@ -25,8 +25,19 @@ export const timePeriodApi = {
     return unwrap<TimePeriodDto>(res, null, true) as TimePeriodDto;
   },
 
+  // <-- Updated remove: do not force unwrap with throwOnMissing
   async remove(id: number): Promise<void> {
     const res = await TimePeriodClient.delete(id);
-    unwrap<void>(res, undefined, true);
+    // res.data may be undefined for 204 No Content — treat that as success.
+    // Optionally assert that we got a response object:
+    if (!res) {
+      throw new Error('No response from server');
+    }
+    return;
   },
+
+  //   async remove(id: number): Promise<void> {
+  //     const res = await TimePeriodClient.delete(id);
+  //     unwrap<void>(res, undefined, true);
+  //   },
 };
