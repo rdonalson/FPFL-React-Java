@@ -1,9 +1,6 @@
 export interface InitialAmountRequest {
   userId: string;
-  name: string;
   amount: number;
-  fkItemType: number; // always 3 for InitialAmount
-  beginDate?: string | null;
 }
 
 export interface InitialAmountResponse {

@@ -1,5 +1,5 @@
 // src/api/client.ts
-import axios, { AxiosError, AxiosInstance } from 'axios';
+import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 import { apiConfig } from './config';
 import { useSessionStore } from '../app/state/sessionStore';
 
@@ -29,17 +29,19 @@ function createClient(): AxiosInstance {
   // ============================
   instance.interceptors.request.use(config => {
     const correlationId = crypto.randomUUID();
-    config.headers['X-Correlation-ID'] = correlationId;
+    // TS: headers can be undefined or a plain object; coerce to any for assignment
+    (config.headers as any) = (config.headers as any) || {};
+    (config.headers as any)['X-Correlation-ID'] = correlationId;
 
     // Pull session values at request time (always fresh)
     const { userId, token } = useSessionStore.getState();
 
     if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
+      (config.headers as any)['Authorization'] = `Bearer ${token}`;
     }
 
     if (userId) {
-      config.headers['X-User-Id'] = userId;
+      (config.headers as any)['X-User-Id'] = userId;
     }
 
     // Local DevTools log
@@ -57,16 +59,19 @@ function createClient(): AxiosInstance {
   // ============================
   // RESPONSE INTERCEPTOR
   // ============================
+  // IMPORTANT: Do NOT unwrap response.data here. Return the full AxiosResponse so callers
+  // can access the ApiResponse<T> wrapper at res.data.
   instance.interceptors.response.use(
-    response => {
+    (response: AxiosResponse) => {
       // Local DevTools log
       console.log('[API RESPONSE]', {
         url: response.config.url,
         status: response.status,
-        correlationId: response.config.headers['X-Correlation-ID'],
+        correlationId: (response.config.headers as any)?.['X-Correlation-ID'],
       });
 
-      return response.data;
+      // Return the full AxiosResponse<ApiResponse<T>>
+      return response;
     },
 
     // ============================
@@ -77,7 +82,7 @@ function createClient(): AxiosInstance {
         status: error.response?.status ?? 0,
         message: (error.response?.data as any)?.message ?? error.message ?? 'Unknown error',
         details: error.response?.data ?? null,
-        correlationId: error.config?.headers?.['X-Correlation-ID'],
+        correlationId: (error.config?.headers as any)?.['X-Correlation-ID'],
         url: error.config?.url,
       };
 
@@ -90,7 +95,7 @@ function createClient(): AxiosInstance {
         details: normalized.details,
       });
 
-      // Send to backend logging API
+      // Send to backend logging API (fire-and-forget)
       sendLogToServer({
         log: {
           level: 'error',
@@ -102,6 +107,7 @@ function createClient(): AxiosInstance {
         },
       });
 
+      // Reject with a normalized error object (not the raw AxiosError)
       return Promise.reject(normalized);
     },
   );

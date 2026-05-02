@@ -1,21 +1,39 @@
 // src/api/utils/apiParse.ts
 import type { ApiResponse } from '@/api/models/ApiResponse';
+import type { AxiosResponse } from 'axios';
 
 /**
  * parseApi adapter
+ * - If payload is an AxiosResponse, extract its .data and continue.
  * - If payload already looks like ApiResponse<T>, return it.
  * - If payload is raw data, wrap it as ApiResponse<T>.
  * - If payload is null/undefined, return { data: undefined }.
  */
 export async function parseApi<T>(payload: unknown): Promise<ApiResponse<T>> {
+  // 1) AxiosResponse case: has 'config' and 'status' properties
+  if (
+    payload &&
+    typeof payload === 'object' &&
+    'config' in (payload as any) &&
+    'status' in (payload as any)
+  ) {
+    const axiosRes = payload as AxiosResponse;
+    // axiosRes.data might be ApiResponse<T> or raw T
+    payload = axiosRes.data;
+  }
+
+  // 2) Null / undefined
   if (payload === null || payload === undefined) {
     return { data: undefined } as ApiResponse<T>;
   }
 
+  // 3) ApiResponse<T> shape detection
   if (typeof payload === 'object' && payload !== null && 'data' in (payload as any)) {
+    // Heuristic: treat it as ApiResponse<T>
     return payload as ApiResponse<T>;
   }
 
+  // 4) Raw payload -> wrap it
   return { data: payload as T } as ApiResponse<T>;
 }
 

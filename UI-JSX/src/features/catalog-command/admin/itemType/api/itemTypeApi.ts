@@ -24,8 +24,14 @@ export const itemTypeApi = {
     return unwrap<ItemType>(res, null, true) as ItemType;
   },
 
+  // <-- Updated remove: do not force unwrap with throwOnMissing
   async remove(id: number): Promise<void> {
     const res = await ItemTypeClient.delete(id);
-    unwrap<void>(res, undefined, true);
+    // res.data may be undefined for 204 No Content — treat that as success.
+    // Optionally assert that we got a response object:
+    if (!res) {
+      throw new Error('No response from server');
+    }
+    return;
   },
 };

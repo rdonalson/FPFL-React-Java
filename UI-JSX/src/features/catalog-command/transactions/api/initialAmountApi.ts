@@ -9,10 +9,10 @@ import { InitialAmountResponse } from '../types/InitialAmount';
  */
 export async function fetchInitialAmount(): Promise<InitialAmountResponse | null> {
   const res = await InitialAmountClient.fetchForCurrentUser();
-  // res: ApiResponse<InitialAmountResponse | null>
-  return unwrap<InitialAmountResponse | null>(res, null);
+  // If backend returns null, unwrap will throw unless we handle it:
+  if (!res || res.data === null) return null;
+  return unwrap<InitialAmountResponse>(res, {} as InitialAmountResponse, true);
 }
-
 /**
  * Create InitialAmount for current user.
  * Guaranteed non-null on success.

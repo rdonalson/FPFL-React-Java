@@ -12,18 +12,12 @@ import {
 
 import { InitialAmountResponse } from '../../types/InitialAmount';
 
-/**
- * InitialAmountPage (PrimeReact)
- * - Shows only the Amount field (currency) to the logged-in user.
- * - Uses PrimeReact InputNumber for formatting.
- * - Uses initialAmountApi helpers for GET/POST/PUT.
- */
-
 export default function InitialAmountPage(): JSX.Element {
   const didLoadRef = useRef(false);
   const toast = useRef<Toast | null>(null);
 
   const [initialAmount, setInitialAmount] = useState<InitialAmountResponse | null>(null);
+
   const [amount, setAmount] = useState<number>(0);
 
   const [loading, setLoading] = useState<boolean>(true);
