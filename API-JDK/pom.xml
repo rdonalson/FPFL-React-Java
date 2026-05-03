@@ -20,6 +20,7 @@
         <module>module-common-bc</module>
         <module>module-items-bc</module>
         <module>module-display-bc</module>
+        <module>module-auth</module>
         <module>module-api</module>
     </modules>
 
