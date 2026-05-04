@@ -55,6 +55,12 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
 
+        <!-- Crypto -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
+        </dependency>
+
         <!-- Unit testing only -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
