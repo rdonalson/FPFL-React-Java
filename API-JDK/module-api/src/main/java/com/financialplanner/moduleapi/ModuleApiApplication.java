@@ -18,6 +18,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
     "com.financialplanner.modulecommonbc",
     "com.financialplanner.moduleitemsbc",
     "com.financialplanner.moduledisplaybc",
+    "com.financialplanner.moduleauth",
     "com.financialplanner.moduleapi"
 })
 public class ModuleApiApplication {

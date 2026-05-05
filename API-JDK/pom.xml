@@ -20,12 +20,14 @@
         <module>module-common-bc</module>
         <module>module-items-bc</module>
         <module>module-display-bc</module>
+        <module>module-auth</module>
         <module>module-api</module>
     </modules>
 
     <properties>
         <java.version>25</java.version>
         <spring.boot.version>4.0.4</spring.boot.version>
+        <postgresql.version>42.7.4</postgresql.version>
     </properties>
 
     <dependencyManagement>
@@ -45,6 +47,11 @@
                 <version>2.8.9</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${postgresql.version}</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>

@@ -8,6 +8,7 @@ WORKDIR /app
 # Copy root pom and module poms first for caching
 COPY pom.xml .
 COPY module-api/pom.xml module-api/
+COPY module-auth/pom.xml module-auth/
 COPY module-common-bc/pom.xml module-common-bc/
 COPY module-display-bc/pom.xml module-display-bc/
 COPY module-items-bc/pom.xml module-items-bc/
