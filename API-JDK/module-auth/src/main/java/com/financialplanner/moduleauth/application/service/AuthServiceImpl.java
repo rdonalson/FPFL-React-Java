@@ -3,7 +3,6 @@ package com.financialplanner.moduleauth.application.service;
 import com.financialplanner.moduleauth.domain.repository.RoleRepository;
 import com.financialplanner.moduleauth.domain.repository.UserRepository;
 import com.financialplanner.moduleauth.domain.service.AuthService;
-//import org.springframework.security.crypto.password.PasswordEncoder;
 import com.financialplanner.moduleauth.infrastructure.persistence.entity.Role;
 import com.financialplanner.moduleauth.infrastructure.persistence.entity.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,15 +22,16 @@ public class AuthServiceImpl implements AuthService {
         RoleRepository roleRepository,
         PasswordEncoder passwordEncoder
                           ) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
+        this.userRepository  = userRepository;
+        this.roleRepository  = roleRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public User register(String email, String rawPassword) {
 
-        if (userRepository.findByEmail(email).isPresent()) {
+        if (userRepository.findByEmail(email)
+                          .isPresent()) {
             throw new IllegalArgumentException("Email already registered");
         }
 
