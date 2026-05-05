@@ -37,11 +37,11 @@ public class SecurityConfig {
                 .requestMatchers("/auth/**")
                 .permitAll()
 
+                // Allow item-related endpoints
+                .requestMatchers("/item-types/**", "/time-periods/**", "/items/**")
+                .permitAll()
                 // Allow Swagger UI + OpenAPI
-                .requestMatchers(
-                    "/v3/api-docs/**",
-                    "/swagger-ui/**",
-                    "/swagger-ui.html")
+                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
                 .permitAll()
 
                 // Everything else requires JWT
