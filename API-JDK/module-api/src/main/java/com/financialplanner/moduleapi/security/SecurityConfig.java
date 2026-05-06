@@ -23,15 +23,20 @@ public class SecurityConfig {
 
         http.csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                // Allow Home Chrome DevTools reload probe
-                .requestMatchers("/",                       // root
-                                 "/home",                   // your Home page route
-                                 "/index.html",             // SPA entrypoint
-                                 "/favicon.ico",            // browser icon
-                                 "/static/**",              // static assets
-                                 "/assets/**"              // Vite/React assets
-                                )
-                .permitAll()
+                // Frontend + static assets
+                .requestMatchers(
+                    "/",
+                    "/home",
+                    "/index.html",
+                    "/favicon.ico",
+                    "/static/**",
+                    "/assets/**",
+                    "/images/**",
+                    "/icon.svg"
+                                ).permitAll()
+
+                // Actuator health
+                .requestMatchers("/actuator/health").permitAll()
 
                 // Allow authentication endpoints
                 .requestMatchers("/auth/**")
