@@ -9,7 +9,7 @@ services:
         environment:
             SPRING_DATASOURCE_URL: jdbc:postgresql://host.docker.internal:5432/FPFL-V2
             SPRING_DATASOURCE_USERNAME: postgres
-            SPRING_DATASOURCE_PASSWORD: xbt20o19A
+            SPRING_DATASOURCE_PASSWORD: password
             SPRING_JPA_HIBERNATE_DDL_AUTO: update
             SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA: fpfl
             SERVER_PORT: 9000

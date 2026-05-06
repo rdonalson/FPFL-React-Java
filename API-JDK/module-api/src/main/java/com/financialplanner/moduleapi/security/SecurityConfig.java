@@ -24,19 +24,13 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 // Frontend + static assets
-                .requestMatchers(
-                    "/",
-                    "/home",
-                    "/index.html",
-                    "/favicon.ico",
-                    "/static/**",
-                    "/assets/**",
-                    "/images/**",
-                    "/icon.svg"
-                                ).permitAll()
+                .requestMatchers("/", "/home", "/index.html", "/favicon.ico", "/static/**", "/assets/**", "/images/**",
+                                 "/icon.svg")
+                .permitAll()
 
                 // Actuator health
-                .requestMatchers("/actuator/health").permitAll()
+                .requestMatchers("/actuator/health")
+                .permitAll()
 
                 // Allow authentication endpoints
                 .requestMatchers("/auth/**")
