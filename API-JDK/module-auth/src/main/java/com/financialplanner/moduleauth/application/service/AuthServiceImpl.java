@@ -1,16 +1,12 @@
 package com.financialplanner.moduleauth.application.service;
 
-import com.financialplanner.moduleauth.domain.repository.UserRepository;
 import com.financialplanner.moduleauth.domain.service.AuthService;
 import com.financialplanner.moduleauth.domain.service.RoleService;
 import com.financialplanner.moduleauth.domain.service.UserService;
-import com.financialplanner.moduleauth.infrastructure.persistence.entity.Role;
 import com.financialplanner.moduleauth.infrastructure.persistence.entity.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Set;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -19,13 +15,9 @@ public class AuthServiceImpl implements AuthService {
     private final RoleService roleService;
     private final PasswordEncoder passwordEncoder; // optional if userService handles encoding
 
-    public AuthServiceImpl(
-        UserService userService,
-        RoleService roleService,
-        PasswordEncoder passwordEncoder
-                          ) {
-        this.userService  = userService;
-        this.roleService  = roleService;
+    public AuthServiceImpl(UserService userService, RoleService roleService, PasswordEncoder passwordEncoder) {
+        this.userService     = userService;
+        this.roleService     = roleService;
         this.passwordEncoder = passwordEncoder;
     }
 
