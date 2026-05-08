@@ -1,56 +1,50 @@
 package com.financialplanner.moduleauth.application.service;
 
-import com.financialplanner.moduleauth.domain.repository.RoleRepository;
 import com.financialplanner.moduleauth.domain.repository.UserRepository;
 import com.financialplanner.moduleauth.domain.service.AuthService;
+import com.financialplanner.moduleauth.domain.service.RoleService;
+import com.financialplanner.moduleauth.domain.service.UserService;
 import com.financialplanner.moduleauth.infrastructure.persistence.entity.Role;
 import com.financialplanner.moduleauth.infrastructure.persistence.entity.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 
 @Service
 public class AuthServiceImpl implements AuthService {
 
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final UserService userService;
+    private final RoleService roleService;
+    private final PasswordEncoder passwordEncoder; // optional if userService handles encoding
 
     public AuthServiceImpl(
-        UserRepository userRepository,
-        RoleRepository roleRepository,
+        UserService userService,
+        RoleService roleService,
         PasswordEncoder passwordEncoder
                           ) {
-        this.userRepository  = userRepository;
-        this.roleRepository  = roleRepository;
+        this.userService  = userService;
+        this.roleService  = roleService;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Override
+    @Transactional
     public User register(String email, String rawPassword) {
 
-        if (userRepository.findByEmail(email)
-                          .isPresent()) {
-            throw new IllegalArgumentException("Email already registered");
-        }
+        // RoleService ensures ROLE_USER exists
+        var userRole = roleService.ensureRoleExists("ROLE_USER");
 
-        Role userRole = roleRepository.findByName("ROLE_USER")
-                                      .orElseThrow(() -> new IllegalStateException("ROLE_USER not found"));
-
-        User user = new User();
-        user.setEmail(email);
-        user.setPasswordHash(passwordEncoder.encode(rawPassword));
-        user.setRoles(Set.of(userRole));
-
-        return userRepository.save(user);
+        // Delegate creation to UserService (which handles duplicate check + encoding)
+        return userService.createUser(email, rawPassword, java.util.Set.of(userRole));
     }
 
     @Override
     public User login(String email, String rawPassword) {
 
-        User user = userRepository.findByEmail(email)
-                                  .orElseThrow(() -> new IllegalArgumentException("Invalid credentials"));
+        User user = userService.findByEmail(email)
+                               .orElseThrow(() -> new IllegalArgumentException("Invalid credentials"));
 
         if (!passwordEncoder.matches(rawPassword, user.getPasswordHash())) {
             throw new IllegalArgumentException("Invalid credentials");
@@ -61,7 +55,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public User loadUserByEmail(String email) {
-        return userRepository.findByEmail(email)
-                             .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        return userService.findByEmail(email)
+                          .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 }

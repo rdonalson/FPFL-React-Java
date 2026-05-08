@@ -5,7 +5,7 @@ import java.util.Set;
 
 @lombok.Data
 @Entity
-@Table(name = "users")
+@Table(name = "users", schema = "fpfl")
 public class User {
 
     @Id
