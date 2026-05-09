@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/auth")
@@ -37,9 +36,8 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
 
-        User user = authService.register(request.email(), request.password());
+        User user = authService.register(request.email(), request.password(), request.first(), request.last());
 
-        // Build roles as a list of names for JWT claims
         var roleNames = user.getRoles()
                             .stream()
                             .map(Role::getName)
@@ -49,36 +47,29 @@ public class AuthController {
 
         var refreshToken = refreshTokenService.createRefreshToken(user.getId());
 
-        Set<String> roles = roleNames.stream()
-                                     .collect(Collectors.toSet());
-
-        var response = new AuthResponse(accessToken, refreshToken.getToken(), user.getId(), user.getEmail(), roles);
+        var response = new AuthResponse(accessToken, refreshToken.getToken(), user.getId(), user.getEmail(),
+                                        user.getUserID(), user.getFirst(), user.getLast(), Set.copyOf(roleNames));
 
         return ResponseEntity.ok(response);
     }
 
+
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
 
-        // Authenticate user (AuthServiceImpl.login checks password)
         User user = authService.login(request.email(), request.password());
 
-        // Map roles to simple names for JWT claims
         var roleNames = user.getRoles()
                             .stream()
                             .map(Role::getName)
                             .toList();
 
-        // Generate access token with roles claim as a list of strings
         var accessToken = jwtService.generateToken(user.getEmail(), Map.of("roles", roleNames));
 
-        // Create refresh token (persisted UUID)
         var refreshToken = refreshTokenService.createRefreshToken(user.getId());
 
-        Set<String> roles = roleNames.stream()
-                                     .collect(Collectors.toSet());
-
-        var response = new AuthResponse(accessToken, refreshToken.getToken(), user.getId(), user.getEmail(), roles);
+        var response = new AuthResponse(accessToken, refreshToken.getToken(), user.getId(), user.getEmail(),
+                                        user.getUserID(), user.getFirst(), user.getLast(), Set.copyOf(roleNames));
 
         return ResponseEntity.ok(response);
     }
@@ -93,7 +84,8 @@ public class AuthController {
 
         var user = refreshToken.getUser();
 
-        var roleNames = user.getRoles().stream()
+        var roleNames = user.getRoles()
+                            .stream()
                             .map(Role::getName)
                             .toList();
 

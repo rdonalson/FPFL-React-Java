@@ -6,6 +6,7 @@ import com.financialplanner.moduleauth.infrastructure.persistence.repository.Jpa
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 public class UserRepositoryImpl implements UserRepository {
@@ -24,6 +25,11 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Optional<User> findById(Long id) {
         return jpa.findById(id);
+    }
+
+    @Override
+    public Optional<User> findByUserID(UUID userID) {
+        return jpa.findByUserID(userID);
     }
 
     @Override

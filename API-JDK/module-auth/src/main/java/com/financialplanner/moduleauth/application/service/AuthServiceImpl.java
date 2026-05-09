@@ -8,6 +8,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Set;
+
 @Service
 public class AuthServiceImpl implements AuthService {
 
@@ -23,13 +25,13 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public User register(String email, String rawPassword) {
+    public User register(String email, String rawPassword, String first, String last) {
 
         // RoleService ensures ROLE_USER exists
         var userRole = roleService.ensureRoleExists("ROLE_USER");
 
         // Delegate creation to UserService (which handles duplicate check + encoding)
-        return userService.createUser(email, rawPassword, java.util.Set.of(userRole));
+        return userService.createUser(email, rawPassword, Set.of(userRole), first, last);
     }
 
     @Override
