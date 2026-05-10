@@ -8,11 +8,11 @@ export function useItem() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function loadForUserAndType(userId: string, itemType: number) {
+  async function loadForUserAndType(userID: string, itemType: number) {
     setLoading(true);
     setError(null);
     try {
-      const data = await itemApi.getItemsForUserAndType(userId, itemType);
+      const data = await itemApi.getItemsForUserAndType(userID, itemType);
       setItems(data);
     } catch (e: any) {
       setError(e.message || 'Failed to load items');

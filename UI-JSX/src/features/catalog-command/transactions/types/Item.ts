@@ -19,7 +19,7 @@ export interface TimePeriodDto {
  */
 export interface Item {
   id?: number;
-  userId: string;
+  userID: string;
   name?: string;
   amount: number;
   ItemType?: ItemTypeDto | null;

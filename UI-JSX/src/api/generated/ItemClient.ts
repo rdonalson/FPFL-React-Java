@@ -15,9 +15,9 @@ const BASE_TIME_PERIODS = '/time-periods';
 
 export const ItemClient = {
   async fetchForCurrentUser(itemType: number): Promise<ApiResponse<Item[]>> {
-    const userId = getSessionUserId();
+    const userID = getSessionUserId();
     return callAndParse<Item[]>(() =>
-      apiClient.get<ApiResponse<Item[]>>(`${BASE_ITEMS}/${encodeURIComponent(userId)}/${itemType}`),
+      apiClient.get<ApiResponse<Item[]>>(`${BASE_ITEMS}/${encodeURIComponent(userID)}/${itemType}`),
     );
   },
 
