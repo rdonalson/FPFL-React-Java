@@ -12,7 +12,6 @@ export const useThemeStore = create<ThemeState>(set => ({
   setTheme: dark => {
     localStorage.setItem('darkTheme', String(dark));
 
-    // C:\Users\rickd\source\repos\FPFL-React-Java\UI-JSX\public\themes\lara-dark-indigo\theme.css
     const themeLink = document.getElementById('theme-css') as HTMLLinkElement;
     themeLink.href = dark
       ? '/public/themes/lara-dark-indigo/theme.css'
