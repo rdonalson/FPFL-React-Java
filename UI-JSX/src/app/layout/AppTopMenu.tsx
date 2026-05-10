@@ -10,53 +10,61 @@ import { useSessionStore } from '@/app/state/sessionStore';
 import { loginApi } from '@/api/authApi';
 import { GUEST_USER_ID, GUEST_TOKEN } from '@/app/auth/constants';
 
-function unwrap<T = any>(maybeAxiosResponse: any): T {
-  if (!maybeAxiosResponse) return maybeAxiosResponse;
-  return maybeAxiosResponse && maybeAxiosResponse.data
-    ? maybeAxiosResponse.data
-    : maybeAxiosResponse;
-}
-
 export default function AppTopMenu({ onToggleSidebar }: { onToggleSidebar: () => void }) {
   const navigate = useNavigate();
-  const { userId, setUserId, setToken, clearSession } = useSessionStore();
+
+  const { userId, setSession, clearSession } = useSessionStore();
 
   const [showLoginDialog, setShowLoginDialog] = useState(false);
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState(''); // backend expects email
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   const isLoggedIn = !!userId;
 
+  // ---------------------------
   // DEMO LOGIN
+  // ---------------------------
   function handleDemoLogin() {
-    setUserId(GUEST_USER_ID);
-    setToken(GUEST_TOKEN);
+    setSession({
+      token: GUEST_TOKEN,
+      refreshToken: '',
+      userId: GUEST_USER_ID,
+      email: 'guest@example.com',
+      roles: ['GUEST'],
+      raw: {},
+    });
+
     navigate('/');
   }
 
+  // ---------------------------
   // REAL LOGIN
+  // ---------------------------
   async function handleLoginSubmit() {
     try {
       setLoading(true);
-      const raw = await loginApi(username, password);
-      const result = unwrap(raw);
 
-      // result should now be the payload with token and userId
-      if (result?.token && result?.userId) {
-        setToken(result.token);
-        setUserId(result.userId);
-        setShowLoginDialog(false);
-        navigate('/');
-      } else {
-        // Optionally handle unexpected payload shape
-        console.error('Unexpected login response shape', result);
-      }
+      const result = await loginApi(email, password);
+
+      // result is already normalized by loginApi
+      setSession(result);
+
+      setShowLoginDialog(false);
+      navigate('/');
     } catch (err) {
       console.error('Login failed', err);
     } finally {
       setLoading(false);
     }
+  }
+
+  // ---------------------------
+  // LOGOUT
+  // ---------------------------
+  function handleLogout() {
+    clearSession();
+    navigate('/');
   }
 
   return (
@@ -92,10 +100,7 @@ export default function AppTopMenu({ onToggleSidebar }: { onToggleSidebar: () =>
             label="Logout"
             icon="pi pi-sign-out"
             className="p-button-sm p-button-danger"
-            onClick={() => {
-              clearSession();
-              navigate('/');
-            }}
+            onClick={handleLogout}
           />
         )}
       </div>
@@ -109,8 +114,8 @@ export default function AppTopMenu({ onToggleSidebar }: { onToggleSidebar: () =>
       >
         <div className="flex flex-col gap-3">
           <span className="p-float-label">
-            <InputText id="username" value={username} onChange={e => setUsername(e.target.value)} />
-            <label htmlFor="username">Username</label>
+            <InputText id="email" value={email} onChange={e => setEmail(e.target.value)} />
+            <label htmlFor="email">Email</label>
           </span>
 
           <span className="p-float-label">
