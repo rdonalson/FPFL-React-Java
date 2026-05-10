@@ -1,32 +1,60 @@
 import { create } from 'zustand';
 
 interface SessionState {
-  userId: string | null;
   token: string | null;
+  refreshToken: string | null;
+  userId: string | null;
+  email: string | null;
+  roles: string[] | null;
+  raw: any | null;
 
-  setUserId: (id: string) => void;
-  setToken: (token: string) => void;
+  setSession: (session: {
+    token: string;
+    refreshToken: string | null;
+    userId: string;
+    email: string;
+    roles: string[];
+    raw: any;
+  }) => void;
 
   clearSession: () => void;
 }
 
 export const useSessionStore = create<SessionState>(set => ({
-  userId: sessionStorage.getItem('userId'),
   token: sessionStorage.getItem('token'),
+  refreshToken: sessionStorage.getItem('refreshToken'),
+  userId: sessionStorage.getItem('userId'),
+  email: sessionStorage.getItem('email'),
+  roles: JSON.parse(sessionStorage.getItem('roles') || 'null'),
+  raw: JSON.parse(sessionStorage.getItem('raw') || 'null'),
 
-  setUserId: id => {
-    sessionStorage.setItem('userId', id);
-    set({ userId: id });
-  },
+  setSession: session => {
+    sessionStorage.setItem('token', session.token);
+    sessionStorage.setItem('refreshToken', session.refreshToken ?? '');
+    sessionStorage.setItem('userId', session.userId);
+    sessionStorage.setItem('email', session.email);
+    sessionStorage.setItem('roles', JSON.stringify(session.roles));
+    sessionStorage.setItem('raw', JSON.stringify(session.raw));
 
-  setToken: token => {
-    sessionStorage.setItem('token', token);
-    set({ token });
+    set({
+      token: session.token,
+      refreshToken: session.refreshToken,
+      userId: session.userId,
+      email: session.email,
+      roles: session.roles,
+      raw: session.raw,
+    });
   },
 
   clearSession: () => {
-    sessionStorage.removeItem('userId');
-    sessionStorage.removeItem('token');
-    set({ userId: null, token: null });
+    sessionStorage.clear();
+    set({
+      token: null,
+      refreshToken: null,
+      userId: null,
+      email: null,
+      roles: null,
+      raw: null,
+    });
   },
 }));
