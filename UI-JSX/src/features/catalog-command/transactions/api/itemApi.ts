@@ -6,7 +6,7 @@ import { getSessionUserId } from '@/api/utils/userId';
 
 /* --- Generic item operations (Credit/Debit and others) --- */
 
-export async function getItemsForUserAndType(userId: string, itemType: number): Promise<Item[]> {
+export async function getItemsForUserAndType(userID: string, itemType: number): Promise<Item[]> {
   const res = await ItemClient.fetchForCurrentUser(itemType);
   return unwrap<Item[]>(res, []); // fallback non-null => returns Item[]
 }
@@ -19,7 +19,7 @@ export async function getItemById(id: number): Promise<Item | null> {
 export async function createItem(payload: Item): Promise<Item> {
   // ensure required fields for backend
   if (!payload.fkItemType && payload.ItemType?.Id) payload.fkItemType = payload.ItemType.Id;
-  if (!payload.userId) payload.userId = getSessionUserId();
+  if (!payload.userID) payload.userID = getSessionUserId();
 
   const res = await ItemClient.create(payload);
   return unwrap<Item>(res, null, true) as Item;

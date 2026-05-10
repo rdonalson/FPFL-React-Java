@@ -4,8 +4,8 @@ import AppMenuitem from './AppMenuitem';
 import { useSessionStore } from '../state/sessionStore';
 
 export default function AppMenu() {
-  const { userId } = useSessionStore();
-  if (!userId) return null;
+  const { userID } = useSessionStore();
+  if (!userID) return null;
 
   return (
     <ul className="layout-menu">

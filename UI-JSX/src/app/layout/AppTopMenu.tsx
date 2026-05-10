@@ -7,32 +7,36 @@ import { Password } from 'primereact/password';
 import { useNavigate } from 'react-router-dom';
 
 import { useSessionStore } from '@/app/state/sessionStore';
-import { loginApi } from '@/api/authApi';
+import { loginApi } from '@/app/auth/api/authApi';
 import { GUEST_USER_ID, GUEST_TOKEN } from '@/app/auth/constants';
+import { useThemeStore } from '../state/themeStore';
 
 export default function AppTopMenu({ onToggleSidebar }: { onToggleSidebar: () => void }) {
   const navigate = useNavigate();
-
-  const { userId, setSession, clearSession } = useSessionStore();
+  const { dark, toggleTheme } = useThemeStore();
+  const { userID, setSession, clearSession } = useSessionStore();
 
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [email, setEmail] = useState(''); // backend expects email
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const isLoggedIn = !!userId;
+  const isLoggedIn = !!userID;
 
   // ---------------------------
   // DEMO LOGIN
   // ---------------------------
   function handleDemoLogin() {
     setSession({
-      token: GUEST_TOKEN,
+      accessToken: GUEST_TOKEN,
       refreshToken: '',
-      userId: GUEST_USER_ID,
+      userID: GUEST_USER_ID,
       email: 'guest@example.com',
       roles: ['GUEST'],
       raw: {},
+      id: 0,
+      first: '',
+      last: '',
     });
 
     navigate('/');
@@ -76,6 +80,9 @@ export default function AppTopMenu({ onToggleSidebar }: { onToggleSidebar: () =>
 
       <h1 className="text-xl font-semibold">My App</h1>
 
+      <button className="p-button p-button-text" onClick={toggleTheme} title="Toggle theme">
+        <i className={dark ? 'pi pi-sun' : 'pi pi-moon'} />
+      </button>
       <div className="flex gap-2">
         {!isLoggedIn && (
           <>
