@@ -1,11 +1,11 @@
 export interface InitialAmountRequest {
-  userID: string;
+  userId: string;
   amount: number;
 }
 
 export interface InitialAmountResponse {
   id: number;
-  userID: string;
+  userId: string;
   name: string;
   amount: number;
   itemType: {

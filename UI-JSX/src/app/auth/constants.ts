@@ -4,4 +4,4 @@ export const GUEST_TOKEN = 'guest-token';
 
 // sessionStorage keys (single source of truth)
 //export const SESSION_TOKEN_KEY = 'accessToken';
-//export const SESSION_USERID_KEY = 'userID';
+//export const SESSION_USERID_KEY = 'userId';

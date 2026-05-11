@@ -3,7 +3,7 @@ export function normalizeAuthResponse(res: any) {
     accessToken: res.accessToken,
     refreshToken: res.refreshToken,
     id: res.id,
-    userID: res.userID,
+    userId: res.userId,
     email: res.email,
     first: res.first,
     last: res.last,

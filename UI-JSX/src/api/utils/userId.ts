@@ -1,6 +1,6 @@
 import { useSessionStore } from '@/app/state/sessionStore';
 
-const DEFAULT_USER_KEY = 'userID';
+const DEFAULT_USER_KEY = 'userId';
 
 /**
  * Resolve the current session user id.
@@ -11,7 +11,7 @@ const DEFAULT_USER_KEY = 'userID';
  */
 export function getSessionUserId(): string {
   try {
-    const fromStore = useSessionStore.getState?.().userID;
+    const fromStore = useSessionStore.getState?.().userId;
     if (fromStore) return fromStore;
   } catch {
     // ignore if Zustand isn't available

@@ -10,7 +10,7 @@ public interface UserRepository {
 
     Optional<User> findById(Long id);
 
-    Optional<User> findByUserID(UUID userID);
+    Optional<User> findByUserId(UUID userId);
 
     User save(User user);
 }

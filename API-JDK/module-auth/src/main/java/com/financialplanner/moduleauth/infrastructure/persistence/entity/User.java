@@ -24,8 +24,8 @@ public class User {
     @Column(name = "created_at", updatable = false, insertable = false)
     private Instant createdAt;
 
-    @Column(name = "\"userID\"", nullable = false, updatable = false)
-    private UUID userID = UUID.randomUUID();
+    @Column(name = "\"userId\"", nullable = false, updatable = false)
+    private UUID userId = UUID.randomUUID();
 
     @Column(name = "first", length = 50)
     private String first;

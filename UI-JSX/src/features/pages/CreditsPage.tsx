@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 interface Item {
   id: number;
-  userID: string;
+  userId: string;
   name: string;
   amount: number;
   itemType: {

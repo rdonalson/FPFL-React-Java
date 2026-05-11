@@ -5,7 +5,7 @@ export interface SessionState {
   accessToken: string | null;
   refreshToken: string | null;
   id: number | null;
-  userID: string | null;
+  userId: string | null;
   email: string | null;
   first: string | null;
   last: string | null;
@@ -19,7 +19,7 @@ export interface SessionState {
     accessToken: string;
     refreshToken: string | null;
     id: number;
-    userID: string;
+    userId: string;
     email: string;
     first: string;
     last: string;
@@ -35,7 +35,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   accessToken: sessionStorage.getItem('accessToken'),
   refreshToken: sessionStorage.getItem('refreshToken'),
   id: Number(sessionStorage.getItem('id')) || null,
-  userID: sessionStorage.getItem('userID'),
+  userId: sessionStorage.getItem('userId'),
   email: sessionStorage.getItem('email'),
   first: sessionStorage.getItem('first'),
   last: sessionStorage.getItem('last'),
@@ -51,7 +51,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     sessionStorage.setItem('accessToken', session.accessToken);
     sessionStorage.setItem('refreshToken', session.refreshToken ?? '');
     sessionStorage.setItem('id', String(session.id));
-    sessionStorage.setItem('userID', session.userID);
+    sessionStorage.setItem('userId', session.userId);
     sessionStorage.setItem('email', session.email);
     sessionStorage.setItem('first', session.first);
     sessionStorage.setItem('last', session.last);
@@ -63,7 +63,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       accessToken: session.accessToken,
       refreshToken: session.refreshToken,
       id: session.id,
-      userID: session.userID,
+      userId: session.userId,
       email: session.email,
       first: session.first,
       last: session.last,
@@ -79,7 +79,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     sessionStorage.removeItem('accessToken');
     sessionStorage.removeItem('refreshToken');
     sessionStorage.removeItem('id');
-    sessionStorage.removeItem('userID');
+    sessionStorage.removeItem('userId');
     sessionStorage.removeItem('email');
     sessionStorage.removeItem('first');
     sessionStorage.removeItem('last');
@@ -91,7 +91,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       accessToken: null,
       refreshToken: null,
       id: null,
-      userID: null,
+      userId: null,
       email: null,
       first: null,
       last: null,

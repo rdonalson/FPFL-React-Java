@@ -34,16 +34,16 @@ function createClient(): AxiosInstance {
     config.headers['X-Correlation-ID'] = correlationId;
 
     // Pull fresh session values
-    const { accessToken, userID } = useSessionStore.getState();
+    const { accessToken, userId } = useSessionStore.getState();
 
     // Add Authorization header
     if (accessToken) {
       config.headers['Authorization'] = `Bearer ${accessToken}`;
     }
 
-    // Add userID header (optional but useful)
-    if (userID) {
-      config.headers['X-User-Id'] = userID;
+    // Add userId header (optional but useful)
+    if (userId) {
+      config.headers['X-User-Id'] = userId;
     }
 
     // Local DevTools log
@@ -51,7 +51,7 @@ function createClient(): AxiosInstance {
       url: config.url,
       method: config.method,
       correlationId,
-      userID,
+      userId,
       payload: config.data,
     });
 

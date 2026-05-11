@@ -13,7 +13,7 @@ public interface UserService {
 
     Optional<User> findById(Long id);
 
-    Optional<User> findByUserID(UUID userID);
+    Optional<User> findByUserId(UUID userId);
 
     User createUser(String email, String rawPassword, Set<Role> roles, String first, String last);
 

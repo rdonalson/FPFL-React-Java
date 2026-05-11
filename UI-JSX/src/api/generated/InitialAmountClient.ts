@@ -10,36 +10,36 @@ import { useSessionStore } from '@/app/state/sessionStore';
 const BASE_IA = '/initial-amount';
 
 /**
- * Helper to safely retrieve the current session userID.
+ * Helper to safely retrieve the current session userId.
  */
 function getSessionUserId(): string {
-  const userID = useSessionStore.getState().userID;
-  if (!userID) {
+  const userId = useSessionStore.getState().userId;
+  if (!userId) {
     throw new Error('UserId missing from session');
   }
-  return userID;
+  return userId;
 }
 
 export const InitialAmountClient = {
   /**
-   * GET /initial-amount/{userID}
+   * GET /initial-amount/{userId}
    */
   async fetchForCurrentUser(): Promise<ApiResponse<InitialAmountResponse>> {
-    const userID = getSessionUserId();
+    const userId = getSessionUserId();
 
-    const res = await apiClient.get<ApiResponse<InitialAmountResponse>>(`${BASE_IA}/${userID}`);
+    const res = await apiClient.get<ApiResponse<InitialAmountResponse>>(`${BASE_IA}/${userId}`);
 
     return res.data;
   },
 
   /**
    * POST /initial-amount
-   * Body: { userID, amount }
+   * Body: { userId, amount }
    */
   async create(amount: number): Promise<ApiResponse<InitialAmountResponse>> {
-    const userID = getSessionUserId();
+    const userId = getSessionUserId();
 
-    const payload: InitialAmountRequest = { userID, amount };
+    const payload: InitialAmountRequest = { userId, amount };
 
     const res = await apiClient.post<ApiResponse<InitialAmountResponse>>(BASE_IA, payload);
 
@@ -48,12 +48,12 @@ export const InitialAmountClient = {
 
   /**
    * PUT /initial-amount/{id}
-   * Body: { userID, amount }
+   * Body: { userId, amount }
    */
   async update(id: number, amount: number): Promise<ApiResponse<InitialAmountResponse>> {
-    const userID = getSessionUserId();
+    const userId = getSessionUserId();
 
-    const payload: InitialAmountRequest = { userID, amount };
+    const payload: InitialAmountRequest = { userId, amount };
 
     const res = await apiClient.put<ApiResponse<InitialAmountResponse>>(
       `${BASE_IA}/${id}`,

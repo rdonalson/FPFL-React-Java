@@ -24,7 +24,7 @@ export function useAuthOnStartup() {
         accessToken,
         refreshToken: sessionStorage.getItem('refreshToken'),
         id: Number(sessionStorage.getItem('id')),
-        userID: sessionStorage.getItem('userID'),
+        userId: sessionStorage.getItem('userId'),
         email: sessionStorage.getItem('email'),
         first: sessionStorage.getItem('first'),
         last: sessionStorage.getItem('last'),

@@ -6,9 +6,9 @@ import AppMenu from './AppMenu';
 import { MenuProvider } from './context/MenuContext';
 
 export default function AppSidebar({ visible, onHide }: { visible: boolean; onHide: () => void }) {
-  const { userID } = useSessionStore();
+  const { userId } = useSessionStore();
 
-  if (!userID) return null;
+  if (!userId) return null;
 
   return (
     <Sidebar visible={visible} onHide={onHide} modal>

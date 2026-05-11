@@ -8,7 +8,7 @@ public record AuthResponse(
     String refreshToken,
     Long id,
     String email,
-    UUID userID,
+    UUID userId,
     String first,
     String last,
     Set<String> roles

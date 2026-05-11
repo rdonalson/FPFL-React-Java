@@ -48,7 +48,7 @@ public class AuthController {
         var refreshToken = refreshTokenService.createRefreshToken(user.getId());
 
         var response = new AuthResponse(accessToken, refreshToken.getToken(), user.getId(), user.getEmail(),
-                                        user.getUserID(), user.getFirst(), user.getLast(), Set.copyOf(roleNames));
+                                        user.getUserId(), user.getFirst(), user.getLast(), Set.copyOf(roleNames));
 
         return ResponseEntity.ok(response);
     }
@@ -69,7 +69,7 @@ public class AuthController {
         var refreshToken = refreshTokenService.createRefreshToken(user.getId());
 
         var response = new AuthResponse(accessToken, refreshToken.getToken(), user.getId(), user.getEmail(),
-                                        user.getUserID(), user.getFirst(), user.getLast(), Set.copyOf(roleNames));
+                                        user.getUserId(), user.getFirst(), user.getLast(), Set.copyOf(roleNames));
 
         return ResponseEntity.ok(response);
     }
