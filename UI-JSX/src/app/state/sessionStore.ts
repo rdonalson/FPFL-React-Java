@@ -1,16 +1,18 @@
+// src/app/state/sessionStore.ts
 import { create } from 'zustand';
 
-interface SessionState {
+export interface SessionState {
   accessToken: string | null;
   refreshToken: string | null;
-  id: number | null; // numeric DB id
-  userID: string | null; // UUID
+  id: number | null;
+  userID: string | null;
   email: string | null;
   first: string | null;
   last: string | null;
   roles: string[] | null;
   raw: any | null;
 
+  // Derived state (NOT a getter — Zustand does not support getters)
   isAuthenticated: boolean;
 
   setSession: (session: {
@@ -28,7 +30,8 @@ interface SessionState {
   clearSession: () => void;
 }
 
-export const useSessionStore = create<SessionState>(set => ({
+export const useSessionStore = create<SessionState>((set, get) => ({
+  // Initial hydration from sessionStorage
   accessToken: sessionStorage.getItem('accessToken'),
   refreshToken: sessionStorage.getItem('refreshToken'),
   id: Number(sessionStorage.getItem('id')) || null,
@@ -39,9 +42,12 @@ export const useSessionStore = create<SessionState>(set => ({
   roles: JSON.parse(sessionStorage.getItem('roles') || 'null'),
   raw: JSON.parse(sessionStorage.getItem('raw') || 'null'),
 
-  isAuthenticated: !!sessionStorage.getItem('accessToken'),
+  // Derived state (must be stored, not a getter)
+  isAuthenticated: Boolean(sessionStorage.getItem('accessToken')),
 
+  // Set session after login or restore
   setSession: session => {
+    // Persist to sessionStorage
     sessionStorage.setItem('accessToken', session.accessToken);
     sessionStorage.setItem('refreshToken', session.refreshToken ?? '');
     sessionStorage.setItem('id', String(session.id));
@@ -52,6 +58,7 @@ export const useSessionStore = create<SessionState>(set => ({
     sessionStorage.setItem('roles', JSON.stringify(session.roles));
     sessionStorage.setItem('raw', JSON.stringify(session.raw));
 
+    // Update Zustand state
     set({
       accessToken: session.accessToken,
       refreshToken: session.refreshToken,
@@ -66,8 +73,20 @@ export const useSessionStore = create<SessionState>(set => ({
     });
   },
 
+  // Clear session on logout
   clearSession: () => {
-    sessionStorage.clear();
+    // Remove everything from sessionStorage
+    sessionStorage.removeItem('accessToken');
+    sessionStorage.removeItem('refreshToken');
+    sessionStorage.removeItem('id');
+    sessionStorage.removeItem('userID');
+    sessionStorage.removeItem('email');
+    sessionStorage.removeItem('first');
+    sessionStorage.removeItem('last');
+    sessionStorage.removeItem('roles');
+    sessionStorage.removeItem('raw');
+
+    // Reset Zustand state
     set({
       accessToken: null,
       refreshToken: null,
@@ -80,5 +99,8 @@ export const useSessionStore = create<SessionState>(set => ({
       raw: null,
       isAuthenticated: false,
     });
+
+    // Global logout event
+    window.dispatchEvent(new Event('session-logged-out'));
   },
 }));

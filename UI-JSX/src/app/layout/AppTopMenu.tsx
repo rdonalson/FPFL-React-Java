@@ -1,143 +1,82 @@
 // src/app/layout/AppTopMenu.tsx
-import React, { useState } from 'react';
-import { Button } from 'primereact/button';
-import { Dialog } from 'primereact/dialog';
-import { InputText } from 'primereact/inputtext';
-import { Password } from 'primereact/password';
+import { useState } from 'react';
+import { useSessionStore } from '@/app/state/sessionStore';
+import { useThemeStore } from '@/app/state/themeStore';
+
+import { LoginDialog } from '@/app/auth/components/LoginDialog';
+import { RegisterDialog } from '@/app/auth/components/RegisterDialog';
 import { useNavigate } from 'react-router-dom';
 
-import { useSessionStore } from '@/app/state/sessionStore';
-import { loginApi } from '@/app/auth/api/authApi';
-import { GUEST_USER_ID, GUEST_TOKEN } from '@/app/auth/constants';
-import { useThemeStore } from '../state/themeStore';
+interface AppTopMenuProps {
+  onToggleSidebar: () => void;
+}
 
-export default function AppTopMenu({ onToggleSidebar }: { onToggleSidebar: () => void }) {
+export function AppTopMenu({ onToggleSidebar }: AppTopMenuProps) {
+  const [showLogin, setShowLogin] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
   const navigate = useNavigate();
   const { dark, toggleTheme } = useThemeStore();
-  const { userID, setSession, clearSession } = useSessionStore();
+  const { accessToken, first, last, clearSession } = useSessionStore();
 
-  const [showLoginDialog, setShowLoginDialog] = useState(false);
-  const [email, setEmail] = useState(''); // backend expects email
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const isLoggedIn = !!userID;
-
-  // ---------------------------
-  // DEMO LOGIN
-  // ---------------------------
-  function handleDemoLogin() {
-    setSession({
-      accessToken: GUEST_TOKEN,
-      refreshToken: '',
-      userID: GUEST_USER_ID,
-      email: 'guest@example.com',
-      roles: ['GUEST'],
-      raw: {},
-      id: 0,
-      first: '',
-      last: '',
-    });
-
-    navigate('/');
-  }
-
-  // ---------------------------
-  // REAL LOGIN
-  // ---------------------------
-  async function handleLoginSubmit() {
-    try {
-      setLoading(true);
-
-      const result = await loginApi(email, password);
-
-      // result is already normalized by loginApi
-      setSession(result);
-
-      setShowLoginDialog(false);
-      navigate('/');
-    } catch (err) {
-      console.error('Login failed', err);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  // ---------------------------
-  // LOGOUT
-  // ---------------------------
-  function handleLogout() {
-    clearSession();
-    navigate('/');
-  }
+  const isLoggedIn = Boolean(accessToken);
 
   return (
-    <div className="flex items-center justify-between px-4 py-2 surface-card shadow-1">
-      {/* Hamburger only when logged in */}
-      {isLoggedIn && (
-        <Button icon="pi pi-bars" className="p-button-text" onClick={onToggleSidebar} />
-      )}
+    <div
+      className="flex align-items-center justify-content-between px-3 py-2"
+      style={{ borderBottom: '1px solid var(--surface-border)' }}
+    >
+      {/* Left side: Sidebar toggle + App title */}
+      <div className="flex align-items-center gap-3">
+        <button className="p-button p-button-text" onClick={onToggleSidebar} title="Open menu">
+          <i className="pi pi-bars text-xl" />
+        </button>
 
-      <h1 className="text-xl font-semibold">My App</h1>
+        <div className="text-xl font-bold">FPFL Platform</div>
+      </div>
 
-      <button className="p-button p-button-text" onClick={toggleTheme} title="Toggle theme">
-        <i className={dark ? 'pi pi-sun' : 'pi pi-moon'} />
-      </button>
-      <div className="flex gap-2">
+      {/* Right side: Buttons */}
+      <div className="flex align-items-center gap-3">
+        {/* Theme toggle */}
+        <button className="p-button p-button-text" onClick={toggleTheme} title="Toggle theme">
+          <i className={dark ? 'pi pi-sun' : 'pi pi-moon'} />
+        </button>
+
+        {/* If NOT logged in → show Login + Register */}
         {!isLoggedIn && (
           <>
-            <Button
-              label="Demo Login"
-              icon="pi pi-user"
-              className="p-button-sm p-button-secondary"
-              onClick={handleDemoLogin}
-            />
+            <button className="p-button p-button-text" onClick={() => setShowLogin(true)}>
+              Login
+            </button>
 
-            <Button
-              label="Login"
-              icon="pi pi-sign-in"
-              className="p-button-sm"
-              onClick={() => setShowLoginDialog(true)}
-            />
+            <button className="p-button p-button-text" onClick={() => setShowRegister(true)}>
+              Register
+            </button>
           </>
         )}
 
+        {/* If logged in → show user + logout */}
         {isLoggedIn && (
-          <Button
-            label="Logout"
-            icon="pi pi-sign-out"
-            className="p-button-sm p-button-danger"
-            onClick={handleLogout}
-          />
+          <div className="flex align-items-center gap-2">
+            <span className="font-medium">
+              {first} {last}
+            </span>
+
+            <button
+              className="p-button p-button-text p-button-danger"
+              onClick={() => {
+                clearSession();
+                navigate('/');
+              }}
+            >
+              Logout
+            </button>
+          </div>
         )}
       </div>
 
-      {/* LOGIN DIALOG */}
-      <Dialog
-        header="Login"
-        visible={showLoginDialog}
-        onHide={() => setShowLoginDialog(false)}
-        style={{ width: '25rem' }}
-      >
-        <div className="flex flex-col gap-3">
-          <span className="p-float-label">
-            <InputText id="email" value={email} onChange={e => setEmail(e.target.value)} />
-            <label htmlFor="email">Email</label>
-          </span>
-
-          <span className="p-float-label">
-            <Password
-              id="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              toggleMask
-            />
-            <label htmlFor="password">Password</label>
-          </span>
-
-          <Button label="Login" icon="pi pi-check" loading={loading} onClick={handleLoginSubmit} />
-        </div>
-      </Dialog>
+      {/* Dialogs */}
+      <LoginDialog visible={showLogin} onHide={() => setShowLogin(false)} />
+      <RegisterDialog visible={showRegister} onHide={() => setShowRegister(false)} />
     </div>
   );
 }

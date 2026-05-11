@@ -1,19 +1,14 @@
 // src/app/router/AuthGate.tsx
-import React from 'react';
-import { Outlet, Navigate } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
 import { useSessionStore } from '@/app/state/sessionStore';
-import { useAuthOnStartup } from '@/app/hooks/useAuthOnStartup';
 
 export default function AuthGate() {
-  // Run startup session restore
-  useAuthOnStartup();
+  // Use the new reactive getter
+  const isAuthenticated = useSessionStore(s => s.isAuthenticated);
 
-  // Pull current auth state
-  const accessToken = useSessionStore(s => s.accessToken);
-
-  // If no token → redirect to login
-  if (!accessToken) {
-    return <Navigate to="/login" replace />;
+  // If not authenticated → redirect to home
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace />;
   }
 
   // Otherwise allow access to protected routes

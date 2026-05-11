@@ -4,7 +4,7 @@ import { Outlet } from 'react-router-dom';
 import { Toast } from 'primereact/toast';
 import { Helmet } from 'react-helmet-async';
 
-import AppTopMenu from './AppTopMenu';
+import { AppTopMenu } from './AppTopMenu';
 import AppSidebar from './AppSidebar';
 import AppFooter from './AppFooter';
 

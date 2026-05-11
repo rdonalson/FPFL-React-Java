@@ -8,31 +8,34 @@ export function useAuthOnStartup() {
   const clearSession = useSessionStore(s => s.clearSession);
 
   useEffect(() => {
-    const stored = sessionStorage.getItem('raw');
+    const accessToken = sessionStorage.getItem('accessToken');
 
-    // No stored session → nothing to restore
-    if (!stored) {
+    // No stored token → logged out
+    if (!accessToken) {
       clearSession();
       return;
     }
 
     try {
-      const parsed = JSON.parse(stored);
+      // Rebuild the session object from sessionStorage
+      const raw = JSON.parse(sessionStorage.getItem('raw') || '{}');
 
-      // If no accessToken → treat as logged out
-      if (!parsed.accessToken) {
-        clearSession();
-        return;
-      }
+      const normalized = normalizeAuthResponse({
+        accessToken,
+        refreshToken: sessionStorage.getItem('refreshToken'),
+        id: Number(sessionStorage.getItem('id')),
+        userID: sessionStorage.getItem('userID'),
+        email: sessionStorage.getItem('email'),
+        first: sessionStorage.getItem('first'),
+        last: sessionStorage.getItem('last'),
+        roles: JSON.parse(sessionStorage.getItem('roles') || '[]'),
+        raw,
+      });
 
-      // Normalize the stored raw session into the new session shape
-      const normalized = normalizeAuthResponse(parsed);
-
-      // Hydrate Zustand + sessionStorage
       setSession(normalized);
     } catch (err) {
       console.error('Failed to restore session:', err);
       clearSession();
     }
-  }, []);
+  }, [clearSession, setSession]);
 }

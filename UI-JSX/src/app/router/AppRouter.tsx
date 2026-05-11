@@ -1,5 +1,5 @@
 // src/app/router/AppRouter.tsx
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 
 import AppLayout from '../layout/AppLayout';
 
@@ -14,27 +14,25 @@ import AuthGate from './AuthGate';
 
 export function AppRouter() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* AppLayout wraps all pages so topbar is always present */}
-        <Route element={<AppLayout />}>
-          {/* Public Home page (visible before login) */}
-          <Route path="/" element={<HomePage />} />
+    <Routes>
+      {/* AppLayout wraps all pages so topbar is always present */}
+      <Route element={<AppLayout />}>
+        {/* Public Home page */}
+        <Route path="/" element={<HomePage />} />
 
-          {/* Protected routes: only accessible when AuthGate allows */}
-          <Route element={<AuthGate />}>
-            <Route path="/command/admin/item-types" element={<ItemTypeTablePage />} />
-            <Route path="/command/admin/time-periods" element={<TimePeriodTablePage />} />
-            <Route path="/command/transactions/initial-amount" element={<InitialAmountPage />} />
+        {/* Protected routes */}
+        <Route element={<AuthGate />}>
+          <Route path="/command/admin/item-types" element={<ItemTypeTablePage />} />
+          <Route path="/command/admin/time-periods" element={<TimePeriodTablePage />} />
+          <Route path="/command/transactions/initial-amount" element={<InitialAmountPage />} />
 
-            <Route path="/credits" element={<CreditsPage />} />
-            <Route path="/items/:id" element={<SpecificItemPage />} />
-          </Route>
+          <Route path="/credits" element={<CreditsPage />} />
+          <Route path="/items/:id" element={<SpecificItemPage />} />
         </Route>
+      </Route>
 
-        {/* Fallback */}
-        <Route path="*" element={<div>Not Found</div>} />
-      </Routes>
-    </BrowserRouter>
+      {/* Fallback */}
+      <Route path="*" element={<div>Not Found</div>} />
+    </Routes>
   );
 }

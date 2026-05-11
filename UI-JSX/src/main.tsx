@@ -13,13 +13,16 @@ import 'primeflex/primeflex.css';
 
 // Tailwind + your global styles
 import './index.css';
+import { BrowserRouter } from 'react-router-dom';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <HelmetProvider>
-      <AppProviders>
-        <App />
-      </AppProviders>
+      <BrowserRouter>
+        <AppProviders>
+          <App />
+        </AppProviders>
+      </BrowserRouter>
     </HelmetProvider>
   </React.StrictMode>,
 );

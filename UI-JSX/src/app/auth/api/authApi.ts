@@ -17,17 +17,15 @@ export async function registerApi(first: string, last: string, email: string, pa
     email,
     password,
   });
-
   const data = res.data;
 
-  // Registration returns same AuthResponse as login
   return normalizeAuthResponse(data);
 }
 
 // Optional: only keep if your backend supports refresh tokens
-// export async function refreshApi() {
-//   const res = await apiClient.post("/auth/refresh");
-//   const data = res.data;
+export async function refreshApi() {
+  const res = await apiClient.post('/auth/refresh');
+  const data = res.data;
 
-//   return normalizeAuthResponse(data);
-// }
+  return normalizeAuthResponse(data);
+}
