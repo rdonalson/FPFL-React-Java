@@ -14,8 +14,8 @@ export const useThemeStore = create<ThemeState>(set => ({
 
     const themeLink = document.getElementById('theme-css') as HTMLLinkElement;
     themeLink.href = dark
-      ? '/public/themes/lara-dark-indigo/theme.css'
-      : '/public/themes/lara-light-indigo/theme.css';
+      ? '/themes/lara-dark-indigo/theme.css'
+      : '/themes/lara-light-indigo/theme.css';
 
     set({ dark });
   },
@@ -27,8 +27,8 @@ export const useThemeStore = create<ThemeState>(set => ({
 
       const themeLink = document.getElementById('theme-css') as HTMLLinkElement;
       themeLink.href = next
-        ? '/public/themes/lara-dark-indigo/theme.css'
-        : '/public/themes/lara-light-indigo/theme.css';
+        ? '/themes/lara-dark-indigo/theme.css'
+        : '/themes/lara-light-indigo/theme.css';
 
       return { dark: next };
     }),
