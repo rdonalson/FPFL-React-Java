@@ -96,7 +96,6 @@ public class SecurityConfig {
 
         // Your frontend origin
         config.setAllowedOrigins(List.of("http://localhost:4000","http://localhost:9500"));
-        //config.setAllowedOrigins(List.of("http://localhost:9500"));
 
         // Allowed HTTP methods
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
