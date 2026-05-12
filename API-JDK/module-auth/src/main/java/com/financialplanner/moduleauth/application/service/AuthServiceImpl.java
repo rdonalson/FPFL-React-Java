@@ -4,6 +4,7 @@ import com.financialplanner.moduleauth.domain.service.AuthService;
 import com.financialplanner.moduleauth.domain.service.RoleService;
 import com.financialplanner.moduleauth.domain.service.UserService;
 import com.financialplanner.moduleauth.infrastructure.persistence.entity.User;
+import com.financialplanner.modulecommonbc.exception.InvalidCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,10 +39,10 @@ public class AuthServiceImpl implements AuthService {
     public User login(String email, String rawPassword) {
 
         User user = userService.findByEmail(email)
-                               .orElseThrow(() -> new IllegalArgumentException("Invalid credentials"));
+                               .orElseThrow(() -> new InvalidCredentialsException("Invalid credentials"));
 
         if (!passwordEncoder.matches(rawPassword, user.getPasswordHash())) {
-            throw new IllegalArgumentException("Invalid credentials");
+            throw new InvalidCredentialsException("Invalid credentials");
         }
 
         return user;

@@ -2,10 +2,7 @@ package com.financialplanner.moduleapi.exception;
 
 
 import com.financialplanner.moduleapi.response.ApiResponse;
-import com.financialplanner.modulecommonbc.exception.DomainValidationException;
-import com.financialplanner.modulecommonbc.exception.DuplicateItemException;
-import com.financialplanner.modulecommonbc.exception.ItemNotFoundException;
-import com.financialplanner.modulecommonbc.exception.SanitizationException;
+import com.financialplanner.modulecommonbc.exception.*;
 import com.financialplanner.modulecommonbc.logging.ErrorLogger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -63,6 +60,13 @@ public class GlobalExceptionHandler {
         String correlationId = ErrorLogger.logException(ex);
         return ResponseEntity.status(HttpStatus.CONFLICT)
                              .body(new ApiResponse<>(409, ex.getMessage(), correlationId));
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ApiResponse<Void>> handleInvalidCredentials(InvalidCredentialsException ex) {
+        String correlationId = ErrorLogger.logException(ex);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                             .body(new ApiResponse<>(401, ex.getMessage(), correlationId));
     }
 
     @ExceptionHandler(Exception.class)
