@@ -30,7 +30,7 @@ export interface SessionState {
   clearSession: () => void;
 }
 
-export const useSessionStore = create<SessionState>((set, get) => ({
+export const useSessionStore = create<SessionState>(set => ({
   // Initial hydration from sessionStorage
   accessToken: sessionStorage.getItem('accessToken'),
   refreshToken: sessionStorage.getItem('refreshToken'),

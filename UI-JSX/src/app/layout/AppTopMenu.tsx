@@ -14,11 +14,12 @@ interface AppTopMenuProps {
 export function AppTopMenu({ onToggleSidebar }: AppTopMenuProps) {
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
-  const navigate = useNavigate();
-  const { dark, toggleTheme } = useThemeStore();
-  const { accessToken, first, last, clearSession } = useSessionStore();
 
-  const isLoggedIn = Boolean(accessToken);
+  const navigate = useNavigate();
+
+  const { dark, toggleTheme } = useThemeStore();
+
+  const { first, last, clearSession, isAuthenticated } = useSessionStore();
 
   return (
     <div
@@ -34,15 +35,15 @@ export function AppTopMenu({ onToggleSidebar }: AppTopMenuProps) {
         <div className="text-xl font-bold">FPFL Platform</div>
       </div>
 
-      {/* Right side: Buttons */}
+      {/* Right side: Theme toggle + Auth buttons */}
       <div className="flex align-items-center gap-3">
         {/* Theme toggle */}
         <button className="p-button p-button-text" onClick={toggleTheme} title="Toggle theme">
           <i className={dark ? 'pi pi-sun' : 'pi pi-moon'} />
         </button>
 
-        {/* If NOT logged in → show Login + Register */}
-        {!isLoggedIn && (
+        {/* Not logged in */}
+        {!isAuthenticated && (
           <>
             <button className="p-button p-button-text" onClick={() => setShowLogin(true)}>
               Login
@@ -54,8 +55,8 @@ export function AppTopMenu({ onToggleSidebar }: AppTopMenuProps) {
           </>
         )}
 
-        {/* If logged in → show user + logout */}
-        {isLoggedIn && (
+        {/* Logged in */}
+        {isAuthenticated && (
           <div className="flex align-items-center gap-2">
             <span className="font-medium">
               {first} {last}
