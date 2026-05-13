@@ -23,8 +23,8 @@ export async function registerApi(first: string, last: string, email: string, pa
 }
 
 // Optional: only keep if your backend supports refresh tokens
-export async function refreshApi() {
-  const res = await apiClient.post('/auth/refresh');
+export async function refreshApi(refreshToken: string) {
+  const res = await apiClient.post('/auth/refresh', { refreshToken });
   const data = res.data;
 
   return normalizeAuthResponse(data);

@@ -3,13 +3,16 @@ import { AppRouter } from '@/app/router/AppRouter';
 import { useThemeStore } from './state/themeStore';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
-import { useAuthOnStartup } from '@/app/hooks/useAuthOnStartup';
+import { useAuthOnStartup } from '@/app/auth/hooks/useAuthOnStartup';
+import { useTokenWatcher } from './auth/hooks/useTokenWatcher';
+import { SessionExpireDialog } from '@/app/auth/components/SessionExpireDialog';
 
 function App() {
+  const { showDialog, setShowDialog } = useTokenWatcher();
   const { dark, setTheme } = useThemeStore();
   const navigate = useNavigate();
 
-  // ⭐ Run session restore ONCE globally
+  // Restore session on startup
   useAuthOnStartup();
 
   // Listen for logout events to redirect to home
@@ -24,7 +27,14 @@ function App() {
     setTheme(dark);
   }, [dark, setTheme]);
 
-  return <AppRouter />;
+  return (
+    <>
+      <AppRouter />
+
+      {/* 🔥 Session Expiring Dialog */}
+      <SessionExpireDialog visible={showDialog} onHide={() => setShowDialog(false)} />
+    </>
+  );
 }
 
 export default App;
