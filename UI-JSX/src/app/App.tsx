@@ -6,11 +6,13 @@ import { useEffect } from 'react';
 import { useAuthOnStartup } from '@/app/auth/hooks/useAuthOnStartup';
 import { useTokenWatcher } from './auth/hooks/useTokenWatcher';
 import { SessionExpireDialog } from '@/app/auth/components/SessionExpireDialog';
+import { useSessionStore } from './state/sessionStore';
 
 function App() {
   const { showDialog, setShowDialog } = useTokenWatcher();
   const { dark, setTheme } = useThemeStore();
   const navigate = useNavigate();
+  const isAuthenticated = useSessionStore(s => s.isAuthenticated);
 
   // Restore session on startup
   useAuthOnStartup();
@@ -32,7 +34,9 @@ function App() {
       <AppRouter />
 
       {/* 🔥 Session Expiring Dialog */}
-      <SessionExpireDialog visible={showDialog} onHide={() => setShowDialog(false)} />
+      {isAuthenticated && showDialog && (
+        <SessionExpireDialog visible={showDialog} onHide={() => setShowDialog(false)} />
+      )}
     </>
   );
 }

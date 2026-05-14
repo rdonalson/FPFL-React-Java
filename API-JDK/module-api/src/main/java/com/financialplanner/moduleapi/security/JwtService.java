@@ -1,9 +1,13 @@
 package com.financialplanner.moduleapi.security;
 
-import io.jsonwebtoken.*;
+import com.financialplanner.moduleauth.config.TokenProperties;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 import java.util.Map;
@@ -11,12 +15,12 @@ import java.util.Map;
 @Service
 public class JwtService {
 
-    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private final Key key;
+    private final long accessTokenExpirationMs;
 
-    private final long accessTokenExpirationMs; // 15 minutes
-
-    public JwtService() {
-        accessTokenExpirationMs = 1000 * 60 * 15;
+    public JwtService(TokenProperties props) {
+        this.accessTokenExpirationMs = props.getAccessTokenExpirationMs();
+        this.key = Keys.hmacShaKeyFor(props.getSecret().getBytes(StandardCharsets.UTF_8));
     }
 
     public String generateToken(String email, Map<String, Object> claims) {

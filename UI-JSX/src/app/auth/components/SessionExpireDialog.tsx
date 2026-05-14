@@ -18,8 +18,24 @@ export function SessionExpireDialog({ visible, onHide }: Props) {
       if (!session?.refreshToken) {
         throw new Error('No refresh token available');
       }
+
       const refreshed = await refreshApi(session.refreshToken);
-      setSession(refreshed);
+
+      // ⭐ FIX: merge refreshed tokens with existing session
+      setSession({
+        accessToken: refreshed.accessToken,
+        refreshToken: refreshed.refreshToken,
+
+        id: session.id!, // non-null assertion
+        userId: session.userId!,
+        email: session.email!,
+        first: session.first!,
+        last: session.last!,
+        roles: session.roles!,
+
+        raw: refreshed,
+      });
+
       onHide();
     } catch (err) {
       console.error('Failed to refresh session', err);

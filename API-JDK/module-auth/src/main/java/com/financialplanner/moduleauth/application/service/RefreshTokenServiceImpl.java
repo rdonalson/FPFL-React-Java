@@ -1,5 +1,6 @@
 package com.financialplanner.moduleauth.application.service;
 
+import com.financialplanner.moduleauth.config.TokenProperties;
 import com.financialplanner.moduleauth.domain.repository.RefreshTokenRepository;
 import com.financialplanner.moduleauth.domain.service.RefreshTokenService;
 import com.financialplanner.moduleauth.domain.service.UserService;
@@ -18,16 +19,13 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserService userService;
 
-    // 7 days
     private final long refreshTokenDurationMs;
 
-    public RefreshTokenServiceImpl(
-        RefreshTokenRepository refreshTokenRepository,
-        UserService userService
-                                  ) {
+    public RefreshTokenServiceImpl(RefreshTokenRepository refreshTokenRepository, UserService userService,
+                                   TokenProperties tokenProperties) {
         this.refreshTokenRepository = refreshTokenRepository;
-        this.userService = userService;
-        this.refreshTokenDurationMs = 7 * 24 * 60 * 60 * 1000L;
+        this.userService            = userService;
+        this.refreshTokenDurationMs = tokenProperties.getRefreshTokenExpirationMs();
     }
 
     @Override
@@ -37,26 +35,28 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         User user = userService.findById(userId)
                                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        // Ensure token uniqueness (very unlikely collision, but safe)
+        // Ensure token uniqueness (extremely unlikely collision, but safe)
         String tokenValue;
         Optional<RefreshToken> existing;
         do {
-            tokenValue = UUID.randomUUID().toString();
-            existing = refreshTokenRepository.findByToken(tokenValue);
+            tokenValue = UUID.randomUUID()
+                             .toString();
+            existing   = refreshTokenRepository.findByToken(tokenValue);
         } while (existing.isPresent());
 
         RefreshToken token = new RefreshToken();
         token.setUser(user);
         token.setToken(tokenValue);
-        token.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
+        token.setExpiryDate(Instant.now()
+                                   .plusMillis(refreshTokenDurationMs));
 
-        // Persist in same transaction / same persistence context as user
         return refreshTokenRepository.save(token);
     }
 
     @Override
     public RefreshToken verifyExpiration(RefreshToken token) {
-        if (token.getExpiryDate().isBefore(Instant.now())) {
+        if (token.getExpiryDate()
+                 .isBefore(Instant.now())) {
             refreshTokenRepository.delete(token);
             throw new IllegalArgumentException("Refresh token expired");
         }
