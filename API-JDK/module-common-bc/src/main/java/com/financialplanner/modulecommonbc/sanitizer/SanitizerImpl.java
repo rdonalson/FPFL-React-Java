@@ -222,6 +222,10 @@ public class SanitizerImpl implements Sanitizer {
         if (root == null) {
             return;
         }
+        // 🚫 Skip sanitization for NoSanitize types
+        if (root instanceof NoSanitize) {
+            return;
+        }
         Set<Object> visited = Collections.newSetFromMap(new IdentityHashMap<>());
         sanitizeValue(root, visited);
     }
@@ -408,6 +412,11 @@ public class SanitizerImpl implements Sanitizer {
      */
     private Object sanitizeRecord(Object record, Class<?> clazz, Set<Object> visited) {
         try {
+            // 🚫 Skip sanitization for NoSanitize records
+            if (record instanceof NoSanitize) {
+                return record;
+            }
+
             RecordComponent[] components = clazz.getRecordComponents();
             Object[] args = new Object[components.length];
             boolean changed = false;
@@ -464,6 +473,7 @@ public class SanitizerImpl implements Sanitizer {
             return null;
         }
     }
+
 
     /**
      * Determines whether the given string appears to be a URI. A string is considered

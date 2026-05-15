@@ -4,6 +4,8 @@ import com.financialplanner.moduleapi.dtos.auth.AuthResponse;
 import com.financialplanner.moduleapi.dtos.auth.LoginRequest;
 import com.financialplanner.moduleapi.dtos.auth.RefreshTokenRequest;
 import com.financialplanner.moduleapi.dtos.auth.RegisterRequest;
+import com.financialplanner.moduleapi.response.ApiResponse;
+import com.financialplanner.moduleapi.response.ApiResponseFactory;
 import com.financialplanner.moduleapi.security.JwtService;
 import com.financialplanner.moduleauth.application.service.RefreshTokenServiceImpl;
 import com.financialplanner.moduleauth.domain.service.AuthService;
@@ -26,15 +28,18 @@ public class AuthController {
     private final AuthService authService;
     private final RefreshTokenServiceImpl refreshTokenService;
     private final JwtService jwtService;
+    private final ApiResponseFactory responseFactory;
 
-    public AuthController(AuthService authService, RefreshTokenServiceImpl refreshTokenService, JwtService jwtService) {
+    public AuthController(AuthService authService, RefreshTokenServiceImpl refreshTokenService, JwtService jwtService,
+                          ApiResponseFactory responseFactory) {
         this.authService         = authService;
         this.refreshTokenService = refreshTokenService;
         this.jwtService          = jwtService;
+        this.responseFactory     = responseFactory;
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<ApiResponse<AuthResponse>> register(@Valid @RequestBody RegisterRequest request) {
 
         User user = authService.register(request.email(), request.password(), request.first(), request.last());
 
@@ -47,15 +52,14 @@ public class AuthController {
 
         var refreshToken = refreshTokenService.createRefreshToken(user.getId());
 
-        var response = new AuthResponse(accessToken, refreshToken.getToken(), user.getId(), user.getEmail(),
-                                        user.getUserId(), user.getFirst(), user.getLast(), Set.copyOf(roleNames));
+        var authResponse = new AuthResponse(accessToken, refreshToken.getToken(), user.getId(), user.getEmail(),
+                                            user.getUserId(), user.getFirst(), user.getLast(), Set.copyOf(roleNames));
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(responseFactory.success(authResponse, "Registration successful"));
     }
 
-
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest request) {
 
         User user = authService.login(request.email(), request.password());
 
@@ -68,18 +72,16 @@ public class AuthController {
 
         var refreshToken = refreshTokenService.createRefreshToken(user.getId());
 
-        var response = new AuthResponse(accessToken, refreshToken.getToken(), user.getId(), user.getEmail(),
-                                        user.getUserId(), user.getFirst(), user.getLast(), Set.copyOf(roleNames));
+        var authResponse = new AuthResponse(accessToken, refreshToken.getToken(), user.getId(), user.getEmail(),
+                                            user.getUserId(), user.getFirst(), user.getLast(), Set.copyOf(roleNames));
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(responseFactory.success(authResponse, "Login successful"));
     }
 
     @PostMapping("/refresh")
-    public Map<String, String> refresh(@RequestBody RefreshTokenRequest request) {
+    public ResponseEntity<ApiResponse<Map<String, String>>> refresh(@RequestBody RefreshTokenRequest request) {
 
-        // before: var refreshToken = refreshTokenService.findByToken(request.getRefreshToken());
         var refreshToken = refreshTokenService.findByToken(request.refreshToken());
-
         refreshTokenService.verifyExpiration(refreshToken);
 
         var user = refreshToken.getUser();
@@ -93,6 +95,8 @@ public class AuthController {
 
         var newRefreshToken = refreshTokenService.createRefreshToken(user.getId());
 
-        return Map.of("accessToken", newAccessToken, "refreshToken", newRefreshToken.getToken());
+        var tokens = Map.of("accessToken", newAccessToken, "refreshToken", newRefreshToken.getToken());
+
+        return ResponseEntity.ok(responseFactory.success(tokens, "Token refreshed"));
     }
 }
