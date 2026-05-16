@@ -33,7 +33,7 @@ public class RefreshTokenRepositoryImpl implements RefreshTokenRepository {
     }
 
     @Override
-    public int deleteByUser(User user) {
-        return jpa.deleteByUser(user);
+    public void deleteByUser(User user) {
+        jpa.deleteByUser(user);
     }
 }

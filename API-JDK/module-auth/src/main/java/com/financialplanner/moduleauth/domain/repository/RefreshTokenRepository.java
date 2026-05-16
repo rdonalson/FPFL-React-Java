@@ -9,5 +9,5 @@ public interface RefreshTokenRepository {
     Optional<RefreshToken> findByToken(String token);
     RefreshToken save(RefreshToken token);
     void delete(RefreshToken token);
-    int deleteByUser(User user);
+    void deleteByUser(User user);
 }
