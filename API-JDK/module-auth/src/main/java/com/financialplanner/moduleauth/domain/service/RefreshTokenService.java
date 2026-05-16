@@ -7,7 +7,7 @@ public interface RefreshTokenService {
 
     RefreshToken createRefreshToken(Long userId);
 
-    RefreshToken verifyExpiration(RefreshToken token);
+    void verifyExpiration(RefreshToken token);
 
     void deleteByUser(User user);
 
