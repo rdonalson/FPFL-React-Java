@@ -69,6 +69,13 @@ public class GlobalExceptionHandler {
                              .body(new ApiResponse<>(401, ex.getMessage(), correlationId));
     }
 
+    @ExceptionHandler(ForbiddenOperationException.class)
+    public ResponseEntity<ApiResponse<Void>> ForbiddenOperation(ForbiddenOperationException ex) {
+        String correlationId = ErrorLogger.logException(ex);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                             .body(new ApiResponse<>(403, ex.getMessage(), correlationId));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGeneric(Exception ex) {
         String correlationId = ErrorLogger.logException(ex);
