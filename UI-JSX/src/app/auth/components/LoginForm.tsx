@@ -1,7 +1,7 @@
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema, LoginFormValues } from '../schemas/loginSchema';
-import { loginApi } from '@/app/auth/api/authApi';
+import { authApi } from '@/app/auth/api/authApi';
 import { Password } from 'primereact/password';
 import { Message } from 'primereact/message';
 import { useState } from 'react';
@@ -30,7 +30,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
     setApiError(null);
 
     try {
-      const session = await loginApi(values.email, values.password);
+      const session = await authApi.login(values.email, values.password);
       onSuccess(session);
     } catch (err: any) {
       if (err.status === 401) {

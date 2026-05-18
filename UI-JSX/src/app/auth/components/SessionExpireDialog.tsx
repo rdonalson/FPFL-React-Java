@@ -1,7 +1,7 @@
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { useSessionStore } from '@/app/state/sessionStore';
-import { refreshApi } from '@/app/auth/api/authApi';
+import { authApi } from '@/app/auth/api/authApi';
 
 interface Props {
   visible: boolean;
@@ -19,7 +19,11 @@ export function SessionExpireDialog({ visible, onHide }: Props) {
         throw new Error('No refresh token available');
       }
 
-      const refreshed = await refreshApi(session.refreshToken);
+      const refreshed = await authApi.refresh(session.refreshToken);
+
+      if (!refreshed) {
+        throw new Error('Failed to refresh session');
+      }
 
       // ⭐ FIX: merge refreshed tokens with existing session
       setSession({

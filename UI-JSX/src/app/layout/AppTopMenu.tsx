@@ -4,7 +4,7 @@ import { useSessionStore } from '@/app/state/sessionStore';
 import { useThemeStore } from '@/app/state/themeStore';
 import { LoginDialog } from '@/app/auth/components/LoginDialog';
 import { RegisterDialog } from '@/app/auth/components/RegisterDialog';
-import { loginApi } from '@/app/auth/api/authApi';
+import { authApi } from '@/app/auth/api/authApi';
 import { unwrap } from '@/api/utils/responseHelpers';
 import { useNavigate } from 'react-router-dom';
 
@@ -29,7 +29,7 @@ export function AppTopMenu({ onToggleSidebar }: AppTopMenuProps) {
     try {
       setLoading(true);
 
-      const raw = await loginApi(DEMO_EMAIL, DEMO_PASSWORD);
+      const raw = await authApi.login(DEMO_EMAIL, DEMO_PASSWORD);
       const result = unwrap(raw);
 
       if (result?.accessToken) {

@@ -3,7 +3,7 @@ import { AppRouter } from '@/app/router/AppRouter';
 import { useThemeStore } from './state/themeStore';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
-import { useAuthOnStartup } from '@/app/auth/hooks/useAuthOnStartup';
+import { useAuth } from '@/app/auth/hooks/useAuth';
 import { useTokenWatcher } from './auth/hooks/useTokenWatcher';
 import { SessionExpireDialog } from '@/app/auth/components/SessionExpireDialog';
 import { useSessionStore } from './state/sessionStore';
@@ -15,7 +15,7 @@ function App() {
   const isAuthenticated = useSessionStore(s => s.isAuthenticated);
 
   // Restore session on startup
-  useAuthOnStartup();
+  useAuth();
 
   // Listen for logout events to redirect to home
   useEffect(() => {

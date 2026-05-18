@@ -2,7 +2,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { registerSchema, RegisterFormValues } from '../schemas/registerSchema';
-import { registerApi } from '@/app/auth/api/authApi';
+import { authApi } from '@/app/auth/api/authApi';
 
 interface RegisterFormProps {
   onSuccess: (session: any) => void;
@@ -18,7 +18,12 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
   });
 
   const onSubmit = async (values: RegisterFormValues) => {
-    const session = await registerApi(values.first, values.last, values.email, values.password);
+    const session = await authApi.register(
+      values.first,
+      values.last,
+      values.email,
+      values.password,
+    );
 
     onSuccess(session);
   };

@@ -1,31 +1,76 @@
 // src/app/auth/api/authApi.ts
-import { apiClient } from '@/api/client';
-import { normalizeAuthResponse } from '@/api/utils/normalizeAuthResponse';
+import { AuthClient } from '@/api/generated/AuthClient';
+import { unwrap } from '@/api/utils/responseHelpers';
+import { useSessionStore } from '@/app/state/sessionStore';
 
-export async function loginApi(email: string, password: string) {
-  const res = await apiClient.post('/auth/login', { email, password });
-  const data = res.data;
+import type { AuthResponse } from '../types/AuthResponse';
+import type { RefreshResponse } from '../types/RefreshResponse';
 
-  // Normalize backend → session shape
-  return normalizeAuthResponse(data);
-}
+export const authApi = {
+  async login(email: string, password: string): Promise<AuthResponse> {
+    const res = await AuthClient.login({ email, password });
+    const data = unwrap<AuthResponse>(res, null, true) as AuthResponse;
 
-export async function registerApi(first: string, last: string, email: string, password: string) {
-  const res = await apiClient.post('/auth/register', {
-    first,
-    last,
-    email,
-    password,
-  });
-  const data = res.data;
+    useSessionStore.getState().setSession({
+      accessToken: data.accessToken,
+      refreshToken: data.refreshToken,
+      id: data.id,
+      userId: data.userId,
+      email: data.email,
+      first: data.first,
+      last: data.last,
+      roles: data.roles,
+      raw: data,
+    });
 
-  return normalizeAuthResponse(data);
-}
+    return data;
+  },
 
-// Optional: only keep if your backend supports refresh tokens
-export async function refreshApi(refreshToken: string) {
-  const res = await apiClient.post('/auth/refresh', { refreshToken });
-  const data = res.data;
+  async register(
+    first: string,
+    last: string,
+    email: string,
+    password: string,
+  ): Promise<AuthResponse> {
+    const res = await AuthClient.register({ first, last, email, password });
+    const data = unwrap<AuthResponse>(res, null, true) as AuthResponse;
 
-  return normalizeAuthResponse(data);
-}
+    useSessionStore.getState().setSession({
+      accessToken: data.accessToken,
+      refreshToken: data.refreshToken,
+      id: data.id,
+      userId: data.userId,
+      email: data.email,
+      first: data.first,
+      last: data.last,
+      roles: data.roles,
+      raw: data,
+    });
+
+    return data;
+  },
+
+  async refresh(refreshToken: string): Promise<RefreshResponse | null> {
+    if (!refreshToken) return null;
+
+    const res = await AuthClient.refresh(refreshToken);
+    const data = unwrap<RefreshResponse>(res, null);
+
+    if (data) {
+      const session = useSessionStore.getState().session!;
+      useSessionStore.getState().setSession({
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+        id: session.id!,
+        userId: session.userId!,
+        email: session.email!,
+        first: session.first!,
+        last: session.last!,
+        roles: session.roles!,
+        raw: data,
+      });
+    }
+
+    return data;
+  },
+};
