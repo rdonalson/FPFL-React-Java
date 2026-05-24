@@ -8,30 +8,33 @@ import { AppTopMenu } from './AppTopMenu';
 import AppSidebar from './AppSidebar';
 import AppFooter from './AppFooter';
 
-import { APP_TITLE, APP_DESCRIPTION, APP_OG_IMAGE } from '../config/seoConfig';
+import { AppConfig } from '@/config/appConfig';
 
 export default function AppLayout() {
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const toastRef = useRef<Toast | null>(null);
 
+  const cfg = AppConfig.get();
+  const { title, description, ogImage } = cfg.app;
+
   return (
     <>
       {/* GLOBAL SEO */}
       <Helmet>
-        <title>{APP_TITLE}</title>
-        <meta name="description" content={APP_DESCRIPTION} />
+        <title>{title}</title>
+        <meta name="description" content={description} />
 
         {/* OpenGraph */}
-        <meta property="og:title" content={APP_TITLE} />
-        <meta property="og:description" content={APP_DESCRIPTION} />
-        <meta property="og:image" content={APP_OG_IMAGE} />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:image" content={ogImage} />
         <meta property="og:type" content="website" />
 
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={APP_TITLE} />
-        <meta name="twitter:description" content={APP_DESCRIPTION} />
-        <meta name="twitter:image" content={APP_OG_IMAGE} />
+        <meta name="twitter:title" content={title} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={ogImage} />
       </Helmet>
 
       <Toast ref={toastRef} position="top-right" />

@@ -1,7 +1,9 @@
+// src/app/auth/components/SessionExpireDialog.tsx
+import { useEffect } from 'react';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
-import { useSessionStore } from '@/app/state/sessionStore';
 import { authApi } from '@/app/auth/api/authApi';
+import { useSessionStore } from '@/app/state/sessionStore';
 
 interface Props {
   visible: boolean;
@@ -9,58 +11,37 @@ interface Props {
 }
 
 export function SessionExpireDialog({ visible, onHide }: Props) {
-  const session = useSessionStore(s => s.session);
-  const setSession = useSessionStore(s => s.setSession);
-  const clearSession = useSessionStore(s => s.clearSession);
+  const refreshToken = useSessionStore(s => s.session?.refreshToken);
 
-  const stayLoggedIn = async () => {
-    try {
-      if (!session?.refreshToken) {
-        throw new Error('No refresh token available');
-      }
+  useEffect(() => {
+    const hide = () => onHide();
+    window.addEventListener('session-expiring-hide', hide);
+    return () => window.removeEventListener('session-expiring-hide', hide);
+  }, [onHide]);
 
-      const refreshed = await authApi.refresh(session.refreshToken);
+  const handleStayLoggedIn = async () => {
+    if (!refreshToken) return;
 
-      if (!refreshed) {
-        throw new Error('Failed to refresh session');
-      }
+    const res = await authApi.refresh(refreshToken);
 
-      // ⭐ FIX: merge refreshed tokens with existing session
-      setSession({
-        accessToken: refreshed.accessToken,
-        refreshToken: refreshed.refreshToken,
-
-        id: session.id!, // non-null assertion
-        userId: session.userId!,
-        email: session.email!,
-        first: session.first!,
-        last: session.last!,
-        roles: session.roles!,
-
-        raw: refreshed,
-      });
-
-      onHide();
-    } catch (err) {
-      console.error('Failed to refresh session', err);
-      clearSession();
-      onHide();
+    if (res) {
+      // Hide dialog after successful refresh
+      window.dispatchEvent(new Event('session-expiring-hide'));
     }
   };
 
+  const handleLogout = () => {
+    useSessionStore.getState().clearSession();
+    window.dispatchEvent(new Event('session-expiring-hide'));
+  };
+
   return (
-    <Dialog
-      header="Session Expiring"
-      visible={visible}
-      onHide={onHide}
-      modal
-      style={{ width: '25rem' }}
-    >
+    <Dialog header="Session Expiring" visible={visible} onHide={onHide} closable={false} modal>
       <p>Your session is about to expire. Would you like to stay logged in?</p>
 
-      <div className="flex justify-content-end gap-2 mt-3">
-        <Button label="Logout" severity="danger" onClick={clearSession} />
-        <Button label="Stay Logged In" onClick={stayLoggedIn} />
+      <div className="flex justify-end gap-2 mt-4">
+        <Button label="Logout" severity="danger" onClick={handleLogout} />
+        <Button label="Stay Logged In" onClick={handleStayLoggedIn} />
       </div>
     </Dialog>
   );

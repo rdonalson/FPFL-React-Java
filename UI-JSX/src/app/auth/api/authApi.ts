@@ -6,11 +6,27 @@ import { useSessionStore } from '@/app/state/sessionStore';
 import type { AuthResponse } from '../types/AuthResponse';
 import type { RefreshResponse } from '../types/RefreshResponse';
 
+// Decode JWT exp → expiresAt (ms)
+function extractExpiresAt(token: string): number | null {
+  try {
+    const [, payload] = token.split('.');
+    const decoded = JSON.parse(atob(payload));
+    if (!decoded.exp) return null;
+    return decoded.exp * 1000; // seconds → ms
+  } catch {
+    return null;
+  }
+}
+
 export const authApi = {
   async login(email: string, password: string): Promise<AuthResponse> {
     const res = await AuthClient.login({ email, password });
     const data = unwrap<AuthResponse>(res, null, true) as AuthResponse;
 
+    // Decode expiry from JWT
+    const expiresAt = extractExpiresAt(data.accessToken);
+
+    // Store session
     useSessionStore.getState().setSession({
       accessToken: data.accessToken,
       refreshToken: data.refreshToken,
@@ -22,6 +38,10 @@ export const authApi = {
       roles: data.roles,
       raw: data,
     });
+
+    // NEW: mark restored + set expiry
+    useSessionStore.getState().setSessionRestored(true);
+    useSessionStore.getState().setExpiresAt(expiresAt);
 
     return data;
   },
@@ -35,6 +55,8 @@ export const authApi = {
     const res = await AuthClient.register({ first, last, email, password });
     const data = unwrap<AuthResponse>(res, null, true) as AuthResponse;
 
+    const expiresAt = extractExpiresAt(data.accessToken);
+
     useSessionStore.getState().setSession({
       accessToken: data.accessToken,
       refreshToken: data.refreshToken,
@@ -47,6 +69,9 @@ export const authApi = {
       raw: data,
     });
 
+    useSessionStore.getState().setSessionRestored(true);
+    useSessionStore.getState().setExpiresAt(expiresAt);
+
     return data;
   },
 
@@ -58,6 +83,8 @@ export const authApi = {
 
     if (data) {
       const session = useSessionStore.getState().session!;
+      const expiresAt = extractExpiresAt(data.accessToken);
+
       useSessionStore.getState().setSession({
         accessToken: data.accessToken,
         refreshToken: data.refreshToken,
@@ -69,6 +96,9 @@ export const authApi = {
         roles: session.roles!,
         raw: data,
       });
+
+      useSessionStore.getState().setSessionRestored(true);
+      useSessionStore.getState().setExpiresAt(expiresAt);
     }
 
     return data;

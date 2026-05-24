@@ -33,6 +33,7 @@ export function AppTopMenu({ onToggleSidebar }: AppTopMenuProps) {
       const result = unwrap(raw);
 
       if (result?.accessToken) {
+        // Persist session into Zustand so token watcher and devtools behave correctly
         setSession({
           accessToken: result.accessToken,
           refreshToken: result.refreshToken ?? null,
@@ -114,6 +115,7 @@ export function AppTopMenu({ onToggleSidebar }: AppTopMenuProps) {
             <button
               className="p-button p-button-text p-button-danger"
               onClick={() => {
+                // clearSession will reset Zustand state and dispatch session-logged-out
                 clearSession();
                 navigate('/');
               }}

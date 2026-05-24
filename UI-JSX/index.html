@@ -10,10 +10,20 @@
       content="FPFL Platform – A React + Java powered financial planning UI with modular features and clean architecture."
     />
     <title>FPFL React/Java Platform</title>
-  </head>
 
+    <!-- Server injected runtime config must appear before the app bundle -->
+    <script>
+      window.__RUNTIME_CONFIG__ = {
+        session: { warningBeforeMs: 300000, debug: false },
+        features: { enableBetaX: true },
+        api: { timeoutMs: 15000 },
+      };
+    </script>
+  </head>
   <body>
     <div id="root"></div>
+
+    <!-- App bundle -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

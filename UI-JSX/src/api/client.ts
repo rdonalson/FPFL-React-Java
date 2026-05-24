@@ -1,21 +1,32 @@
 // src/api/client.ts
 import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
-import { apiConfig } from './config';
-import { useSessionStore } from '../app/state/sessionStore';
+import { AppConfig } from '@/config/appConfig';
+import { useSessionStore } from '@/app/state/sessionStore';
 
-// Fire-and-forget log sender
+/**
+ * Fire-and-forget log sender
+ * Uses runtime/build-time config for the API base URL.
+ */
 function sendLogToServer({ log }: { log: any }): void {
-  fetch(`${apiConfig.baseUrl}/client-logs`, {
-    method: 'POST',
-    body: JSON.stringify(log),
-    headers: { 'Content-Type': 'application/json' },
-  }).catch(() => {});
+  try {
+    const baseUrl = AppConfig.get().api.baseUrl;
+    // best-effort, don't block or throw
+    void fetch(`${baseUrl.replace(/\/$/, '')}/client-logs`, {
+      method: 'POST',
+      body: JSON.stringify(log),
+      headers: { 'Content-Type': 'application/json' },
+      // don't wait for response
+    }).catch(() => {});
+  } catch {
+    // swallow any errors — logging must never break the app
+  }
 }
 
 function createClient(): AxiosInstance {
+  const cfg = AppConfig.get();
   const instance = axios.create({
-    baseURL: apiConfig.baseUrl,
-    timeout: apiConfig.timeout,
+    baseURL: cfg.api.baseUrl,
+    timeout: cfg.api.timeoutMs,
     headers: {
       'Content-Type': 'application/json',
     },
@@ -31,29 +42,32 @@ function createClient(): AxiosInstance {
     config.headers = config.headers ?? {};
 
     // Add correlation ID
-    config.headers['X-Correlation-ID'] = correlationId;
+    (config.headers as Record<string, unknown>)['X-Correlation-ID'] = correlationId;
 
     // Pull fresh session values
     const { accessToken, userId } = useSessionStore.getState();
 
     // Add Authorization header
     if (accessToken) {
-      config.headers['Authorization'] = `Bearer ${accessToken}`;
+      (config.headers as Record<string, unknown>)['Authorization'] = `Bearer ${accessToken}`;
     }
 
     // Add userId header (optional but useful)
     if (userId) {
-      config.headers['X-User-Id'] = userId;
+      (config.headers as Record<string, unknown>)['X-User-Id'] = userId;
     }
 
-    // Local DevTools log
-    console.log('[API REQUEST]', {
-      url: config.url,
-      method: config.method,
-      correlationId,
-      userId,
-      payload: config.data,
-    });
+    // Local DevTools log (respect debug flag)
+    if (cfg.session.debug) {
+      // eslint-disable-next-line no-console
+      console.debug('[API REQUEST]', {
+        url: config.url,
+        method: config.method,
+        correlationId,
+        userId,
+        payload: config.data,
+      });
+    }
 
     return config;
   });
@@ -63,11 +77,14 @@ function createClient(): AxiosInstance {
   // ============================
   instance.interceptors.response.use(
     (response: AxiosResponse) => {
-      console.log('[API RESPONSE]', {
-        url: response.config.url,
-        status: response.status,
-        correlationId: response.config.headers?.['X-Correlation-ID'],
-      });
+      if (cfg.session.debug) {
+        // eslint-disable-next-line no-console
+        console.debug('[API RESPONSE]', {
+          url: response.config.url,
+          status: response.status,
+          correlationId: response.config.headers?.['X-Correlation-ID'],
+        });
+      }
 
       return response; // IMPORTANT: return full AxiosResponse
     },
@@ -84,6 +101,7 @@ function createClient(): AxiosInstance {
         url: error.config?.url,
       };
 
+      // eslint-disable-next-line no-console
       console.error('[API ERROR]', normalized);
 
       sendLogToServer({
@@ -94,6 +112,8 @@ function createClient(): AxiosInstance {
           message: normalized.message,
           correlationId: normalized.correlationId,
           details: normalized.details,
+          // include environment for easier debugging
+          env: cfg.app.nodeEnv,
         },
       });
 
