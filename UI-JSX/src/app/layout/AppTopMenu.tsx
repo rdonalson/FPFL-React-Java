@@ -4,6 +4,7 @@ import { useSessionStore } from '@/app/state/sessionStore';
 import { useThemeStore } from '@/app/state/themeStore';
 import { LoginDialog } from '@/app/auth/components/LoginDialog';
 import { RegisterDialog } from '@/app/auth/components/RegisterDialog';
+import { ChangePasswordDialog } from '@/app/auth/components/ChangePasswordDialog';
 import { authApi } from '@/app/auth/api/authApi';
 import { unwrap } from '@/api/utils/responseHelpers';
 import { useNavigate } from 'react-router-dom';
@@ -18,12 +19,13 @@ interface AppTopMenuProps {
 export function AppTopMenu({ onToggleSidebar }: AppTopMenuProps) {
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
   const { dark, toggleTheme } = useThemeStore();
-  const { first, last, clearSession, isAuthenticated, setSession } = useSessionStore();
+  const { first, last, clearSession, isAuthenticated, setSession, id } = useSessionStore();
 
   async function handleDemoLogin() {
     try {
@@ -33,7 +35,6 @@ export function AppTopMenu({ onToggleSidebar }: AppTopMenuProps) {
       const result = unwrap(raw);
 
       if (result?.accessToken) {
-        // Persist session into Zustand so token watcher and devtools behave correctly
         setSession({
           accessToken: result.accessToken,
           refreshToken: result.refreshToken ?? null,
@@ -112,10 +113,13 @@ export function AppTopMenu({ onToggleSidebar }: AppTopMenuProps) {
               {first} {last}
             </span>
 
+            <button className="p-button p-button-text" onClick={() => setShowChangePassword(true)}>
+              Change Password
+            </button>
+
             <button
               className="p-button p-button-text p-button-danger"
               onClick={() => {
-                // clearSession will reset Zustand state and dispatch session-logged-out
                 clearSession();
                 navigate('/');
               }}
@@ -129,6 +133,11 @@ export function AppTopMenu({ onToggleSidebar }: AppTopMenuProps) {
       {/* Dialogs */}
       <LoginDialog visible={showLogin} onHide={() => setShowLogin(false)} />
       <RegisterDialog visible={showRegister} onHide={() => setShowRegister(false)} />
+      <ChangePasswordDialog
+        visible={showChangePassword}
+        onHide={() => setShowChangePassword(false)}
+        id={id ?? 0} // <-- Long id from Zustand
+      />
     </div>
   );
 }

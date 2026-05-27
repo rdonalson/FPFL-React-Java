@@ -5,8 +5,9 @@ import { callAndParse } from '@/api/utils/apiParse';
 import type { ApiResponse } from '@/api/models/ApiResponse';
 import type { LoginRequest } from '@/app/auth/types/LoginRequest';
 import type { AuthResponse } from '@/app/auth/types/AuthResponse';
-import { RegisterRequest } from '@/app/auth/types/RegisterRequest';
-import { RefreshResponse } from '@/app/auth/types/RefreshResponse';
+import type { RegisterRequest } from '@/app/auth/types/RegisterRequest';
+import type { RefreshResponse } from '@/app/auth/types/RefreshResponse';
+import type { ChangePasswordRequest } from '@/app/auth/types/ChangePasswordRequest';
 
 const BASE = '/auth';
 
@@ -28,6 +29,12 @@ export const AuthClient = {
       apiClient.post<ApiResponse<RefreshResponse>>(`${BASE}/refresh`, {
         refreshToken,
       }),
+    );
+  },
+
+  async changePassword(payload: ChangePasswordRequest): Promise<ApiResponse<AuthResponse>> {
+    return callAndParse<AuthResponse>(() =>
+      apiClient.post<ApiResponse<AuthResponse>>(`${BASE}/change-password`, payload),
     );
   },
 };
