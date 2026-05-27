@@ -9,4 +9,6 @@ public interface AuthService {
     User login(String email, String rawPassword);
 
     User loadUserByEmail(String email);
+
+    User changePassword(Long userId, String currentPassword, String newPassword);
 }

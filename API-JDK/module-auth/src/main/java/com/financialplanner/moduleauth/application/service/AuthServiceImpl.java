@@ -49,6 +49,22 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
+    public User changePassword(Long userId, String currentPassword, String newPassword) {
+
+        User user = userService.findById(userId)
+                               .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        if (!passwordEncoder.matches(currentPassword, user.getPasswordHash())) {
+            throw new InvalidCredentialsException("Current password is incorrect");
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+
+        return userService.save(user);
+    }
+
+    @Override
     public User loadUserByEmail(String email) {
         return userService.findByEmail(email)
                           .orElseThrow(() -> new IllegalArgumentException("User not found"));

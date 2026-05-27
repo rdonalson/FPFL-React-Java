@@ -1,9 +1,6 @@
 package com.financialplanner.moduleapi.controllers;
 
-import com.financialplanner.moduleapi.dtos.auth.AuthResponse;
-import com.financialplanner.moduleapi.dtos.auth.LoginRequest;
-import com.financialplanner.moduleapi.dtos.auth.RefreshTokenRequest;
-import com.financialplanner.moduleapi.dtos.auth.RegisterRequest;
+import com.financialplanner.moduleapi.dtos.auth.*;
 import com.financialplanner.moduleapi.response.ApiResponse;
 import com.financialplanner.moduleapi.response.ApiResponseFactory;
 import com.financialplanner.moduleapi.security.JwtService;
@@ -13,6 +10,7 @@ import com.financialplanner.moduleauth.infrastructure.persistence.entity.Role;
 import com.financialplanner.moduleauth.infrastructure.persistence.entity.User;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -98,5 +96,40 @@ public class AuthController {
         var tokens = Map.of("accessToken", newAccessToken, "refreshToken", newRefreshToken.getToken());
 
         return ResponseEntity.ok(responseFactory.success(tokens, "Token refreshed"));
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<ApiResponse<AuthResponse>> changePassword(
+        @Valid @RequestBody ChangePasswordRequest request) {
+
+        // Service call using the request object
+        User user = authService.changePassword(
+            request.userId(),
+            request.currentPassword(),
+            request.newPassword()
+                                              );
+
+        var roleNames = user.getRoles()
+                            .stream()
+                            .map(Role::getName)
+                            .toList();
+
+        var accessToken = jwtService.generateToken(user.getEmail(), Map.of("roles", roleNames));
+        var refreshToken = refreshTokenService.createRefreshToken(user.getId());
+
+        var authResponse = new AuthResponse(
+            accessToken,
+            refreshToken.getToken(),
+            user.getId(),
+            user.getEmail(),
+            user.getUserId(),
+            user.getFirst(),
+            user.getLast(),
+            Set.copyOf(roleNames)
+        );
+
+        return ResponseEntity.ok(
+            responseFactory.success(authResponse, "Password changed successfully")
+                                );
     }
 }
