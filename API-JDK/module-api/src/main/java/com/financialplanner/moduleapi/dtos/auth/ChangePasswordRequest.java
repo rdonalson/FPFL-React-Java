@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 
 public record ChangePasswordRequest(
     @NotNull(message = "User ID is required")
-    Long userId,
+    Long Id,
 
     @NotBlank(message = "Current Password is required")
     String currentPassword,
