@@ -1,83 +1,139 @@
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { loginSchema, LoginFormValues } from '../schemas/loginSchema';
+// src/app/auth/LoginForm.tsx
+import React, { useRef, useState } from 'react';
+import { Toast } from 'primereact/toast';
+import { InputText } from 'primereact/inputtext';
+import { Button } from 'primereact/button';
 import { authApi } from '@/app/auth/api/authApi';
-import { Password } from 'primereact/password';
-import { Message } from 'primereact/message';
-import { useState } from 'react';
+import { unwrap } from '@/api/utils/responseHelpers';
+import type { AuthResponse } from '@/app/auth/types/AuthResponse';
 
 interface LoginFormProps {
-  onSuccess: (session: any) => void;
+  onSuccess: (session: AuthResponse) => void;
+  initialEmail?: string;
 }
 
-export function LoginForm({ onSuccess }: LoginFormProps) {
-  const [apiError, setApiError] = useState<string | null>(null);
+export function LoginForm({ onSuccess, initialEmail = '' }: LoginFormProps) {
+  const toast = useRef<Toast | null>(null);
 
-  const {
-    control,
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-    },
-  });
+  const [email, setEmail] = useState<string>(initialEmail);
+  const [password, setPassword] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
-  const onSubmit = async (values: LoginFormValues) => {
-    setApiError(null);
+  const handleSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    setLoading(true);
 
     try {
-      const session = await authApi.login(values.email, values.password);
-      onSuccess(session);
-    } catch (err: any) {
-      if (err.status === 401) {
-        setApiError(err.message); // "Invalid credentials"
-        return;
-      }
+      const raw = await authApi.login(email, password);
+      const result = unwrap(raw, null, true);
 
-      console.error(err);
+      onSuccess(result as AuthResponse);
+      toast.current?.show({
+        severity: 'success',
+        summary: 'Signed in',
+        detail: 'Welcome back',
+        life: 2000,
+      });
+    } catch (err: any) {
+      const message = err?.message ?? String(err);
+      toast.current?.show({
+        severity: 'error',
+        summary: 'Login failed',
+        detail: message,
+        life: 4000,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDemo = async () => {
+    setLoading(true);
+    try {
+      const raw = await authApi.login('guest.user@gmail.com', 'Password@2');
+      const result = unwrap(raw, null, true);
+      onSuccess(result as AuthResponse);
+      toast.current?.show({
+        severity: 'success',
+        summary: 'Signed in',
+        detail: 'Demo session started',
+        life: 2000,
+      });
+    } catch (err: any) {
+      toast.current?.show({
+        severity: 'error',
+        summary: 'Demo login failed',
+        detail: err?.message ?? String(err),
+        life: 4000,
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-column gap-3">
-      {/* Email */}
-      <div>
-        <label>Email</label>
-        <input {...register('email')} className="p-inputtext w-full" />
-        {errors.email && <small className="p-error">{errors.email.message}</small>}
-      </div>
+    <div>
+      <Toast ref={toast} />
 
-      {/* Password */}
-      <div>
-        <label>Password</label>
+      <form className="p-fluid" onSubmit={handleSubmit} aria-label="Login form">
+        <div className="p-field">
+          <label htmlFor="login-email" className="p-d-block">
+            Email
+          </label>
+          <InputText
+            id="login-email"
+            value={email}
+            onChange={e => setEmail((e.target as HTMLInputElement).value)}
+            placeholder="you@example.com"
+            autoComplete="username"
+          />
+        </div>
 
-        <Controller
-          name="password"
-          control={control}
-          render={({ field }) => (
-            <Password
-              value={field.value || ''}
-              onChange={e => field.onChange(e.target.value)}
-              toggleMask
-              className={errors.password ? 'p-invalid' : ''}
-              inputClassName="w-full"
+        <div className="p-field" style={{ marginTop: 12 }}>
+          <label htmlFor="login-password" className="p-d-block">
+            Password
+          </label>
+
+          <div className="p-inputgroup">
+            <InputText
+              id="login-password"
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={e => setPassword((e.target as HTMLInputElement).value)}
+              placeholder="Enter your password"
+              autoComplete="current-password"
             />
-          )}
-        />
+            <Button
+              type="button"
+              icon={showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'}
+              className="p-button-text"
+              onClick={() => setShowPassword(s => !s)}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            />
+          </div>
+        </div>
 
-        {errors.password && <small className="p-error">{errors.password.message}</small>}
-      </div>
-
-      {/* API Error */}
-      {apiError && <Message severity="error" text={apiError} className="mt-1" />}
-
-      <button type="submit" className="p-button p-component w-full" disabled={isSubmitting}>
-        {isSubmitting ? 'Logging in...' : 'Login'}
-      </button>
-    </form>
+        <div
+          className="p-field"
+          style={{ marginTop: 18, display: 'flex', gap: 8, justifyContent: 'flex-end' }}
+        >
+          <Button
+            type="button"
+            label="Demo"
+            icon="pi pi-user"
+            className="p-button-text"
+            onClick={handleDemo}
+            disabled={loading}
+          />
+          <Button
+            type="submit"
+            label={loading ? 'Signing in...' : 'Sign in'}
+            icon="pi pi-sign-in"
+            disabled={loading}
+          />
+        </div>
+      </form>
+    </div>
   );
 }

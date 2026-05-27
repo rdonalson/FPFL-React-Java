@@ -15,7 +15,7 @@ export function LoginDialog({ visible, onHide }: LoginDialogProps) {
     <Dialog header="Login" visible={visible} onHide={onHide} style={{ width: '30rem' }} modal>
       <LoginForm
         onSuccess={session => {
-          setSession(session);
+          setSession({ ...session, raw: session });
           onHide();
         }}
       />
