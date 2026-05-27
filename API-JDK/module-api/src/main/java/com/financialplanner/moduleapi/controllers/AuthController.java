@@ -103,7 +103,7 @@ public class AuthController {
 
         // Service call using the request object
         User user = authService.changePassword(
-            request.Id(),
+            request.id(),
             request.currentPassword(),
             request.newPassword()
                                               );
