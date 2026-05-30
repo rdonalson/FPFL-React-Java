@@ -1,7 +1,7 @@
 // src/app/auth/LoginDialog.tsx
-import { Dialog } from 'primereact/dialog';
 import { LoginForm } from './LoginForm';
 import { useSessionStore } from '@/app/state/sessionStore';
+import { AuthDialogLayout } from '@/app/layout/AuthDialogLayout';
 
 interface LoginDialogProps {
   visible: boolean;
@@ -12,13 +12,13 @@ export function LoginDialog({ visible, onHide }: LoginDialogProps) {
   const setSession = useSessionStore(s => s.setSession);
 
   return (
-    <Dialog header="Login" visible={visible} onHide={onHide} style={{ width: '30rem' }} modal>
+    <AuthDialogLayout title="Login" visible={visible} onHide={onHide}>
       <LoginForm
         onSuccess={session => {
           setSession({ ...session, raw: session });
           onHide();
         }}
       />
-    </Dialog>
+    </AuthDialogLayout>
   );
 }

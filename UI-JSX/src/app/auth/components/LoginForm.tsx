@@ -15,10 +15,10 @@ interface LoginFormProps {
 export function LoginForm({ onSuccess, initialEmail = '' }: LoginFormProps) {
   const toast = useRef<Toast | null>(null);
 
-  const [email, setEmail] = useState<string>(initialEmail);
-  const [password, setPassword] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
-  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [email, setEmail] = useState(initialEmail);
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -29,6 +29,7 @@ export function LoginForm({ onSuccess, initialEmail = '' }: LoginFormProps) {
       const result = unwrap(raw, null, true);
 
       onSuccess(result as AuthResponse);
+
       toast.current?.show({
         severity: 'success',
         summary: 'Signed in',
@@ -37,6 +38,7 @@ export function LoginForm({ onSuccess, initialEmail = '' }: LoginFormProps) {
       });
     } catch (err: any) {
       const message = err?.message ?? String(err);
+
       toast.current?.show({
         severity: 'error',
         summary: 'Login failed',
@@ -53,7 +55,9 @@ export function LoginForm({ onSuccess, initialEmail = '' }: LoginFormProps) {
     try {
       const raw = await authApi.login('guest.user@gmail.com', 'Password@2');
       const result = unwrap(raw, null, true);
+
       onSuccess(result as AuthResponse);
+
       toast.current?.show({
         severity: 'success',
         summary: 'Signed in',
@@ -73,50 +77,58 @@ export function LoginForm({ onSuccess, initialEmail = '' }: LoginFormProps) {
   };
 
   return (
-    <div>
+    <div style={{ width: '100%' }}>
       <Toast ref={toast} />
 
-      <form className="p-fluid" onSubmit={handleSubmit} aria-label="Login form">
-        <div className="p-field">
-          <label htmlFor="login-email" className="p-d-block">
-            Email
-          </label>
+      <form className="login-form-grid" onSubmit={handleSubmit} style={{ width: '100%' }}>
+        {/* Email */}
+        <label htmlFor="login-email" className="form-label">
+          Email
+        </label>
+        <div className="form-field">
           <InputText
             id="login-email"
             value={email}
             onChange={e => setEmail((e.target as HTMLInputElement).value)}
             placeholder="you@example.com"
             autoComplete="username"
+            style={{ width: '100%' }}
           />
         </div>
 
-        <div className="p-field" style={{ marginTop: 12 }}>
-          <label htmlFor="login-password" className="p-d-block">
-            Password
-          </label>
-
-          <div className="p-inputgroup">
-            <InputText
-              id="login-password"
-              type={showPassword ? 'text' : 'password'}
-              value={password}
-              onChange={e => setPassword((e.target as HTMLInputElement).value)}
-              placeholder="Enter your password"
-              autoComplete="current-password"
-            />
-            <Button
-              type="button"
-              icon={showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'}
-              className="p-button-text"
-              onClick={() => setShowPassword(s => !s)}
-              aria-label={showPassword ? 'Hide password' : 'Show password'}
-            />
-          </div>
+        {/* Password */}
+        <label htmlFor="login-password" className="form-label">
+          Password
+        </label>
+        <div className="form-field" style={{ display: 'flex', gap: 8 }}>
+          <InputText
+            id="login-password"
+            type={showPassword ? 'text' : 'password'}
+            value={password}
+            onChange={e => setPassword((e.target as HTMLInputElement).value)}
+            placeholder="Enter your password"
+            autoComplete="current-password"
+            style={{ flex: 1 }}
+          />
+          <Button
+            type="button"
+            icon={showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'}
+            className="p-button-text"
+            onClick={() => setShowPassword(s => !s)}
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+          />
         </div>
 
+        {/* Actions */}
         <div
-          className="p-field"
-          style={{ marginTop: 18, display: 'flex', gap: 8, justifyContent: 'flex-end' }}
+          className="form-actions"
+          style={{
+            gridColumn: '1 / -1',
+            display: 'flex',
+            justifyContent: 'flex-end',
+            gap: 8,
+            marginTop: 16,
+          }}
         >
           <Button
             type="button"

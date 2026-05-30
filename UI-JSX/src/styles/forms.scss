@@ -1,7 +1,143 @@
-/* src/styles/forms.css */
-.form-row {
+// /* src/styles/forms.css */
+// .form-row {
+//   display: grid;
+//   grid-template-columns: 140px 1fr;
+//   gap: 12px;
+//   align-items: center;
+// }
+
+// /* Change password form styles */
+// .change-password-grid {
+//   display: grid;
+//   grid-template-columns: 200px 1fr;
+//   gap: 12px 16px;
+//   align-items: center;
+//   width: 100%;
+// }
+
+// .form-label {
+//   justify-self: end;
+//   padding-right: 12px;
+//   font-weight: 600;
+// }
+
+// .form-field {
+//   justify-self: stretch;
+// }
+
+// .form-actions {
+//   margin-top: 8px;
+// }
+
+// /* Responsive collapse */
+// @media (max-width: 720px) {
+//   .change-password-grid {
+//     grid-template-columns: 1fr;
+//   }
+//   .form-label {
+//     justify-self: start;
+//     padding-right: 0;
+//   }
+// }
+
+// /* Login form styles */
+// .login-form-grid {
+//   display: grid;
+//   grid-template-columns: 200px 1fr; // same as Change Password
+//   gap: 12px 16px;
+//   align-items: center;
+//   width: 100%;
+// }
+
+// .form-label {
+//   justify-self: end;
+//   padding-right: 12px;
+//   font-weight: 600;
+// }
+
+// .form-field {
+//   justify-self: stretch;
+// }
+
+// .form-actions {
+//   margin-top: 8px;
+// }
+
+// /* Responsive collapse */
+// @media (max-width: 720px) {
+//   .login-form-grid {
+//     grid-template-columns: 1fr;
+//   }
+//   .form-label {
+//     justify-self: start;
+//     padding-right: 0;
+//   }
+// }
+
+// /* Register form styles */
+// .register-form-grid {
+//   display: grid;
+//   grid-template-columns: 200px 1fr;
+//   gap: 12px 16px;
+//   align-items: center;
+//   width: 100%;
+// }
+
+// .form-label {
+//   justify-self: end;
+//   padding-right: 12px;
+//   font-weight: 600;
+// }
+
+// .form-field {
+//   justify-self: stretch;
+// }
+
+// .form-actions {
+//   margin-top: 8px;
+// }
+
+// /* Responsive collapse */
+// @media (max-width: 720px) {
+//   .register-form-grid {
+//     grid-template-columns: 1fr;
+//   }
+//   .form-label {
+//     justify-self: start;
+//     padding-right: 0;
+//   }
+// }
+
+/* Additional shared styles for all forms */
+.auth-form-grid {
   display: grid;
-  grid-template-columns: 140px 1fr;
-  gap: 12px;
+  grid-template-columns: 200px 1fr;
+  gap: 12px 16px;
   align-items: center;
+  width: 100%;
+}
+
+.form-label {
+  justify-self: end;
+  padding-right: 12px;
+  font-weight: 600;
+}
+
+.form-field {
+  justify-self: stretch;
+}
+
+.form-actions {
+  margin-top: 8px;
+}
+
+/* Responsive collapse */
+@media (max-width: 720px) {
+  .auth-form-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-label {
+    justify-self: start;
+    padding-right: 0;
+  }
 }

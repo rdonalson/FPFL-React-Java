@@ -5,6 +5,8 @@ import { HelmetProvider } from 'react-helmet-async';
 import App from './app/App';
 import { AppProviders } from './app/providers/AppProviders';
 import { BrowserRouter } from 'react-router-dom';
+import '@/styles/global.scss'; // global app styles (colors, spacing, utilities)
+import '@/styles/forms.scss'; // form/grid helpers like .login-form-grid
 
 // PrimeReact global styles
 import 'primereact/resources/primereact.min.css';

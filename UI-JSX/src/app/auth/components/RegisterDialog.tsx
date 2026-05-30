@@ -1,7 +1,7 @@
 // src/app/auth/RegisterDialog.tsx
-import { Dialog } from 'primereact/dialog';
 import { RegisterForm } from './RegisterForm';
 import { useSessionStore } from '@/app/state/sessionStore';
+import { AuthDialogLayout } from '@/app/layout/AuthDialogLayout';
 
 interface RegisterDialogProps {
   visible: boolean;
@@ -12,19 +12,13 @@ export function RegisterDialog({ visible, onHide }: RegisterDialogProps) {
   const setSession = useSessionStore(s => s.setSession);
 
   return (
-    <Dialog
-      header="Create Account"
-      visible={visible}
-      onHide={onHide}
-      style={{ width: '30rem' }}
-      modal
-    >
+    <AuthDialogLayout title="Create Account" visible={visible} onHide={onHide}>
       <RegisterForm
         onSuccess={session => {
           setSession(session);
           onHide();
         }}
       />
-    </Dialog>
+    </AuthDialogLayout>
   );
 }
