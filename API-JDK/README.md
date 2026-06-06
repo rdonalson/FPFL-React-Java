@@ -315,10 +315,10 @@ Each bounded context produces a JAR:
 
 ---
 
-api/target/api-VERSION.jar
-items/target/items-VERSION.jar
-display/target/display-VERSION.jar
-common/target/common-VERSION.jar
+- api/target/api-VERSION.jar
+- items/target/items-VERSION.jar
+- display/target/display-VERSION.jar
+- common/target/common-VERSION.jar
 
 ---
 
