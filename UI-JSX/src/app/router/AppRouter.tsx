@@ -11,21 +11,27 @@ import { TimePeriodTablePage } from '@/features/catalog-command/admin/timePeriod
 import InitialAmountPage from '@/features/catalog-command/transactions/components/initial-amount/InitialAmountPage';
 
 import AuthGate from './AuthGate';
+import { AdminRouteGuard } from './AdminRouteGuard';
 
 export function AppRouter() {
   return (
     <Routes>
-      {/* AppLayout wraps all pages so topbar is always present */}
+      {/* AppLayout wraps everything so topbar/sidebar are always present */}
       <Route element={<AppLayout />}>
-        {/* Public Home page */}
+        {/* Public Home */}
         <Route path="/" element={<HomePage />} />
 
-        {/* Protected routes */}
+        {/* Authenticated area */}
         <Route element={<AuthGate />}>
-          <Route path="/command/admin/item-types" element={<ItemTypeTablePage />} />
-          <Route path="/command/admin/time-periods" element={<TimePeriodTablePage />} />
-          <Route path="/command/transactions/initial-amount" element={<InitialAmountPage />} />
+          {/* Admin-only routes */}
+          <Route element={<AdminRouteGuard />}>
+            <Route path="/command/admin/item-types" element={<ItemTypeTablePage />} />
+            <Route path="/command/admin/time-periods" element={<TimePeriodTablePage />} />
+            <Route path="/status" element={<div>Status Page Coming Soon</div>} />
+          </Route>
 
+          {/* Authenticated but NOT admin-only */}
+          <Route path="/command/transactions/initial-amount" element={<InitialAmountPage />} />
           <Route path="/credits" element={<CreditsPage />} />
           <Route path="/items/:id" element={<SpecificItemPage />} />
         </Route>
