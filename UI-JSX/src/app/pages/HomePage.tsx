@@ -2,9 +2,13 @@ import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import { Panel } from 'primereact/panel';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/app/auth/hooks/useAuth';
 
 export function HomePage() {
   const navigate = useNavigate();
+  const { hasRole } = useAuth();
+
+  const isAdmin = hasRole('ROLE_ADMIN');
 
   return (
     <div className="p-4 flex flex-column gap-4">
@@ -22,26 +26,35 @@ export function HomePage() {
       {/* Quick Actions */}
       <Panel header="Quick Actions" className="shadow-1">
         <div className="flex flex-column gap-3">
-          <Button
-            label="Manage Item Types"
-            icon="pi pi-list"
-            onClick={() => navigate('/command/admin/item-types')}
-          />
-          <Button
-            label="Manage Time Periods"
-            icon="pi pi-list"
-            onClick={() => navigate('/command/admin/time-periods')}
-          />
+          {/* ADMIN‑ONLY ACTIONS */}
+          {isAdmin && (
+            <>
+              <Button
+                label="Manage Item Types"
+                icon="pi pi-list"
+                onClick={() => navigate('/command/admin/item-types')}
+              />
+
+              <Button
+                label="Manage Time Periods"
+                icon="pi pi-calendar"
+                onClick={() => navigate('/command/admin/time-periods')}
+              />
+
+              <Button
+                label="Check API Status"
+                icon="pi pi-server"
+                severity="secondary"
+                onClick={() => navigate('/status')}
+              />
+            </>
+          )}
+
+          {/* EVERYONE CAN SEE */}
           <Button
             label="Manage Initial Amount"
             icon="pi pi-dollar"
             onClick={() => navigate('/command/transactions/initial-amount')}
-          />
-          <Button
-            label="Check API Status"
-            icon="pi pi-server"
-            severity="secondary"
-            onClick={() => navigate('/status')}
           />
 
           <Button

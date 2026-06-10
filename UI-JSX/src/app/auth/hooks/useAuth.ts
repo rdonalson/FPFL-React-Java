@@ -4,9 +4,11 @@ import { useSessionStore } from '@/app/state/sessionStore';
 import { authApi } from '../api/authApi';
 
 export function useAuth() {
+  const session = useSessionStore(s => s.session);
   const setSession = useSessionStore(s => s.setSession);
   const clearSession = useSessionStore(s => s.clearSession);
 
+  // --- Startup hydration ---
   useEffect(() => {
     const accessToken = sessionStorage.getItem('accessToken');
 
@@ -15,7 +17,6 @@ export function useAuth() {
       return;
     }
 
-    // Rehydrate from sessionStorage
     try {
       const session = {
         accessToken,
@@ -31,10 +32,25 @@ export function useAuth() {
 
       setSession(session);
 
-      // Optional: attempt silent refresh
+      // Optional silent refresh
       authApi.refresh(session.refreshToken!).catch(() => clearSession());
     } catch {
       clearSession();
     }
   }, [setSession, clearSession]);
+
+  // --- Role helpers ---
+  const roles = session?.roles ?? [];
+  const isAuthenticated = Boolean(session?.accessToken);
+
+  const hasRole = (role: string) => roles.includes(role);
+  const isAdmin = hasRole('ROLE_ADMIN');
+
+  return {
+    session,
+    isAuthenticated,
+    roles,
+    hasRole,
+    isAdmin,
+  };
 }

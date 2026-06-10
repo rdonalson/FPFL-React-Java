@@ -1,6 +1,6 @@
 // src/app/layout/AppMenuitem.tsx
 import { Link, useLocation } from 'react-router-dom';
-import { useMenuContext } from './context/MenuContext';
+import { useMenuContext } from './context/useMenuContext';
 import { useEffect } from 'react';
 import type { MenuItem } from './model/menuModel';
 
@@ -12,12 +12,12 @@ interface Props {
 
 export default function AppMenuitem({ item, index }: Props) {
   const location = useLocation();
-  const { activeIndex, setActiveIndex, onMenuToggle } = useMenuContext();
+  const { activeIndex, setActiveIndex, toggleIndex, closeMenu } = useMenuContext();
 
   const isActiveRoute = item.to === location.pathname;
-  const isActive = activeIndex === index;
-  const expanded = isActive;
+  const expanded = activeIndex === index;
 
+  // Auto-expand parent when route matches
   useEffect(() => {
     if (isActiveRoute) {
       setActiveIndex(index);
@@ -26,10 +26,9 @@ export default function AppMenuitem({ item, index }: Props) {
 
   const onItemClick = () => {
     if (item.items) {
-      setActiveIndex(isActive ? null : index);
+      toggleIndex(index);
     } else {
-      // Leaf item selected: trigger menu toggle which will close the sidebar
-      onMenuToggle();
+      closeMenu();
     }
   };
 
