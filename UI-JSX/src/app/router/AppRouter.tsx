@@ -12,6 +12,7 @@ import InitialAmountPage from '@/features/catalog-command/transactions/component
 
 import AuthGate from './AuthGate';
 import { AdminRouteGuard } from './AdminRouteGuard';
+import { ItemsListPage } from '@/features/catalog-command/transactions/components/items/ItemsListPage';
 
 export function AppRouter() {
   return (
@@ -32,6 +33,7 @@ export function AppRouter() {
 
           {/* Authenticated but NOT admin-only */}
           <Route path="/command/transactions/initial-amount" element={<InitialAmountPage />} />
+          <Route path="/command/transactions/credits" element={<ItemsListPage />} />
           <Route path="/credits" element={<CreditsPage />} />
           <Route path="/items/:id" element={<SpecificItemPage />} />
         </Route>

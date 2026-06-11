@@ -3,7 +3,7 @@ import React from 'react';
 import { Sidebar } from 'primereact/sidebar';
 import { useSessionStore } from '@/app/state/sessionStore';
 import AppMenu from './AppMenu';
-import { MenuProvider } from './context/MenuContext';
+import { MenuProvider } from '@/app/components/MenuProvider';
 
 export default function AppSidebar({ visible, onHide }: { visible: boolean; onHide: () => void }) {
   const { userId } = useSessionStore();

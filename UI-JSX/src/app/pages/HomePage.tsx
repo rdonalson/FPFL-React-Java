@@ -56,6 +56,12 @@ export function HomePage() {
             icon="pi pi-dollar"
             onClick={() => navigate('/command/transactions/initial-amount')}
           />
+          {/* ⭐ NEW CREDIT BUTTON */}
+          <Button
+            label="Credits"
+            icon="pi pi-plus-circle"
+            onClick={() => navigate('/command/transactions/credits')}
+          />
 
           <Button
             label="View Documentation"
