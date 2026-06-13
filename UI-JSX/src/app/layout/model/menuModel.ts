@@ -10,7 +10,7 @@ export interface MenuItem {
 
 export const menuModel: MenuItem[] = [
   { label: 'Home', icon: 'pi pi-home', to: '/' },
-
+  /** ADMIN-ONLY ITEMS */
   {
     label: 'Item Types',
     icon: 'pi pi-tags',
@@ -23,23 +23,28 @@ export const menuModel: MenuItem[] = [
     to: '/command/admin/time-periods',
     roles: ['ROLE_ADMIN'],
   },
-
+  {
+    label: 'Status',
+    icon: 'pi pi-server',
+    to: '/status',
+    roles: ['ROLE_ADMIN'],
+  },
+  /** EVERYONE CAN SEE THESE ITEMS */
+  /** Note: The "to" paths here should match the routes defined in AppRouter.tsx */
+  {
+    label: 'Initial Amount',
+    icon: 'pi pi-dollar',
+    to: '/command/transactions/initial-amount',
+  },
   {
     label: 'Credits',
     icon: 'pi pi-dollar',
     to: '/command/transactions/credits',
   },
   {
-    label: 'Initial Amount',
+    label: 'Debits',
     icon: 'pi pi-dollar',
-    to: '/command/transactions/initial-amount',
-  },
-
-  {
-    label: 'Status',
-    icon: 'pi pi-server',
-    to: '/status',
-    roles: ['ROLE_ADMIN'],
+    to: '/command/transactions/debits',
   },
 
   { label: 'Docs', icon: 'pi pi-book', to: '/docs' },

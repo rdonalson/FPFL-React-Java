@@ -94,7 +94,7 @@ export const useSessionStore = create<SessionState>()(
       let initialDebug = false;
       try {
         // lazy require to avoid circular import at module load
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
+
         //const { AppConfig } = require('@/config/appConfig');
         const cfg = AppConfig.get();
         initialWarning = cfg?.session?.warningBeforeMs ?? initialWarning;
@@ -180,7 +180,7 @@ export const useSessionStore = create<SessionState>()(
             }
           } catch (e) {
             // ignore storage errors (e.g., private mode)
-            // eslint-disable-next-line no-console
+
             console.warn('sessionStore: failed to persist sessionStorage', e);
           }
 
@@ -270,7 +270,7 @@ export const useSessionStore = create<SessionState>()(
             sessionStorage.removeItem('expiresAt');
           } catch (e) {
             // ignore storage errors
-            // eslint-disable-next-line no-console
+
             console.warn('sessionStore: failed to clear sessionStorage', e);
           }
 

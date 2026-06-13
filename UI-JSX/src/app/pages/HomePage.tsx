@@ -62,7 +62,12 @@ export function HomePage() {
             icon="pi pi-plus-circle"
             onClick={() => navigate('/command/transactions/credits')}
           />
-
+          {/* ⭐ NEW DEBIT BUTTON */}
+          <Button
+            label="Debits"
+            icon="pi pi-minus-circle"
+            onClick={() => navigate('/command/transactions/debits')}
+          />
           <Button
             label="View Documentation"
             icon="pi pi-book"
