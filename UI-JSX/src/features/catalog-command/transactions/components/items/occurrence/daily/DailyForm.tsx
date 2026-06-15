@@ -1,42 +1,32 @@
+// src/features/catalog-command/transactions/components/items/forms/DailyForm.tsx
 import React, { useEffect, useState } from 'react';
 import { InputText } from 'primereact/inputtext';
-import { Calendar } from 'primereact/calendar';
 import { InputNumber } from 'primereact/inputnumber';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { Toast } from 'primereact/toast';
 
-import type { Item } from '../../../types/Item';
+import type { Item } from '../../../../types/Item';
 import { getSessionUserId } from '@/app/state/sessionHelpers';
 
-interface OneTimeFormProps {
-  itemType: number; // 1 = Credit, 2 = Debit (required)
+interface DailyFormProps {
+  itemType: number; // 1 = Credit, 2 = Debit
   initial?: Item | null;
   onSaved?: () => void;
   create: (payload: Item) => Promise<Item>;
   update: (id: number, payload: Item) => Promise<Item>;
 }
 
-export default function OneTimeForm({
-  itemType,
-  initial,
-  onSaved,
-  create,
-  update,
-}: OneTimeFormProps) {
+export default function DailyForm({ itemType, initial, onSaved, create, update }: DailyFormProps) {
   const toastRef = React.useRef<Toast | null>(null);
 
   const [name, setName] = useState<string>(initial?.name ?? '');
   const [amount, setAmount] = useState<number | null>(initial?.amount ?? null);
-  const [occurrence, setOccurrence] = useState<Date | null>(
-    initial?.beginDate ? new Date(initial.beginDate as string) : null,
-  );
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     setName(initial?.name ?? '');
     setAmount(initial?.amount ?? null);
-    setOccurrence(initial?.beginDate ? new Date(initial.beginDate as string) : null);
   }, [initial]);
 
   async function handleSave(e?: React.FormEvent) {
@@ -44,9 +34,8 @@ export default function OneTimeForm({
     setSaving(true);
 
     try {
-      // Defensive check: ensure itemType is present and valid
+      // Validate itemType
       if (!itemType || typeof itemType !== 'number' || itemType <= 0) {
-        console.error('OneTimeForm: missing or invalid itemType prop:', itemType);
         toastRef.current?.show({
           severity: 'error',
           summary: 'Save failed',
@@ -87,21 +76,17 @@ export default function OneTimeForm({
         return;
       }
 
-      const isoDate = occurrence ? occurrence.toISOString() : null;
-
+      // ⭐ Daily occurrence has NO beginDate or endDate
       const payload: Item = {
         id: initial?.id,
         userId,
         name: name.trim(),
         amount,
-        fkPeriod: 1, // one-time period
+        fkPeriod: 2, // ⭐ DAILY
         fkItemType: itemType, // required by backend
-        beginDate: isoDate,
       } as Item;
 
-      // debug: inspect payload in console
-
-      console.debug('OneTimeForm payload:', payload);
+      console.debug('DailyForm payload:', payload);
 
       if (initial && initial.id) {
         await update(initial.id, payload);
@@ -146,14 +131,7 @@ export default function OneTimeForm({
             />
           </div>
 
-          <div>
-            <label className="block mb-1">Occurrence Date</label>
-            <Calendar
-              value={occurrence}
-              onChange={e => setOccurrence(e.value as Date)}
-              dateFormat="yy-mm-dd"
-            />
-          </div>
+          {/* ⭐ No date field for Daily */}
         </div>
       </Card>
 

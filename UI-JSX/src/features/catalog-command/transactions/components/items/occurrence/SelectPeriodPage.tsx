@@ -32,22 +32,50 @@ export default function SelectPeriodPage({ itemType }: SelectPeriodPageProps) {
 
   const { data, isLoading, isError } = useTimePeriods();
 
-  // Map API data to TimePeriod[] and sort by id ascending.
   const periods: TimePeriod[] = React.useMemo(() => {
     const src: TimePeriod[] = Array.isArray(data)
       ? (data as TimePeriod[])
       : (FALLBACK_PERIODS as TimePeriod[]);
-    // Create a shallow copy and sort to avoid mutating react-query cache
     return [...src].sort((a, b) => a.id - b.id);
   }, [data]);
 
   function handleChoose(periodId: number) {
-    navigate(`${base}/new/${periodId}`);
+    switch (periodId) {
+      case 1:
+        navigate(`${base}/new/1`);
+        break;
+      case 2:
+        navigate(`${base}/new/2`);
+        break;
+      case 3:
+        navigate(`${base}/new/3`);
+        break;
+      case 4:
+        navigate(`${base}/new/4`);
+        break;
+      case 5:
+        navigate(`${base}/new/5`);
+        break;
+      case 6:
+        navigate(`${base}/new/6`);
+        break;
+      case 7:
+        navigate(`${base}/new/7`);
+        break;
+      case 8:
+        navigate(`${base}/new/8`);
+        break;
+      case 9:
+        navigate(`${base}/new/9`);
+        break;
+      default:
+        console.warn('Unknown periodId:', periodId);
+        navigate(base);
+    }
   }
 
-  // If the period is One Time (id === 1) we offer a direct "Add One Time" action
   const actionBody = (row: TimePeriod) => (
-    <div className="flex items-center justify-center gap-2">
+    <div className="flex items-center justify-center">
       <Button
         label="Select"
         icon="pi pi-check"
@@ -55,39 +83,14 @@ export default function SelectPeriodPage({ itemType }: SelectPeriodPageProps) {
         onClick={() => handleChoose(row.id)}
         aria-label={`Select ${row.name}`}
       />
-
-      {row.id === 1 && (
-        <Button
-          icon="pi pi-plus"
-          className="p-button-sm p-button-text"
-          aria-label="Add One Time Occurrence"
-          onClick={() => navigate(`${base}/new/1`)}
-          tooltip="Add One Time"
-        />
-      )}
     </div>
   );
-
-  // Optional compact header-level shortcut to add a One Time occurrence
-  function goToAddOneTime() {
-    navigate(`${base}/new/1`);
-  }
 
   return (
     <div className="p-4">
       <Card>
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">{itemType === 1 ? 'New Credit' : 'New Debit'}</h2>
-
-          <div className="flex items-center gap-2">
-            <Button
-              label="Add One Time"
-              icon="pi pi-calendar"
-              className="p-button-sm p-button-primary"
-              onClick={goToAddOneTime}
-              aria-label="Add One Time Occurrence"
-            />
-          </div>
         </div>
       </Card>
 
@@ -112,7 +115,7 @@ export default function SelectPeriodPage({ itemType }: SelectPeriodPageProps) {
           emptyMessage="No time periods available"
           responsiveLayout="scroll"
           sortField="id"
-          sortOrder={1} // ascending
+          sortOrder={1}
           showGridlines={false}
         >
           <Column field="id" header="ID" style={{ width: '60px', textAlign: 'center' }} />

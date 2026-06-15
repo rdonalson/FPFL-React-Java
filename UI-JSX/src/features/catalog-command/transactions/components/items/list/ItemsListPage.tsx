@@ -8,8 +8,8 @@ import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
 import { Card } from 'primereact/card';
 
-import { Item } from '../../types/Item';
-import { useItem } from '../../hooks/useItem';
+import { Item } from '../../../types/Item';
+import { useItem } from '../../../hooks/useItem';
 import { getSessionUserId } from '@/app/state/sessionHelpers';
 
 interface ItemsListPageProps {

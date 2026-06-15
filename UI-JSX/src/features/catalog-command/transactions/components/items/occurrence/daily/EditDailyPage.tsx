@@ -1,19 +1,20 @@
+// src/features/catalog-command/transactions/components/items/EditDailyPage.tsx
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card } from 'primereact/card';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Toast } from 'primereact/toast';
 
-import OneTimeForm from './OneTimeForm';
-import { useItem } from '../../../hooks/useItem';
-import type { Item } from '../../../types/Item';
+import DailyForm from './DailyForm';
+import { useItem } from '../../../../hooks/useItem';
+import type { Item } from '../../../../types/Item';
 import { getSessionUserId } from '@/app/state/sessionHelpers';
 
-interface EditOneTimePageProps {
+interface EditDailyPageProps {
   itemType: number;
 }
 
-export default function EditOneTimePage({ itemType }: EditOneTimePageProps) {
+export default function EditDailyPage({ itemType }: EditDailyPageProps) {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const toastRef = React.useRef<Toast | null>(null);
@@ -30,14 +31,17 @@ export default function EditOneTimePage({ itemType }: EditOneTimePageProps) {
       try {
         if (!id) throw new Error('Missing id');
 
+        // Try to find item in already-loaded items
         const found = items?.find(it => String(it.id) === String(id));
         if (found) {
           if (mounted) setItem(found);
           return;
         }
 
+        // Otherwise load items for this user + type
         const userId = getSessionUserId();
         if (!userId) throw new Error('No user session');
+
         await loadForUserAndType(userId, itemType);
 
         const refreshed = (items ?? []).find(it => String(it.id) === String(id));
@@ -90,12 +94,12 @@ export default function EditOneTimePage({ itemType }: EditOneTimePageProps) {
       <Toast ref={toastRef} />
       <Card>
         <h2 className="text-lg font-semibold">
-          {itemType === 1 ? 'Edit One Time Credit' : 'Edit One Time Debit'}
+          {itemType === 1 ? 'Edit Daily Credit' : 'Edit Daily Debit'}
         </h2>
       </Card>
 
       <div className="mt-3">
-        <OneTimeForm
+        <DailyForm
           itemType={itemType}
           initial={item}
           create={async () => {

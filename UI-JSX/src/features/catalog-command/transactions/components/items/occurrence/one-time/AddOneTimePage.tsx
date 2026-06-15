@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card } from 'primereact/card';
 
 import OneTimeForm from './OneTimeForm';
-import { useItem } from '../../../hooks/useItem';
+import { useItem } from '../../../../hooks/useItem';
 
 interface AddOneTimePageProps {
   itemType: number;
