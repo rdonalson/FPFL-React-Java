@@ -40,12 +40,20 @@ export function unwrap<T>(
   // Case A: ApiResponse<T> wrapper (has 'data' property)
   if (typeof res === 'object' && res !== null && 'data' in (res as any)) {
     const api = res as ApiResponse<T>;
+
+    // ⭐ NEW: treat successful DELETE responses as success even if data is null
+    if (api.status === 200 && api.message?.toLowerCase().includes('deleted')) {
+      return fallback ?? (true as any);
+    }
+
     if (api.data !== undefined && api.data !== null) {
       return api.data;
     }
+
     if (throwOnMissing) {
       throw new Error(api.message ?? 'No data returned from API');
     }
+
     return fallback;
   }
 

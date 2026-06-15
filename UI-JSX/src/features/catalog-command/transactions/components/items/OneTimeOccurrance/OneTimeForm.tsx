@@ -97,7 +97,6 @@ export default function OneTimeForm({
         fkPeriod: 1, // one-time period
         fkItemType: itemType, // required by backend
         beginDate: isoDate,
-        endDate: isoDate,
       } as Item;
 
       // debug: inspect payload in console
