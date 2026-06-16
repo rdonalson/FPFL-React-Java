@@ -9,7 +9,7 @@ import { Button } from 'primereact/button';
 
 import type { Item } from '../../../../types/Item';
 import { getSessionUserId } from '@/app/state/sessionHelpers';
-import WeekdayRadioGroup from '@/features/catalog-command/transactions/components/common/WeekdayRadioGroup';
+import { WeekdayRadioGroup } from '@/features/catalog-command/transactions/components/common/WeekdayRadioGroup';
 
 interface WeeklyFormProps {
   itemType: number;
