@@ -115,12 +115,12 @@ export default function DailyForm({ itemType, initial, onSaved, create, update }
       <Card>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
-            <label className="block mb-1">Name</label>
+            <label className="block mb-2">Name</label>
             <InputText value={name} onChange={e => setName(e.target.value)} />
           </div>
 
           <div>
-            <label className="block mb-1">Amount</label>
+            <label className="block mb-2">Amount</label>
             <InputNumber
               value={amount}
               onValueChange={e => setAmount(e.value as number)}

@@ -130,12 +130,12 @@ export default function OneTimeForm({
       <Card>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
-            <label className="block mb-1">Name</label>
+            <label className="block mb-2">Name</label>
             <InputText value={name} onChange={e => setName(e.target.value)} />
           </div>
 
           <div>
-            <label className="block mb-1">Amount</label>
+            <label className="block mb-2">Amount</label>
             <InputNumber
               value={amount}
               onValueChange={e => setAmount(e.value as number)}
@@ -147,7 +147,7 @@ export default function OneTimeForm({
           </div>
 
           <div>
-            <label className="block mb-1">Occurrence Date</label>
+            <label className="block mb-2">Occurrence Date</label>
             <Calendar
               value={occurrence}
               onChange={e => setOccurrence(e.value as Date)}

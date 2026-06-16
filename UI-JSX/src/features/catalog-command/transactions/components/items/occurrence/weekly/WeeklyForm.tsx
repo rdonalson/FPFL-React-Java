@@ -123,13 +123,13 @@ export default function WeeklyForm({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {/* Name */}
           <div>
-            <label className="block mb-1">Name</label>
+            <label className="block mb-2">Name</label>
             <InputText value={name} onChange={e => setName(e.target.value)} className="w-full" />
           </div>
 
           {/* Amount */}
           <div>
-            <label className="block mb-1">Amount</label>
+            <label className="block mb-2">Amount</label>
             <InputNumber
               value={amount}
               onValueChange={e => setAmount(e.value as number)}
@@ -142,7 +142,7 @@ export default function WeeklyForm({
 
           {/* Weekday Selector */}
           <div className="col-span-2">
-            <label className="block mb-1">Select Weekday</label>
+            <label className="block mb-2">Select Weekday</label>
             <WeekdayRadioGroup value={weeklyDow} onChange={setWeeklyDow} />
           </div>
         </div>

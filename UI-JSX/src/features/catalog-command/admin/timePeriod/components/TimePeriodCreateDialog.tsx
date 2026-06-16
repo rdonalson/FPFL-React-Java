@@ -35,7 +35,7 @@ export function TimePeriodCreateDialog({ visible, onHide, onCreate }: Props) {
     >
       <div className="flex flex-column gap-3">
         <div>
-          <label className="block mb-1">ID</label>
+          <label className="block mb-2">ID</label>
           <InputNumber
             value={id}
             onValueChange={e => setId(e.value ?? null)}
@@ -46,7 +46,7 @@ export function TimePeriodCreateDialog({ visible, onHide, onCreate }: Props) {
         </div>
 
         <div>
-          <label className="block mb-1">Name</label>
+          <label className="block mb-2">Name</label>
           <InputText value={name} onChange={e => setName(e.target.value)} className="w-full" />
         </div>
 

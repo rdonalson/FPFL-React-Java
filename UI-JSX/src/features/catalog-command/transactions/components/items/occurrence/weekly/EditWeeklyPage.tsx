@@ -52,7 +52,7 @@ export default function EditWeeklyPage({ itemType }: { itemType: number }) {
     return () => {
       mounted = false;
     };
-  }, [id, items]);
+  }, [id, items, itemType, loadForUserAndType]);
 
   function handleSaved() {
     const base = itemType === 1 ? '/command/transactions/credits' : '/command/transactions/debits';

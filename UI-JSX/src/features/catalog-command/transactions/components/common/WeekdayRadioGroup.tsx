@@ -1,7 +1,7 @@
 // src/features/catalog-command/transactions/components/common/WeekdayRadioGroup.tsx
 
 import React from 'react';
-import { SelectButton } from 'primereact/selectbutton';
+import { RadioButton } from 'primereact/radiobutton';
 import { WEEKDAYS } from '@/features/catalog-command/transactions/constants/weekdays';
 
 interface WeekdayRadioGroupProps {
@@ -11,14 +11,21 @@ interface WeekdayRadioGroupProps {
 
 export default function WeekdayRadioGroup({ value, onChange }: WeekdayRadioGroupProps) {
   return (
-    <SelectButton
-      value={value}
-      onChange={e => onChange(e.value)}
-      options={WEEKDAYS}
-      optionLabel="label"
-      optionValue="value"
-      unselectable={false} // ensures only ONE weekday can be selected
-      className="w-full"
-    />
+    <div className="flex flex-wrap gap-3">
+      {WEEKDAYS.map(day => (
+        <div key={day.value} className="flex align-items-center">
+          <RadioButton
+            inputId={`weekday-${day.value}`}
+            name="weekday"
+            value={day.value}
+            checked={value === day.value}
+            onChange={e => onChange(e.value)}
+          />
+          <label htmlFor={`weekday-${day.value}`} className="ml-2">
+            {day.label}
+          </label>
+        </div>
+      ))}
+    </div>
   );
 }

@@ -47,12 +47,12 @@ export function ItemTypeEditDialog({ visible, onHide, itemType, onUpdate }: Prop
     >
       <div className="flex flex-column gap-3">
         <div>
-          <label className="block mb-1">ID</label>
+          <label className="block mb-2">ID</label>
           <div className="p-2 border-round surface-100">{id}</div>
         </div>
 
         <div>
-          <label className="block mb-1">Name</label>
+          <label className="block mb-2">Name</label>
           <InputText value={name} onChange={e => setName(e.target.value)} className="w-full" />
         </div>
 
