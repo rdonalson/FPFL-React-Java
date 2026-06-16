@@ -52,7 +52,7 @@ export function HomePage() {
 
           {/* EVERYONE CAN SEE */}
           <Button
-            label="Manage Initial Amount"
+            label="Initial Amount"
             icon="pi pi-dollar"
             onClick={() => navigate('/command/transactions/initial-amount')}
           />

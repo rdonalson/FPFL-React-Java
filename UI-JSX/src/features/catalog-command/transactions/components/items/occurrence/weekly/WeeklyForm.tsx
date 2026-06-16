@@ -6,11 +6,10 @@ import { Toast } from 'primereact/toast';
 import { InputText } from 'primereact/inputtext';
 import { InputNumber } from 'primereact/inputnumber';
 import { Button } from 'primereact/button';
-import { SelectButton } from 'primereact/selectbutton';
 
 import type { Item } from '../../../../types/Item';
 import { getSessionUserId } from '@/app/state/sessionHelpers';
-import { WEEKDAYS } from '@/features/catalog-command/transactions/constants/weekdays';
+import WeekdayRadioGroup from '@/features/catalog-command/transactions/components/common/WeekdayRadioGroup';
 
 interface WeeklyFormProps {
   itemType: number;
@@ -144,21 +143,11 @@ export default function WeeklyForm({
           {/* Weekday Selector */}
           <div className="col-span-2">
             <label className="block mb-1">Select Weekday</label>
-
-            <SelectButton
-              value={weeklyDow}
-              onChange={e => setWeeklyDow(e.value)}
-              options={WEEKDAYS}
-              optionLabel="label"
-              optionValue="value"
-              unselectable={false}
-              className="w-full"
-            />
+            <WeekdayRadioGroup value={weeklyDow} onChange={setWeeklyDow} />
           </div>
         </div>
       </Card>
 
-      {/* Buttons */}
       <div className="mt-3 flex gap-2">
         <Button label="Save" icon="pi pi-check" type="submit" loading={saving} />
         <Button
