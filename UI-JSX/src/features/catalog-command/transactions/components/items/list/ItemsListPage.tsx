@@ -62,7 +62,18 @@ export default function ItemsListPage({ itemType }: ItemsListPageProps) {
 
   function handleEdit(item: Item) {
     const base = itemType === 1 ? '/command/transactions/credits' : '/command/transactions/debits';
-    navigate(`${base}/${item.id}/edit`);
+    const period = item.TimePeriod?.Id;
+
+    if (!period) {
+      toastRef.current?.show({
+        severity: 'error',
+        summary: 'Missing Period',
+        detail: 'This item has no period assigned.',
+      });
+      return;
+    }
+
+    navigate(`${base}/${period}/${item.id}/edit`);
   }
 
   function confirmDelete(item: Item) {

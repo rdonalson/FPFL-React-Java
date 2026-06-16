@@ -22,87 +22,74 @@ import EditOneTimePage from '@/features/catalog-command/transactions/components/
 import AddDailyPage from '@/features/catalog-command/transactions/components/items/occurrence/daily/AddDailyPage';
 import EditDailyPage from '@/features/catalog-command/transactions/components/items/occurrence/daily/EditDailyPage';
 
+// Weekly
+import AddWeeklyPage from '@/features/catalog-command/transactions/components/items/occurrence/weekly/AddWeeklyPage';
+import EditWeeklyPage from '@/features/catalog-command/transactions/components/items/occurrence/weekly/EditWeeklyPage';
+
 export function AppRouter() {
   return (
     <Routes>
-      {/* AppLayout wraps everything so topbar/sidebar are always present */}
       <Route element={<AppLayout />}>
-        {/* Public Home */}
+        {/* Public */}
         <Route path="/" element={<HomePage />} />
 
-        {/* Authenticated area */}
+        {/* Authenticated */}
         <Route element={<AuthGate />}>
-          {/* Admin-only routes */}
+          {/* Admin-only */}
           <Route element={<AdminRouteGuard />}>
             <Route path="/command/admin/item-types" element={<ItemTypeTablePage />} />
             <Route path="/command/admin/time-periods" element={<TimePeriodTablePage />} />
             <Route path="/status" element={<div>Status Page Coming Soon</div>} />
           </Route>
 
-          {/* Authenticated but NOT admin-only */}
+          {/* Shared authenticated */}
           <Route path="/command/transactions/initial-amount" element={<InitialAmountPage />} />
 
-          {/* ----------------------------- */}
-          {/* CREDIT FLOWS (itemType = 1)   */}
-          {/* ----------------------------- */}
-          <Route path="/command/transactions/credits" element={<ItemsListPage itemType={1} />} />
+          {/* ====================================================== */}
+          {/*                     CREDIT FLOWS (1)                   */}
+          {/* ====================================================== */}
+          <Route path="/command/transactions/credits">
+            {/* List */}
+            <Route index element={<ItemsListPage itemType={1} />} />
 
-          {/* Select Period */}
-          <Route
-            path="/command/transactions/credits/new"
-            element={<SelectPeriodPage itemType={1} />}
-          />
+            {/* Select Period */}
+            <Route path="new" element={<SelectPeriodPage itemType={1} />} />
 
-          {/* One-Time (Period 1) */}
-          <Route
-            path="/command/transactions/credits/new/1"
-            element={<AddOneTimePage itemType={1} />}
-          />
-          <Route
-            path="/command/transactions/credits/1/:id/edit"
-            element={<EditOneTimePage itemType={1} />}
-          />
+            {/* One-Time (Period 1) */}
+            <Route path="new/1" element={<AddOneTimePage itemType={1} />} />
+            <Route path="1/:id/edit" element={<EditOneTimePage itemType={1} />} />
 
-          {/* Daily (Period 2) */}
-          <Route
-            path="/command/transactions/credits/new/2"
-            element={<AddDailyPage itemType={1} />}
-          />
-          <Route
-            path="/command/transactions/credits/2/:id/edit"
-            element={<EditDailyPage itemType={1} />}
-          />
+            {/* Daily (Period 2) */}
+            <Route path="new/2" element={<AddDailyPage itemType={1} />} />
+            <Route path="2/:id/edit" element={<EditDailyPage itemType={1} />} />
 
-          {/* ----------------------------- */}
-          {/* DEBIT FLOWS (itemType = 2)    */}
-          {/* ----------------------------- */}
-          <Route path="/command/transactions/debits" element={<ItemsListPage itemType={2} />} />
+            {/* Weekly (Period 3) */}
+            <Route path="new/3" element={<AddWeeklyPage itemType={1} />} />
+            <Route path="3/:id/edit" element={<EditWeeklyPage itemType={1} />} />
+          </Route>
 
-          {/* Select Period */}
-          <Route
-            path="/command/transactions/debits/new"
-            element={<SelectPeriodPage itemType={2} />}
-          />
+          {/* ====================================================== */}
+          {/*                     DEBIT FLOWS (2)                    */}
+          {/* ====================================================== */}
+          <Route path="/command/transactions/debits">
+            {/* List */}
+            <Route index element={<ItemsListPage itemType={2} />} />
 
-          {/* One-Time (Period 1) */}
-          <Route
-            path="/command/transactions/debits/new/1"
-            element={<AddOneTimePage itemType={2} />}
-          />
-          <Route
-            path="/command/transactions/debits/1/:id/edit"
-            element={<EditOneTimePage itemType={2} />}
-          />
+            {/* Select Period */}
+            <Route path="new" element={<SelectPeriodPage itemType={2} />} />
 
-          {/* Daily (Period 2) */}
-          <Route
-            path="/command/transactions/debits/new/2"
-            element={<AddDailyPage itemType={2} />}
-          />
-          <Route
-            path="/command/transactions/debits/2/:id/edit"
-            element={<EditDailyPage itemType={2} />}
-          />
+            {/* One-Time (Period 1) */}
+            <Route path="new/1" element={<AddOneTimePage itemType={2} />} />
+            <Route path="1/:id/edit" element={<EditOneTimePage itemType={2} />} />
+
+            {/* Daily (Period 2) */}
+            <Route path="new/2" element={<AddDailyPage itemType={2} />} />
+            <Route path="2/:id/edit" element={<EditDailyPage itemType={2} />} />
+
+            {/* Weekly (Period 3) */}
+            <Route path="new/3" element={<AddWeeklyPage itemType={2} />} />
+            <Route path="3/:id/edit" element={<EditWeeklyPage itemType={2} />} />
+          </Route>
         </Route>
       </Route>
 
