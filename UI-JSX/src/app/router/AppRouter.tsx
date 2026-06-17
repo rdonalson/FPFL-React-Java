@@ -29,6 +29,8 @@ import EditWeeklyPage from '@/features/catalog-command/transactions/components/i
 // Every Two Weeks
 import AddEveryTwoWeeksPage from '@/features/catalog-command/transactions/components/items/occurrence/every-two-weeks/AddEveryTwoWeeksPage';
 import EditEveryTwoWeeksPage from '@/features/catalog-command/transactions/components/items/occurrence/every-two-weeks/EditEveryTwoWeeksPage';
+import EditBiMonthlyPage from '@/features/catalog-command/transactions/components/items/occurrence/bi-monthly/EditBiMonthlyPage';
+import AddBiMonthlyPage from '@/features/catalog-command/transactions/components/items/occurrence/bi-monthly/AddBiMonthlyPage';
 
 export function AppRouter() {
   return (
@@ -74,6 +76,10 @@ export function AppRouter() {
             {/* Every Two Weeks (Period 4) */}
             <Route path="new/4" element={<AddEveryTwoWeeksPage itemType={1} />} />
             <Route path="4/:id/edit" element={<EditEveryTwoWeeksPage itemType={1} />} />
+
+            {/* Bi-Monthly (Period 5) */}
+            <Route path="new/5" element={<AddBiMonthlyPage itemType={1} />} />
+            <Route path="5/:id/edit" element={<EditBiMonthlyPage itemType={1} />} />
           </Route>
 
           {/* ====================================================== */}
@@ -101,6 +107,10 @@ export function AppRouter() {
             {/* Every Two Weeks (Period 4) */}
             <Route path="new/4" element={<AddEveryTwoWeeksPage itemType={2} />} />
             <Route path="4/:id/edit" element={<EditEveryTwoWeeksPage itemType={2} />} />
+
+            {/* Bi-Monthly (Period 5) */}
+            <Route path="new/5" element={<AddBiMonthlyPage itemType={2} />} />
+            <Route path="5/:id/edit" element={<EditBiMonthlyPage itemType={2} />} />
           </Route>
         </Route>
       </Route>
