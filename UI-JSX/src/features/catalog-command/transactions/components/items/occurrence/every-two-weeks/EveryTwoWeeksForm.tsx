@@ -1,16 +1,17 @@
-// src/features/catalog-command/transactions/components/items/occurrence/weekly/WeeklyForm.tsx
+// src/features/catalog-command/transactions/components/items/occurrence/every-two-weeks/EveryTwoWeeksForm.tsx
 import React, { useEffect, useState } from 'react';
 import { Card } from 'primereact/card';
 import { Toast } from 'primereact/toast';
 import { InputText } from 'primereact/inputtext';
 import { InputNumber } from 'primereact/inputnumber';
+import { Calendar } from 'primereact/calendar';
 import { Button } from 'primereact/button';
 
 import type { Item } from '../../../../types/Item';
 import { getSessionUserId } from '@/app/state/sessionHelpers';
 import { WeekdayRadioGroup } from '@/features/catalog-command/transactions/components/common/WeekdayRadioGroup';
 
-interface WeeklyFormProps {
+interface EveryTwoWeeksFormProps {
   itemType: number;
   initial: Item | null;
   create: (payload: Item) => Promise<Item>;
@@ -18,24 +19,30 @@ interface WeeklyFormProps {
   onSaved: () => void;
 }
 
-export default function WeeklyForm({
+export default function EveryTwoWeeksForm({
   itemType,
   initial,
   create,
   update,
   onSaved,
-}: WeeklyFormProps) {
+}: EveryTwoWeeksFormProps) {
   const toastRef = React.useRef<Toast | null>(null);
 
   const [name, setName] = useState(initial?.name ?? '');
   const [amount, setAmount] = useState<number | null>(initial?.amount ?? null);
-  const [weeklyDow, setWeeklyDow] = useState<number | null>(initial?.weeklyDow ?? null);
+  const [beginDate, setBeginDate] = useState<Date | null>(
+    initial?.beginDate ? new Date(initial.beginDate) : null,
+  );
+  const [everyOtherWeekDow, setEveryOtherWeekDow] = useState<number | null>(
+    initial?.everyOtherWeekDow ?? null,
+  );
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     setName(initial?.name ?? '');
     setAmount(initial?.amount ?? null);
-    setWeeklyDow(initial?.weeklyDow ?? null);
+    setBeginDate(initial?.beginDate ? new Date(initial.beginDate) : null);
+    setEveryOtherWeekDow(initial?.everyOtherWeekDow ?? null);
   }, [initial]);
 
   async function handleSave(e?: React.FormEvent) {
@@ -66,7 +73,17 @@ export default function WeeklyForm({
         return;
       }
 
-      if (weeklyDow === null) {
+      if (!beginDate) {
+        toastRef.current?.show({
+          severity: 'warn',
+          summary: 'Validation',
+          detail: 'Inception date is required.',
+        });
+        setSaving(false);
+        return;
+      }
+
+      if (everyOtherWeekDow === null) {
         toastRef.current?.show({
           severity: 'warn',
           summary: 'Validation',
@@ -82,8 +99,9 @@ export default function WeeklyForm({
         name: name.trim(),
         amount,
         fkItemType: itemType,
-        fkPeriod: 3, // ⭐ WEEKLY
-        weeklyDow, // ⭐ correct backend field
+        fkPeriod: 4, // ⭐ EVERY TWO WEEKS
+        beginDate: beginDate.toISOString(),
+        everyOtherWeekDow, // ⭐ correct backend field
       };
 
       if (initial?.id) {
@@ -139,10 +157,21 @@ export default function WeeklyForm({
             />
           </div>
 
+          {/* Inception Date */}
+          <div>
+            <label className="block mb-2">Inception Date</label>
+            <Calendar
+              value={beginDate}
+              onChange={e => setBeginDate(e.value as Date)}
+              showIcon
+              className="w-full"
+            />
+          </div>
+
           {/* Weekday Selector */}
           <div className="col-span-2">
             <label className="block mb-2">Select Weekday</label>
-            <WeekdayRadioGroup value={weeklyDow} onChange={setWeeklyDow} />
+            <WeekdayRadioGroup value={everyOtherWeekDow} onChange={setEveryOtherWeekDow} />
           </div>
         </div>
       </Card>

@@ -1,6 +1,4 @@
 // src/features/catalog-command/transactions/types/Item.ts
-
-// C:\Users\rickd\source\repos\FPFL-React-Java\UI-JSX\src\features\catalog-command\transactions\types\Item
 export interface ItemTypeDto {
   Id: number;
   Name?: string;

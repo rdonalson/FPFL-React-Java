@@ -1,4 +1,4 @@
-// src/features/catalog-command/transactions/components/items/forms/DailyForm.tsx
+// src/features/catalog-command/transactions/components/items/occurrence/daily/DailyForm.tsx
 import React, { useEffect, useState } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { InputNumber } from 'primereact/inputnumber';

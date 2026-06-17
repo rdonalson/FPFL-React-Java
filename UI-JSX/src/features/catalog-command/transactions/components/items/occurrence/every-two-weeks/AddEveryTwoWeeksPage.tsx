@@ -1,12 +1,12 @@
-// src/features/catalog-command/transactions/components/items/occurrence/weekly/AddWeeklyPage.tsx
+// src/features/catalog-command/transactions/components/items/occurrence/every-two-weeks/AddEveryTwoWeeksPage.tsx
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from 'primereact/card';
 
-import WeeklyForm from './WeeklyForm';
+import EveryTwoWeeksForm from './EveryTwoWeeksForm';
 import { useItem } from '../../../../hooks/useItem';
 
-export default function AddWeeklyPage({ itemType }: { itemType: number }) {
+export default function AddEveryTwoWeeksPage({ itemType }: { itemType: number }) {
   const navigate = useNavigate();
   const { create } = useItem();
 
@@ -19,12 +19,12 @@ export default function AddWeeklyPage({ itemType }: { itemType: number }) {
     <div className="p-4">
       <Card>
         <h2 className="text-lg font-semibold">
-          {itemType === 1 ? 'Add Weekly Credit' : 'Add Weekly Debit'}
+          {itemType === 1 ? 'Add Every Two Weeks Credit' : 'Add Every Two Weeks Debit'}
         </h2>
       </Card>
 
       <div className="mt-3">
-        <WeeklyForm
+        <EveryTwoWeeksForm
           itemType={itemType}
           initial={null}
           create={create}

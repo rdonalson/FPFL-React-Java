@@ -1,4 +1,4 @@
-import React from 'react';
+// src/features/catalog-command/transactions/components/items/occurrence/one-time/AddOneTimePage.tsx
 import { useNavigate } from 'react-router-dom';
 import { Card } from 'primereact/card';
 

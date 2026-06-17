@@ -1,79 +1,67 @@
-// src/features/catalog-command/transactions/components/items/occurrence/daily/EditDailyPage.tsx
+// src/features/catalog-command/transactions/components/items/occurrence/every-two-weeks/EditEveryTwoWeeksPage.tsx
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card } from 'primereact/card';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Toast } from 'primereact/toast';
 
-import DailyForm from './DailyForm';
+import EveryTwoWeeksForm from './EveryTwoWeeksForm';
 import { useItem } from '../../../../hooks/useItem';
-import type { Item } from '../../../../types/Item';
 import { getSessionUserId } from '@/app/state/sessionHelpers';
+import type { Item } from '../../../../types/Item';
 
-interface EditDailyPageProps {
-  itemType: number;
-}
-
-export default function EditDailyPage({ itemType }: EditDailyPageProps) {
-  const { id } = useParams<{ id: string }>();
+export default function EditEveryTwoWeeksPage({ itemType }: { itemType: number }) {
+  const { id } = useParams();
   const navigate = useNavigate();
   const toastRef = React.useRef<Toast | null>(null);
 
   const { items, loadForUserAndType, update } = useItem();
   const [item, setItem] = useState<Item | null>(null);
-  const [localLoading, setLocalLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let mounted = true;
 
     async function load() {
-      setLocalLoading(true);
+      setLoading(true);
       try {
-        if (!id) throw new Error('Missing id');
-
-        // Try to find item in already-loaded items
         const found = items?.find(it => String(it.id) === String(id));
         if (found) {
           if (mounted) setItem(found);
           return;
         }
 
-        // Otherwise load items for this user + type
         const userId = getSessionUserId();
         if (!userId) throw new Error('No user session');
-
         await loadForUserAndType(userId, itemType);
 
         const refreshed = (items ?? []).find(it => String(it.id) === String(id));
         if (mounted) setItem(refreshed ?? null);
       } catch (err: any) {
-        console.error('Failed to load item', err);
         toastRef.current?.show({
           severity: 'error',
           summary: 'Load failed',
-          detail: err?.message ?? 'Could not load item',
+          detail: err?.message,
         });
       } finally {
-        if (mounted) setLocalLoading(false);
+        if (mounted) setLoading(false);
       }
     }
 
     load();
-
     return () => {
       mounted = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, items]);
+  }, [id, items, itemType, loadForUserAndType]);
 
   function handleSaved() {
     const base = itemType === 1 ? '/command/transactions/credits' : '/command/transactions/debits';
     navigate(base);
   }
 
-  if (localLoading) {
+  if (loading) {
     return (
-      <div className="p-4 flex items-center justify-center">
+      <div className="p-4 flex justify-center">
         <ProgressSpinner />
       </div>
     );
@@ -83,7 +71,7 @@ export default function EditDailyPage({ itemType }: EditDailyPageProps) {
     return (
       <div className="p-4">
         <Card>
-          <h3 className="text-red-600">Item not found</h3>
+          <h3>Item not found</h3>
         </Card>
       </div>
     );
@@ -94,16 +82,16 @@ export default function EditDailyPage({ itemType }: EditDailyPageProps) {
       <Toast ref={toastRef} />
       <Card>
         <h2 className="text-lg font-semibold">
-          {itemType === 1 ? 'Edit Daily Credit' : 'Edit Daily Debit'}
+          {itemType === 1 ? 'Edit Every Two Weeks Credit' : 'Edit Every Two Weeks Debit'}
         </h2>
       </Card>
 
       <div className="mt-3">
-        <DailyForm
+        <EveryTwoWeeksForm
           itemType={itemType}
           initial={item}
           create={async () => {
-            throw new Error('create not supported here');
+            throw new Error('create not supported');
           }}
           update={update}
           onSaved={handleSaved}

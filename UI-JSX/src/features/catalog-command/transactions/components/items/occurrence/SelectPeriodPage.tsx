@@ -1,4 +1,4 @@
-// src/features/catalog-command/transactions/components/items/SelectPeriodPage.tsx
+// src/features/catalog-command/transactions/components/items/occurrence/SelectPeriodPage.tsx
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from 'primereact/card';
