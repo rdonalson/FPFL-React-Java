@@ -147,7 +147,7 @@ export default function BiMonthlyForm({
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3 inline-dropdown">
+          <div className="grid grid-cols-2 gap-3 inline-dropdown-borders">
             {/* Bi-Monthly Day 1 */}
             <div>
               <label className="block mb-2">Day 1</label>
