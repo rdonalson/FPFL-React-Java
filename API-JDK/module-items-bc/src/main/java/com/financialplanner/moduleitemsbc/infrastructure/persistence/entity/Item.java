@@ -1,6 +1,5 @@
 package com.financialplanner.moduleitemsbc.infrastructure.persistence.entity;
 
-import com.financialplanner.modulecommonbc.converters.BooleanToBitConverter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
@@ -133,7 +132,6 @@ public class Item {
      * BooleanToBitConverter class.
      * The field is mapped to the "date_range_req" column in the database and cannot be null.
      */
-    @Convert(converter = BooleanToBitConverter.class)
     @Column(name = "date_range_req", nullable = false)
     private Boolean DateRangeReq = false;
 

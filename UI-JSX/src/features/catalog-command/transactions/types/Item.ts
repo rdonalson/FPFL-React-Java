@@ -43,7 +43,7 @@ export interface Item {
   semiAnnual2Day?: number | null;
   annualMoy?: number | null;
   annualDom?: number | null;
-  dateRangeReq?: boolean | null;
+  dateRangeReq: boolean | false;
 
   // POST/PUT fields expected by backend
   fkItemType?: number;
