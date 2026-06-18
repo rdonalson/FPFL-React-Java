@@ -42,6 +42,14 @@ import AddMonthlyPage from '@/features/catalog-command/transactions/components/i
 import EditQuarterlyPage from '@/features/catalog-command/transactions/components/items/occurrence/quarterly/EditQuarterlyPage';
 import AddQuarterlyPage from '@/features/catalog-command/transactions/components/items/occurrence/quarterly/AddQuarterlyPage';
 
+// Semi-Annual
+import AddSemiAnnualPage from '@/features/catalog-command/transactions/components/items/occurrence/semi-annual/AddSemiAnnualPage';
+import EditSemiAnnualPage from '@/features/catalog-command/transactions/components/items/occurrence/semi-annual/EditSemiAnnualPage';
+
+// Annual
+// import AddAnnualPage from '@/features/catalog-command/transactions/components/items/occurrence/annual/AddAnnualPage';
+// import EditAnnualPage from '@/features/catalog-command/transactions/components/items/occurrence/annual/EditAnnualPage';
+
 export function AppRouter() {
   return (
     <Routes>
@@ -98,6 +106,10 @@ export function AppRouter() {
             {/* Quarterly (Period 7) */}
             <Route path="new/7" element={<AddQuarterlyPage itemType={1} />} />
             <Route path="7/:id/edit" element={<EditQuarterlyPage itemType={1} />} />
+
+            {/* Semi-Annual (Period 8) */}
+            <Route path="new/8" element={<AddSemiAnnualPage itemType={1} />} />
+            <Route path="8/:id/edit" element={<EditSemiAnnualPage itemType={1} />} />
           </Route>
 
           {/* ====================================================== */}
@@ -137,6 +149,10 @@ export function AppRouter() {
             {/* Quarterly (Period 7) */}
             <Route path="new/7" element={<AddQuarterlyPage itemType={2} />} />
             <Route path="7/:id/edit" element={<EditQuarterlyPage itemType={2} />} />
+
+            {/* Semi-Annual (Period 8) */}
+            <Route path="new/8" element={<AddSemiAnnualPage itemType={2} />} />
+            <Route path="8/:id/edit" element={<EditSemiAnnualPage itemType={2} />} />
           </Route>
         </Route>
       </Route>

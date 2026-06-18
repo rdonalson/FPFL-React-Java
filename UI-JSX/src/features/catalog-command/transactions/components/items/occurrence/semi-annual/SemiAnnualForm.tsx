@@ -1,4 +1,4 @@
-// src/features/catalog-command/transactions/components/items/occurrence/quarterly/QuarterlyForm.tsx
+// src/features/catalog-command/transactions/components/items/occurrence/semiannual/SemiAnnualForm.tsx
 import React, { useEffect, useState } from 'react';
 import { Card } from 'primereact/card';
 import { Toast } from 'primereact/toast';
@@ -7,10 +7,10 @@ import { InputNumber } from 'primereact/inputnumber';
 import { Button } from 'primereact/button';
 
 import type { Item } from '../../../../types/Item';
-import { getSessionUserId } from '@/app/state/sessionHelpers';
 import MonthDayRow from '../../../common/MonthDayRow';
+import { getSessionUserId } from '@/app/state/sessionHelpers';
 
-interface QuarterlyFormProps {
+interface SemiAnnualFormProps {
   itemType: number;
   initial: Item | null;
   create: (payload: Item) => Promise<Item>;
@@ -18,29 +18,23 @@ interface QuarterlyFormProps {
   onSaved: () => void;
 }
 
-export default function QuarterlyForm({
+export default function SemiAnnualForm({
   itemType,
   initial,
   create,
   update,
   onSaved,
-}: QuarterlyFormProps) {
+}: SemiAnnualFormProps) {
   const toastRef = React.useRef<Toast | null>(null);
 
   const [name, setName] = useState(initial?.name ?? '');
   const [amount, setAmount] = useState<number | null>(initial?.amount ?? null);
 
-  const [q1Month, setQ1Month] = useState<number | null>(initial?.quarterly1Month ?? null);
-  const [q1Day, setQ1Day] = useState<number | null>(initial?.quarterly1Day ?? null);
+  const [semi1Month, setSemi1Month] = useState<number | null>(initial?.semiAnnual1Month ?? null);
+  const [semi1Day, setSemi1Day] = useState<number | null>(initial?.semiAnnual1Day ?? null);
 
-  const [q2Month, setQ2Month] = useState<number | null>(initial?.quarterly2Month ?? null);
-  const [q2Day, setQ2Day] = useState<number | null>(initial?.quarterly2Day ?? null);
-
-  const [q3Month, setQ3Month] = useState<number | null>(initial?.quarterly3Month ?? null);
-  const [q3Day, setQ3Day] = useState<number | null>(initial?.quarterly3Day ?? null);
-
-  const [q4Month, setQ4Month] = useState<number | null>(initial?.quarterly4Month ?? null);
-  const [q4Day, setQ4Day] = useState<number | null>(initial?.quarterly4Day ?? null);
+  const [semi2Month, setSemi2Month] = useState<number | null>(initial?.semiAnnual2Month ?? null);
+  const [semi2Day, setSemi2Day] = useState<number | null>(initial?.semiAnnual2Day ?? null);
 
   const [saving, setSaving] = useState(false);
 
@@ -48,17 +42,11 @@ export default function QuarterlyForm({
     setName(initial?.name ?? '');
     setAmount(initial?.amount ?? null);
 
-    setQ1Month(initial?.quarterly1Month ?? null);
-    setQ1Day(initial?.quarterly1Day ?? null);
+    setSemi1Month(initial?.semiAnnual1Month ?? null);
+    setSemi1Day(initial?.semiAnnual1Day ?? null);
 
-    setQ2Month(initial?.quarterly2Month ?? null);
-    setQ2Day(initial?.quarterly2Day ?? null);
-
-    setQ3Month(initial?.quarterly3Month ?? null);
-    setQ3Day(initial?.quarterly3Day ?? null);
-
-    setQ4Month(initial?.quarterly4Month ?? null);
-    setQ4Day(initial?.quarterly4Day ?? null);
+    setSemi2Month(initial?.semiAnnual2Month ?? null);
+    setSemi2Day(initial?.semiAnnual2Day ?? null);
   }, [initial]);
 
   async function handleSave(e?: React.FormEvent) {
@@ -89,19 +77,17 @@ export default function QuarterlyForm({
         return;
       }
 
-      const quarters = [
-        { m: q1Month, d: q1Day, label: '1st Quarter' },
-        { m: q2Month, d: q2Day, label: '2nd Quarter' },
-        { m: q3Month, d: q3Day, label: '3rd Quarter' },
-        { m: q4Month, d: q4Day, label: '4th Quarter' },
+      const annums = [
+        { m: semi1Month, d: semi1Day, label: '1st Annum' },
+        { m: semi2Month, d: semi2Day, label: '2nd Annum' },
       ];
 
-      for (const q of quarters) {
-        if (q.m === null || q.d === null) {
+      for (const a of annums) {
+        if (a.m === null || a.d === null) {
           toastRef.current?.show({
             severity: 'warn',
             summary: 'Validation',
-            detail: `${q.label}: Month and Day are required.`,
+            detail: `${a.label}: Month and Day are required.`,
           });
           setSaving(false);
           return;
@@ -114,19 +100,13 @@ export default function QuarterlyForm({
         name: name.trim(),
         amount,
         fkItemType: itemType,
-        fkPeriod: 7, // ⭐ QUARTERLY
+        fkPeriod: 8, // ⭐ SEMI-ANNUAL
 
-        quarterly1Month: q1Month,
-        quarterly1Day: q1Day,
+        semiAnnual1Month: semi1Month,
+        semiAnnual1Day: semi1Day,
 
-        quarterly2Month: q2Month,
-        quarterly2Day: q2Day,
-
-        quarterly3Month: q3Month,
-        quarterly3Day: q3Day,
-
-        quarterly4Month: q4Month,
-        quarterly4Day: q4Day,
+        semiAnnual2Month: semi2Month,
+        semiAnnual2Day: semi2Day,
 
         dateRangeReq: false,
       };
@@ -184,37 +164,21 @@ export default function QuarterlyForm({
             />
           </div>
 
-          {/* Quarter Rows */}
+          {/* Semi-Annual Rows */}
           <MonthDayRow
-            label="1st Quarter"
-            month={q1Month}
-            day={q1Day}
-            setMonth={setQ1Month}
-            setDay={setQ1Day}
+            label="1st Annum"
+            month={semi1Month}
+            day={semi1Day}
+            setMonth={setSemi1Month}
+            setDay={setSemi1Day}
           />
 
           <MonthDayRow
-            label="2nd Quarter"
-            month={q2Month}
-            day={q2Day}
-            setMonth={setQ2Month}
-            setDay={setQ2Day}
-          />
-
-          <MonthDayRow
-            label="3rd Quarter"
-            month={q3Month}
-            day={q3Day}
-            setMonth={setQ3Month}
-            setDay={setQ3Day}
-          />
-
-          <MonthDayRow
-            label="4th Quarter"
-            month={q4Month}
-            day={q4Day}
-            setMonth={setQ4Month}
-            setDay={setQ4Day}
+            label="2nd Annum"
+            month={semi2Month}
+            day={semi2Day}
+            setMonth={setSemi2Month}
+            setDay={setSemi2Day}
           />
         </div>
       </Card>

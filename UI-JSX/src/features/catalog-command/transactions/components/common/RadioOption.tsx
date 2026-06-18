@@ -1,3 +1,4 @@
+// src/features/catalog-command/transactions/components/common/RadioOption.tsx
 import { RadioButton } from 'primereact/radiobutton';
 
 export interface RadioOptionProps {
