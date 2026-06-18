@@ -20,8 +20,8 @@ Java 25 · Spring Boot 4.x · Spring Data JPA · Maven · PostgreSQL 16+
 
 ## Quick links
 
-- **API module**: `api/` (runnable Spring Boot app)  
-- **Docs**: `API-JDK/docs/` (ER diagrams, screenshots)  
+- **API module**: `api/` (runnable Spring Boot app)
+- **Docs**: `API-JDK/docs/` (ER diagrams, screenshots)
 - **License**: `../LICENSE` (MIT)
 
 ---
@@ -32,12 +32,12 @@ Each module is packaged as a **JAR** and built under a unified parent POM.
 
 ### API-JDK/
 
-- ├── api/        # REST API, controllers, DTOs, app bootstrap
-- ├── auth/       # Authentication and authorization (module-auth)
-- ├── items/      # Domain + persistence for source data
-- ├── display/    # Read models, projections, query handlers
-- ├── common/     # Shared utilities, exceptions, config
-- └── pom.xml     # Parent POM (dependencyManagement + modules)
+- ├── api/ # REST API, controllers, DTOs, app bootstrap
+- ├── auth/ # Authentication and authorization (module-auth)
+- ├── items/ # Domain + persistence for source data
+- ├── display/ # Read models, projections, query handlers
+- ├── common/ # Shared utilities, exceptions, config
+- └── pom.xml # Parent POM (dependencyManagement + modules)
 
 ---
 
@@ -108,36 +108,36 @@ Below is a summary of the schema represented in the ER diagram.
 
 Stores all user‑defined financial items, including scheduling metadata.
 
-| **Column** | **Description** |
-| --- | --- |
-| **id** | Primary key |
-| **user_id** | Owner of the item (UUID referencing ``users.userID``) |
-| **name** | Item name |
-| **amount** | Monetary value |
-| **fk_item_type** | Foreign key → ``item_types.id`` |
-| **fk_time_period** | Foreign key → ``time_periods.id`` |
-| **begin_date** | Start date |
-| **end_date** | End date |
-| **weekly_dow** | Weekly day of week (0–6 or 1–7 depending on app convention) |
-| **every_other_week_dow** | Bi‑weekly day of week |
-| **bi_monthly_day_1** | First bi‑monthly day |
-| **bi_monthly_day_2** | Second bi‑monthly day |
-| **monthly_dom** | Monthly day of month |
-| **quarterly_1_month** | Q1 month |
-| **quarterly_1_day** | Q1 day |
-| **quarterly_2_month** | Q2 month |
-| **quarterly_2_day** | Q2 day |
-| **quarterly_3_month** | Q3 month |
-| **quarterly_3_day** | Q3 day |
-| **quarterly_4_month** | Q4 month |
-| **quarterly_4_day** | Q4 day |
-| **semi_annual_1_month** | First semi‑annual month |
-| **semi_annual_1_day** | First semi‑annual day |
-| **semi_annual_2_month** | Second semi‑annual month |
-| **semi_annual_2_day** | Second semi‑annual day |
-| **annual_moy** | Annual month of year |
-| **annual_dom** | Annual day of month |
-| **date_range_req** | Whether a date range is required (flag or descriptor) |
+| **Column**               | **Description**                                             |
+| ------------------------ | ----------------------------------------------------------- |
+| **id**                   | Primary key                                                 |
+| **user_id**              | Owner of the item (UUID referencing `users.userID`)         |
+| **name**                 | Item name                                                   |
+| **amount**               | Monetary value                                              |
+| **fk_item_type**         | Foreign key → `item_types.id`                               |
+| **fk_time_period**       | Foreign key → `time_periods.id`                             |
+| **begin_date**           | Start date                                                  |
+| **end_date**             | End date                                                    |
+| **weekly_dow**           | Weekly day of week (0–6 or 1–7 depending on app convention) |
+| **every_other_week_dow** | Bi‑weekly day of week                                       |
+| **bi_monthly_day_1**     | First bi‑monthly day                                        |
+| **bi_monthly_day_2**     | Second bi‑monthly day                                       |
+| **monthly_dom**          | Monthly day of month                                        |
+| **quarterly_1_month**    | Q1 month                                                    |
+| **quarterly_1_day**      | Q1 day                                                      |
+| **quarterly_2_month**    | Q2 month                                                    |
+| **quarterly_2_day**      | Q2 day                                                      |
+| **quarterly_3_month**    | Q3 month                                                    |
+| **quarterly_3_day**      | Q3 day                                                      |
+| **quarterly_4_month**    | Q4 month                                                    |
+| **quarterly_4_day**      | Q4 day                                                      |
+| **semi_annual_1_month**  | First semi‑annual month                                     |
+| **semi_annual_1_day**    | First semi‑annual day                                       |
+| **semi_annual_2_month**  | Second semi‑annual month                                    |
+| **semi_annual_2_day**    | Second semi‑annual day                                      |
+| **annual_moy**           | Annual month of year                                        |
+| **annual_dom**           | Annual day of month                                         |
+| **date_range_req**       | Whether a date range is required (flag or descriptor)       |
 
 ---
 
@@ -145,10 +145,10 @@ Stores all user‑defined financial items, including scheduling metadata.
 
 Defines the type/category of an item.
 
-| **Column** | **Description** |
-| --- | --- |
-| **id** | Primary key |
-| **name** | Type name (e.g., rent, salary, subscription) |
+| **Column** | **Description**                              |
+| ---------- | -------------------------------------------- |
+| **id**     | Primary key                                  |
+| **name**   | Type name (e.g., rent, salary, subscription) |
 
 ---
 
@@ -156,10 +156,10 @@ Defines the type/category of an item.
 
 Defines the recurrence period for an item.
 
-| **Column** | **Description** |
-| --- | --- |
-| **id** | Primary key |
-| **name** | Type name (e.g., rent, salary, subscription) |
+| **Column** | **Description**                              |
+| ---------- | -------------------------------------------- |
+| **id**     | Primary key                                  |
+| **name**   | Type name (e.g., rent, salary, subscription) |
 
 ---
 
@@ -167,16 +167,16 @@ Defines the recurrence period for an item.
 
 Stores application user accounts used by the auth module and referenced by items.
 
-| **Column** | **Description** |
-| --- | --- |
-| **id** | Primary key (bigserial) used for relational joins |
-| **userID** | Application UUID for the user (used as ``items.user_id``) |
-| **email** | Unique username or email address |
-| **password_hash** | Hashed password (store only salted hashes) |
-| **first** | First name |
-| **last** | Last name |
-| **created_at** | Account creation timestamp |
-| **last_login** | Last successful login timestamp |
+| **Column**        | **Description**                                         |
+| ----------------- | ------------------------------------------------------- |
+| **id**            | Primary key (bigserial) used for relational joins       |
+| **userID**        | Application UUID for the user (used as `items.user_id`) |
+| **email**         | Unique username or email address                        |
+| **password_hash** | Hashed password (store only salted hashes)              |
+| **first**         | First name                                              |
+| **last**          | Last name                                               |
+| **created_at**    | Account creation timestamp                              |
+| **last_login**    | Last successful login timestamp                         |
 
 ---
 
@@ -184,10 +184,10 @@ Stores application user accounts used by the auth module and referenced by items
 
 Defines named roles for authorization.
 
-| **Column** | **Description** |
-| --- | --- |
-| **id** | Primary key (bigserial) |
-| **name** | Role name (e.g., ROLE_USER, ROLE_ADMIN) |
+| **Column** | **Description**                         |
+| ---------- | --------------------------------------- |
+| **id**     | Primary key (bigserial)                 |
+| **name**   | Role name (e.g., ROLE_USER, ROLE_ADMIN) |
 
 ---
 
@@ -195,10 +195,10 @@ Defines named roles for authorization.
 
 Join table mapping users to roles.
 
-| **Column** | **Description** |
-| --- | --- |
-| **user_id** | FK → ``users.id`` (links a user to a role) |
-| **role_id** | FK → ``roles.id`` (links a role to a user) |
+| **Column**  | **Description**                          |
+| ----------- | ---------------------------------------- |
+| **user_id** | FK → `users.id` (links a user to a role) |
+| **role_id** | FK → `roles.id` (links a role to a user) |
 
 ---
 
@@ -206,13 +206,13 @@ Join table mapping users to roles.
 
 Tracks refresh tokens for session management and revocation.
 
-| **Column** | **Description** |
-| --- | --- |
-| **id** | Primary key (bigserial) |
-| **token** | Stored token value or token identifier (store hashed token where possible) |
-| **user_id** | FK → ``users.id`` (owner of the token) |
-| **expiry_date** | Token expiration timestamp |
-| **revoked** | Optional boolean flag indicating token revocation (if implemented) |
+| **Column**      | **Description**                                                            |
+| --------------- | -------------------------------------------------------------------------- |
+| **id**          | Primary key (bigserial)                                                    |
+| **token**       | Stored token value or token identifier (store hashed token where possible) |
+| **user_id**     | FK → `users.id` (owner of the token)                                       |
+| **expiry_date** | Token expiration timestamp                                                 |
+| **revoked**     | Optional boolean flag indicating token revocation (if implemented)         |
 
 ---
 
@@ -285,7 +285,6 @@ mvn -pl api spring-boot:run
 ---
 
 Or run the packaged JAR:
-
 
 ```bash
 java -jar target/api-0.0.1-SNAPSHOT.jar
