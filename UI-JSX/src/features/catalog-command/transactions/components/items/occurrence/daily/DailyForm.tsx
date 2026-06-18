@@ -84,6 +84,7 @@ export default function DailyForm({ itemType, initial, onSaved, create, update }
         amount,
         fkPeriod: 2, // ⭐ DAILY
         fkItemType: itemType, // required by backend
+        dateRangeReq: false, // required by backend for validation
       } as Item;
 
       console.debug('DailyForm payload:', payload);

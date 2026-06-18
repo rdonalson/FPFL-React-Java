@@ -98,6 +98,7 @@ export default function OneTimeForm({
         fkPeriod: 1, // one-time period
         fkItemType: itemType, // required by backend
         beginDate: isoDate,
+        dateRangeReq: false, // required by backend for validation
       } as Item;
 
       // debug: inspect payload in console

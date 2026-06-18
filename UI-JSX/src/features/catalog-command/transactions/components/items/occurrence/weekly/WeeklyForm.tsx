@@ -84,6 +84,7 @@ export default function WeeklyForm({
         fkItemType: itemType,
         fkPeriod: 3, // ⭐ WEEKLY
         weeklyDow, // ⭐ correct backend field
+        dateRangeReq: false, // ⭐ required by backend for validation
       };
 
       if (initial?.id) {

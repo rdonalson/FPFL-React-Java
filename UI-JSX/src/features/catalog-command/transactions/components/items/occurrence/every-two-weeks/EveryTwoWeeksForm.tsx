@@ -102,6 +102,7 @@ export default function EveryTwoWeeksForm({
         fkPeriod: 4, // ⭐ EVERY TWO WEEKS
         beginDate: beginDate.toISOString(),
         everyOtherWeekDow, // ⭐ correct backend field
+        dateRangeReq: false, // required by backend for validation
       };
 
       if (initial?.id) {

@@ -85,6 +85,7 @@ export default function MonthlyForm({
         fkItemType: itemType,
         fkPeriod: 6, // ⭐ MONTHLY
         monthlyDom, // ⭐ correct backend field
+        dateRangeReq: false, // required by backend for validation
       };
 
       if (initial?.id) {
