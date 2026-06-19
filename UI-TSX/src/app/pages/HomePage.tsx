@@ -14,7 +14,7 @@ export function HomePage() {
     <div className="p-4 flex flex-column gap-4">
       {/* Hero Section */}
       <Card className="shadow-2">
-        <h1 className="text-3xl font-bold mb-2">Welcome to UI‑JSX</h1>
+        <h1 className="text-3xl font-bold mb-2">Welcome to UI-TSX</h1>
         <p className="text-lg text-color-secondary mb-3">
           A modular, enterprise‑grade React + PrimeReact workspace designed for clarity,
           scalability, and developer happiness.
