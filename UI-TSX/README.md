@@ -1,6 +1,6 @@
-# UI-JSX — React Frontend for FPFL-React-Java
+# UI-TSX — React Frontend for FPFL-React-Java
 
-UI-JSX is the React + TypeScript frontend for the FPFL platform.  
+UI-TSX is the React + TypeScript frontend for the FPFL platform.  
 It is built with Vite, follows a modular domain‑driven structure, and integrates cleanly with the Java 25 / Spring Boot 4 API.
 
 ---
@@ -24,7 +24,7 @@ The folder layout mirrors backend bounded contexts to keep the system consistent
 
 ### High‑level layout
 
-![API_Welcome_Page.png](./docs/images/UI-JSX%20Overview.png)
+![API_Welcome_Page.png](./docs/images/UI-TSX%20Overview.png)
 
 ### 🟦 public/
 

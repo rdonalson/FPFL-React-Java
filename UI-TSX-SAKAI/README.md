@@ -1,6 +1,6 @@
-# UI-JSX-SAKAI
+# UI-TSX-SAKAI
 
-UI-JSX-SAKAI is a modern Next.js 13+ web application integrating PrimeReact, the Sakai layout system, and a fully customizable SASS design system. It provides a clean, enterprise-ready foundation for scalable UI development, consistent theming, and maintainable architecture.
+UI-TSX-SAKAI is a modern Next.js 13+ web application integrating PrimeReact, the Sakai layout system, and a fully customizable SASS design system. It provides a clean, enterprise-ready foundation for scalable UI development, consistent theming, and maintainable architecture.
 
 ---
 
@@ -54,7 +54,7 @@ flowchart TD
 ## Project Structure
 
 ```
-ui-jsx-sakai/
+ui-tsx-sakai/
 │
 ├── app/
 │   ├── layout.tsx              # Root layout mapping Sakai → Next.js
