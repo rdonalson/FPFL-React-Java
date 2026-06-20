@@ -1,0 +1,32 @@
+@use 'variables';
+
+/* 1. Remove Card padding on mobile */
+@media (max-width: 767px) {
+  .p-card {
+    padding: 0 !important;
+    border-radius: 0 !important;
+  }
+}
+
+/* 2. Stop PrimeReact's .flex-1 from breaking Tailwind */
+.weekly-form,
+.biweekly-form,
+.monthly-form,
+.semi-monthly-form,
+.quarterly-form,
+.semi-annual-form,
+.annual-form,
+.custom-ndays-form {
+  .flex-1 {
+    flex: initial !important;
+  }
+}
+
+/* 3. Make occurrence cards full width on mobile */
+@media (max-width: 767px) {
+  .occurrence-card {
+    width: 100% !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+  }
+}

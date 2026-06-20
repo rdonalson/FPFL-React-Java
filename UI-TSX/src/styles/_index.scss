@@ -1,0 +1,11 @@
+/* src/styles/_index.scss */
+
+/* Re-export all partials */
+@forward 'variables';
+@forward 'mixins';
+@forward 'global';
+@forward 'forms';
+@forward 'login';
+@forward 'radiobutton';
+@forward 'checkbox';
+@forward 'primereact-overrides';

@@ -1,12 +1,9 @@
-// src/main.tsx
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
 import App from './app/App';
 import { AppProviders } from './app/providers/AppProviders';
 import { BrowserRouter } from 'react-router-dom';
-import '@/styles/global.scss'; // global app styles (colors, spacing, utilities)
-import '@/styles/forms.scss'; // form/grid helpers like .login-form-grid
 
 // PrimeReact global styles
 import 'primereact/resources/primereact.min.css';
@@ -15,24 +12,18 @@ import 'primeicons/primeicons.css';
 // PrimeFlex
 import 'primeflex/primeflex.css';
 
-// Tailwind + your global styles
+// Tailwind (must load BEFORE SCSS)
 import './index.css';
 
-// App config bootstrap (initializes runtime overrides)
+// Global SCSS (loads AFTER Tailwind)
+import '@/styles/main.scss';
+
 import { initAppConfig } from '@/config/appConfig';
 
 async function bootstrap() {
-  try {
-    // Load runtime config (server-injected / public/config.json) and merge with build-time defaults
-    await initAppConfig();
-  } catch (err) {
-    // Non-fatal: log and continue with build-time defaults
-    // eslint-disable-next-line no-console
-    console.error('Failed to initialize runtime config, continuing with defaults', err);
-  }
+  await initAppConfig();
 
-  const root = ReactDOM.createRoot(document.getElementById('root')!);
-  root.render(
+  ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
       <HelmetProvider>
         <BrowserRouter>
@@ -45,5 +36,4 @@ async function bootstrap() {
   );
 }
 
-// Start the app
 bootstrap();

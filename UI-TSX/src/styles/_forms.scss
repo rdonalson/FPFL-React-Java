@@ -1,4 +1,17 @@
-// /* src/styles/forms.css */
+// /* src/styles/_forms.scss */
+
+@use 'variables';
+
+/* Shared form layout helpers */
+
+.form-label {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.form-section {
+  margin-top: 1.25rem;
+}
 
 /* Additional shared styles for all forms */
 .auth-form-grid {
@@ -28,13 +41,17 @@
   .auth-form-grid {
     grid-template-columns: 1fr;
   }
+
   .form-label {
     justify-self: start;
     padding-right: 0;
   }
 }
+
 /* Additional styles for inline dropdowns in occurrence forms */
 .inline-dropdown-borders {
   margin-right: 0 !important;
   margin-left: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }

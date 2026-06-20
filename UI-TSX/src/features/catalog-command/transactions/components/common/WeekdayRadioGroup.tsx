@@ -9,7 +9,7 @@ export interface WeekdayRadioGroupProps {
 
 export function WeekdayRadioGroup({ value, onChange, className = '' }: WeekdayRadioGroupProps) {
   return (
-    <div className={`flex gap-4 ${className}`}>
+    <div className={`flex flex-col sm:flex-row flex-wrap gap-4 ${className}`}>
       {WEEKDAYS.map(d => (
         <RadioOption
           key={d.value}

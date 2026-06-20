@@ -70,7 +70,7 @@ export default function EditWeeklyPage({ itemType }: { itemType: number }) {
   if (!item) {
     return (
       <div className="p-4">
-        <Card>
+        <Card className="w-full">
           <h3>Item not found</h3>
         </Card>
       </div>
@@ -78,15 +78,18 @@ export default function EditWeeklyPage({ itemType }: { itemType: number }) {
   }
 
   return (
-    <div className="p-4">
+    <div className="p-0 md:p-4 w-full">
       <Toast ref={toastRef} />
-      <Card>
+
+      {/* Title Card */}
+      <Card className="w-full mb-3">
         <h2 className="text-lg font-semibold">
           {itemType === 1 ? 'Edit Weekly Credit' : 'Edit Weekly Debit'}
         </h2>
       </Card>
 
-      <div className="mt-3">
+      {/* Weekly Form */}
+      <Card className="w-full">
         <WeeklyForm
           itemType={itemType}
           initial={item}
@@ -96,7 +99,7 @@ export default function EditWeeklyPage({ itemType }: { itemType: number }) {
           update={update}
           onSaved={handleSaved}
         />
-      </div>
+      </Card>
     </div>
   );
 }

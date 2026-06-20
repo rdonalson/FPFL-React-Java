@@ -23,7 +23,7 @@ export default function AddWeeklyPage({ itemType }: { itemType: number }) {
         </h2>
       </Card>
 
-      <div className="mt-3">
+      <div className="mt-3 w-full">
         <WeeklyForm
           itemType={itemType}
           initial={null}

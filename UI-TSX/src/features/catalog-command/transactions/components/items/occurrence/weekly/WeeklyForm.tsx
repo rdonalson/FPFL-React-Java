@@ -1,14 +1,13 @@
-// src/features/catalog-command/transactions/components/items/occurrence/weekly/WeeklyForm.tsx
 import React, { useEffect, useState } from 'react';
 import { Card } from 'primereact/card';
 import { Toast } from 'primereact/toast';
-import { InputText } from 'primereact/inputtext';
-import { InputNumber } from 'primereact/inputnumber';
 import { Button } from 'primereact/button';
 
 import type { Item } from '../../../../types/Item';
 import { getSessionUserId } from '@/app/state/sessionHelpers';
 import { WeekdayRadioGroup } from '@/features/catalog-command/transactions/components/common/WeekdayRadioGroup';
+import { TimeFrameSelector } from '@/features/catalog-command/transactions/components/common/TimeFrameSelector';
+import { HeaderFields } from '@/features/catalog-command/transactions/components/common/HeaderFields';
 
 interface WeeklyFormProps {
   itemType: number;
@@ -30,12 +29,26 @@ export default function WeeklyForm({
   const [name, setName] = useState(initial?.name ?? '');
   const [amount, setAmount] = useState<number | null>(initial?.amount ?? null);
   const [weeklyDow, setWeeklyDow] = useState<number | null>(initial?.weeklyDow ?? null);
+
+  // Time frame state
+  const [dateRangeReq, setDateRangeReq] = useState(initial?.dateRangeReq ?? false);
+  const [beginDate, setBeginDate] = useState<Date | null>(
+    initial?.beginDate ? new Date(initial.beginDate) : null,
+  );
+  const [endDate, setEndDate] = useState<Date | null>(
+    initial?.endDate ? new Date(initial.endDate) : null,
+  );
+
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     setName(initial?.name ?? '');
     setAmount(initial?.amount ?? null);
     setWeeklyDow(initial?.weeklyDow ?? null);
+
+    setDateRangeReq(initial?.dateRangeReq ?? false);
+    setBeginDate(initial?.beginDate ? new Date(initial.beginDate) : null);
+    setEndDate(initial?.endDate ? new Date(initial.endDate) : null);
   }, [initial]);
 
   async function handleSave(e?: React.FormEvent) {
@@ -82,9 +95,12 @@ export default function WeeklyForm({
         name: name.trim(),
         amount,
         fkItemType: itemType,
-        fkPeriod: 3, // ⭐ WEEKLY
-        weeklyDow, // ⭐ correct backend field
-        dateRangeReq: false, // ⭐ required by backend for validation
+        fkPeriod: 3,
+        weeklyDow,
+
+        dateRangeReq,
+        beginDate: dateRangeReq && beginDate ? beginDate.toISOString() : null,
+        endDate: dateRangeReq && endDate ? endDate.toISOString() : null,
       };
 
       if (initial?.id) {
@@ -119,34 +135,38 @@ export default function WeeklyForm({
     <form onSubmit={handleSave}>
       <Toast ref={toastRef} />
 
-      <Card>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {/* Name */}
-          <div>
-            <label className="block mb-2">Name</label>
-            <InputText value={name} onChange={e => setName(e.target.value)} className="w-full" />
-          </div>
-
-          {/* Amount */}
-          <div>
-            <label className="block mb-2">Amount</label>
-            <InputNumber
-              value={amount}
-              onValueChange={e => setAmount(e.value as number)}
-              mode="currency"
-              currency="USD"
-              locale="en-US"
-              className="w-full"
-            />
-          </div>
+      {/* Card goes full width on mobile */}
+      <div className="p-0 md:p-4 w-full">
+        <Card className="w-full">
+          {/* HeaderFields replaces Name + Amount */}
+          <HeaderFields
+            name={name}
+            amount={amount}
+            onNameChange={setName}
+            onAmountChange={setAmount}
+          />
 
           {/* Weekday Selector */}
-          <div className="col-span-2">
+          <div className="mt-4">
             <label className="block mb-2">Select Weekday</label>
             <WeekdayRadioGroup value={weeklyDow} onChange={setWeeklyDow} />
           </div>
-        </div>
-      </Card>
+
+          {/* Time Frame Selector */}
+          <div className="mt-4">
+            <TimeFrameSelector
+              dateRangeReq={dateRangeReq}
+              beginDate={beginDate}
+              endDate={endDate}
+              onChange={v => {
+                setDateRangeReq(v.dateRangeReq);
+                setBeginDate(v.beginDate);
+                setEndDate(v.endDate);
+              }}
+            />
+          </div>
+        </Card>
+      </div>
 
       <div className="mt-3 flex gap-2">
         <Button label="Save" icon="pi pi-check" type="submit" loading={saving} />
