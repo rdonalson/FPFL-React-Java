@@ -1,74 +1,54 @@
-// src/features/catalog-command/transactions/components/items/occurrence/one-time/OneTimeForm.tsx
 import React, { useEffect, useState } from 'react';
-import { InputText } from 'primereact/inputtext';
-import { Calendar } from 'primereact/calendar';
-import { InputNumber } from 'primereact/inputnumber';
-import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { Toast } from 'primereact/toast';
+import { Calendar } from 'primereact/calendar';
 
 import type { Item } from '../../../../types/Item';
 import { getSessionUserId } from '@/app/state/sessionHelpers';
+import { HeaderFields } from '@/features/catalog-command/transactions/components/common/HeaderFields';
+import { FormLayout } from '@/features/catalog-command/transactions/components/common/FormLayout';
 
 interface OneTimeFormProps {
-  itemType: number; // 1 = Credit, 2 = Debit (required)
-  initial?: Item | null;
-  onSaved?: () => void;
+  itemType: number;
+  initial: Item | null;
   create: (payload: Item) => Promise<Item>;
   update: (id: number, payload: Item) => Promise<Item>;
+  onSaved: () => void;
 }
 
 export default function OneTimeForm({
   itemType,
   initial,
-  onSaved,
   create,
   update,
+  onSaved,
 }: OneTimeFormProps) {
   const toastRef = React.useRef<Toast | null>(null);
 
-  const [name, setName] = useState<string>(initial?.name ?? '');
+  const [name, setName] = useState(initial?.name ?? '');
   const [amount, setAmount] = useState<number | null>(initial?.amount ?? null);
-  const [occurrence, setOccurrence] = useState<Date | null>(
-    initial?.beginDate ? new Date(initial.beginDate as string) : null,
+
+  // One-time occurrence uses beginDate only
+  const [beginDate, setBeginDate] = useState<Date | null>(
+    initial?.beginDate ? new Date(initial.beginDate) : null,
   );
+
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     setName(initial?.name ?? '');
     setAmount(initial?.amount ?? null);
-    setOccurrence(initial?.beginDate ? new Date(initial.beginDate as string) : null);
+    setBeginDate(initial?.beginDate ? new Date(initial.beginDate) : null);
   }, [initial]);
 
-  async function handleSave(e?: React.FormEvent) {
-    e?.preventDefault();
+  async function handleSave() {
     setSaving(true);
 
     try {
-      // Defensive check: ensure itemType is present and valid
-      if (!itemType || typeof itemType !== 'number' || itemType <= 0) {
-        console.error('OneTimeForm: missing or invalid itemType prop:', itemType);
-        toastRef.current?.show({
-          severity: 'error',
-          summary: 'Save failed',
-          detail: 'Missing item type',
-        });
-        setSaving(false);
-        return;
-      }
-
       const userId = getSessionUserId();
-      if (!userId) {
-        toastRef.current?.show({
-          severity: 'error',
-          summary: 'Save failed',
-          detail: 'No user session',
-        });
-        setSaving(false);
-        return;
-      }
+      if (!userId) throw new Error('No user session');
 
-      if (!name?.trim()) {
+      if (!name.trim()) {
         toastRef.current?.show({
           severity: 'warn',
           summary: 'Validation',
@@ -78,7 +58,7 @@ export default function OneTimeForm({
         return;
       }
 
-      if (amount === null || Number.isNaN(amount)) {
+      if (amount === null) {
         toastRef.current?.show({
           severity: 'warn',
           summary: 'Validation',
@@ -88,34 +68,48 @@ export default function OneTimeForm({
         return;
       }
 
-      const isoDate = occurrence ? occurrence.toISOString() : null;
+      if (!beginDate) {
+        toastRef.current?.show({
+          severity: 'warn',
+          summary: 'Validation',
+          detail: 'Please select a date.',
+        });
+        setSaving(false);
+        return;
+      }
 
       const payload: Item = {
         id: initial?.id,
         userId,
         name: name.trim(),
         amount,
-        fkPeriod: 1, // one-time period
-        fkItemType: itemType, // required by backend
-        beginDate: isoDate,
-        dateRangeReq: false, // required by backend for validation
-      } as Item;
+        fkItemType: itemType,
+        fkPeriod: 1, // One-time occurrence
+        weeklyDow: null,
 
-      // debug: inspect payload in console
+        dateRangeReq: true,
+        beginDate: beginDate.toISOString(),
+        endDate: null,
+      };
 
-      console.debug('OneTimeForm payload:', payload);
-
-      if (initial && initial.id) {
+      if (initial?.id) {
         await update(initial.id, payload);
-        toastRef.current?.show({ severity: 'success', summary: 'Saved', detail: 'Item updated.' });
+        toastRef.current?.show({
+          severity: 'success',
+          summary: 'Updated',
+          detail: 'Item updated successfully.',
+        });
       } else {
         await create(payload);
-        toastRef.current?.show({ severity: 'success', summary: 'Saved', detail: 'Item created.' });
+        toastRef.current?.show({
+          severity: 'success',
+          summary: 'Created',
+          detail: 'Item created successfully.',
+        });
       }
 
-      onSaved?.();
+      onSaved();
     } catch (err: any) {
-      console.error('Save failed', err);
       toastRef.current?.show({
         severity: 'error',
         summary: 'Save failed',
@@ -127,47 +121,35 @@ export default function OneTimeForm({
   }
 
   return (
-    <form onSubmit={handleSave}>
+    <>
       <Toast ref={toastRef} />
-      <Card>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div>
-            <label className="block mb-2">Name</label>
-            <InputText value={name} onChange={e => setName(e.target.value)} />
-          </div>
 
-          <div>
-            <label className="block mb-2">Amount</label>
-            <InputNumber
-              value={amount}
-              onValueChange={e => setAmount(e.value as number)}
-              mode="currency"
-              currency="USD"
-              locale="en-US"
-              showButtons={false}
-            />
-          </div>
+      <div className="p-0 md:p-4 w-full">
+        <Card className="w-full">
+          <FormLayout saving={saving} onCancel={onSaved} onSave={handleSave}>
+            {/* Name + Amount */}
+            <div className="col-span-1 sm:col-span-2">
+              <HeaderFields
+                name={name}
+                amount={amount}
+                onNameChange={setName}
+                onAmountChange={setAmount}
+              />
+            </div>
 
-          <div>
-            <label className="block mb-2">Occurrence Date</label>
-            <Calendar
-              value={occurrence}
-              onChange={e => setOccurrence(e.value as Date)}
-              dateFormat="yy-mm-dd"
-            />
-          </div>
-        </div>
-      </Card>
-
-      <div className="mt-3 flex gap-2">
-        <Button label="Save" icon="pi pi-check" type="submit" loading={saving} />
-        <Button
-          label="Cancel"
-          icon="pi pi-times"
-          className="p-button-secondary"
-          onClick={() => onSaved?.()}
-        />
+            {/* Occurrence Date */}
+            <div className="col-span-1 sm:col-span-2 mt-4">
+              <label className="block mb-2">Date of Occurrence</label>
+              <Calendar
+                value={beginDate}
+                onChange={e => setBeginDate(e.value ?? null)}
+                showIcon
+                placeholder="Select date"
+              />
+            </div>
+          </FormLayout>
+        </Card>
       </div>
-    </form>
+    </>
   );
 }

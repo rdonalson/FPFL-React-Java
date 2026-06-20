@@ -17,13 +17,13 @@ export default function AddWeeklyPage({ itemType }: { itemType: number }) {
 
   return (
     <div className="p-4">
-      <Card>
+      <Card className="w-full mb-3 px-4 sm:px-6">
         <h2 className="text-lg font-semibold">
           {itemType === 1 ? 'Add Weekly Credit' : 'Add Weekly Debit'}
         </h2>
       </Card>
 
-      <div className="mt-3 w-full">
+      <Card className="w-full">
         <WeeklyForm
           itemType={itemType}
           initial={null}
@@ -33,7 +33,7 @@ export default function AddWeeklyPage({ itemType }: { itemType: number }) {
           }}
           onSaved={handleSaved}
         />
-      </div>
+      </Card>
     </div>
   );
 }

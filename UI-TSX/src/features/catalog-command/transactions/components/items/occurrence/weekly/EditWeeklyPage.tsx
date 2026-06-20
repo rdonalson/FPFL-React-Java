@@ -81,14 +81,13 @@ export default function EditWeeklyPage({ itemType }: { itemType: number }) {
     <div className="p-0 md:p-4 w-full">
       <Toast ref={toastRef} />
 
-      {/* Title Card */}
-      <Card className="w-full mb-3">
+      <Card className="w-full mb-3 px-4 sm:px-6">
         <h2 className="text-lg font-semibold">
           {itemType === 1 ? 'Edit Weekly Credit' : 'Edit Weekly Debit'}
         </h2>
       </Card>
 
-      {/* Weekly Form */}
+      {/* Weekly Form now includes its own title */}
       <Card className="w-full">
         <WeeklyForm
           itemType={itemType}

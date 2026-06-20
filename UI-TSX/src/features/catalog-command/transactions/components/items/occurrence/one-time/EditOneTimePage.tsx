@@ -56,12 +56,10 @@ export default function EditOneTimePage({ itemType }: EditOneTimePageProps) {
     }
 
     load();
-
     return () => {
       mounted = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, items]);
+  }, [id, items, itemType, loadForUserAndType]);
 
   function handleSaved() {
     const base = itemType === 1 ? '/command/transactions/credits' : '/command/transactions/debits';
@@ -89,13 +87,16 @@ export default function EditOneTimePage({ itemType }: EditOneTimePageProps) {
   return (
     <div className="p-4">
       <Toast ref={toastRef} />
-      <Card>
+
+      {/* Title Card */}
+      <Card className="w-full mb-3 px-4 sm:px-6 py-3">
         <h2 className="text-lg font-semibold">
           {itemType === 1 ? 'Edit One Time Credit' : 'Edit One Time Debit'}
         </h2>
       </Card>
 
-      <div className="mt-3">
+      {/* Form Card */}
+      <Card className="w-full">
         <OneTimeForm
           itemType={itemType}
           initial={item}
@@ -105,7 +106,7 @@ export default function EditOneTimePage({ itemType }: EditOneTimePageProps) {
           update={update}
           onSaved={handleSaved}
         />
-      </div>
+      </Card>
     </div>
   );
 }

@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Card } from 'primereact/card';
 import { Toast } from 'primereact/toast';
-import { Button } from 'primereact/button';
 
 import type { Item } from '../../../../types/Item';
 import { getSessionUserId } from '@/app/state/sessionHelpers';
 import { WeekdayRadioGroup } from '@/features/catalog-command/transactions/components/common/WeekdayRadioGroup';
 import { TimeFrameSelector } from '@/features/catalog-command/transactions/components/common/TimeFrameSelector';
 import { HeaderFields } from '@/features/catalog-command/transactions/components/common/HeaderFields';
+import { FormLayout } from '@/features/catalog-command/transactions/components/common/FormLayout';
 
 interface WeeklyFormProps {
   itemType: number;
@@ -30,7 +30,6 @@ export default function WeeklyForm({
   const [amount, setAmount] = useState<number | null>(initial?.amount ?? null);
   const [weeklyDow, setWeeklyDow] = useState<number | null>(initial?.weeklyDow ?? null);
 
-  // Time frame state
   const [dateRangeReq, setDateRangeReq] = useState(initial?.dateRangeReq ?? false);
   const [beginDate, setBeginDate] = useState<Date | null>(
     initial?.beginDate ? new Date(initial.beginDate) : null,
@@ -51,8 +50,7 @@ export default function WeeklyForm({
     setEndDate(initial?.endDate ? new Date(initial.endDate) : null);
   }, [initial]);
 
-  async function handleSave(e?: React.FormEvent) {
-    e?.preventDefault();
+  async function handleSave() {
     setSaving(true);
 
     try {
@@ -132,52 +130,41 @@ export default function WeeklyForm({
   }
 
   return (
-    <form onSubmit={handleSave}>
+    <>
       <Toast ref={toastRef} />
 
-      {/* Card goes full width on mobile */}
       <div className="p-0 md:p-4 w-full">
         <Card className="w-full">
-          {/* HeaderFields replaces Name + Amount */}
-          <HeaderFields
-            name={name}
-            amount={amount}
-            onNameChange={setName}
-            onAmountChange={setAmount}
-          />
+          <FormLayout saving={saving} onCancel={onSaved} onSave={handleSave}>
+            <div className="col-span-1 sm:col-span-2">
+              <HeaderFields
+                name={name}
+                amount={amount}
+                onNameChange={setName}
+                onAmountChange={setAmount}
+              />
+            </div>
 
-          {/* Weekday Selector */}
-          <div className="mt-4">
-            <label className="block mb-2">Select Weekday</label>
-            <WeekdayRadioGroup value={weeklyDow} onChange={setWeeklyDow} />
-          </div>
+            <div className="col-span-1 sm:col-span-2 mt-4">
+              <label className="block mb-2">Select Weekday</label>
+              <WeekdayRadioGroup value={weeklyDow} onChange={setWeeklyDow} />
+            </div>
 
-          {/* Time Frame Selector */}
-          <div className="mt-4">
-            <TimeFrameSelector
-              dateRangeReq={dateRangeReq}
-              beginDate={beginDate}
-              endDate={endDate}
-              onChange={v => {
-                setDateRangeReq(v.dateRangeReq);
-                setBeginDate(v.beginDate);
-                setEndDate(v.endDate);
-              }}
-            />
-          </div>
+            <div className="col-span-1 sm:col-span-2 mt-4">
+              <TimeFrameSelector
+                dateRangeReq={dateRangeReq}
+                beginDate={beginDate}
+                endDate={endDate}
+                onChange={v => {
+                  setDateRangeReq(v.dateRangeReq);
+                  setBeginDate(v.beginDate);
+                  setEndDate(v.endDate);
+                }}
+              />
+            </div>
+          </FormLayout>
         </Card>
       </div>
-
-      <div className="mt-3 flex gap-2">
-        <Button label="Save" icon="pi pi-check" type="submit" loading={saving} />
-        <Button
-          label="Cancel"
-          icon="pi pi-times"
-          className="p-button-secondary"
-          type="button"
-          onClick={onSaved}
-        />
-      </div>
-    </form>
+    </>
   );
 }

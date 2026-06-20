@@ -20,13 +20,15 @@ export default function AddOneTimePage({ itemType }: AddOneTimePageProps) {
 
   return (
     <div className="p-4">
-      <Card>
+      {/* Title Card */}
+      <Card className="w-full mb-3 px-4 sm:px-6 py-3">
         <h2 className="text-lg font-semibold">
           {itemType === 1 ? 'Add One Time Credit' : 'Add One Time Debit'}
         </h2>
       </Card>
 
-      <div className="mt-3">
+      {/* Form Card */}
+      <Card className="w-full">
         <OneTimeForm
           itemType={itemType}
           initial={null}
@@ -36,7 +38,7 @@ export default function AddOneTimePage({ itemType }: AddOneTimePageProps) {
           }}
           onSaved={handleSaved}
         />
-      </div>
+      </Card>
     </div>
   );
 }
