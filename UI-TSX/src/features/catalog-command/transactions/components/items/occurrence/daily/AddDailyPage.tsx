@@ -21,13 +21,15 @@ export default function AddDailyPage({ itemType }: AddDailyPageProps) {
 
   return (
     <div className="p-4">
-      <Card>
+      {/* Title Card */}
+      <Card className="w-full mb-3 px-4 sm:px-6">
         <h2 className="text-lg font-semibold">
           {itemType === 1 ? 'Add Daily Credit' : 'Add Daily Debit'}
         </h2>
       </Card>
 
-      <div className="mt-3">
+      {/* Form Card */}
+      <Card className="w-full">
         <DailyForm
           itemType={itemType}
           initial={null}
@@ -37,7 +39,7 @@ export default function AddDailyPage({ itemType }: AddDailyPageProps) {
           }}
           onSaved={handleSaved}
         />
-      </div>
+      </Card>
     </div>
   );
 }

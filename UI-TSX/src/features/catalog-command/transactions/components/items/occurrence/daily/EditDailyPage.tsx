@@ -21,13 +21,13 @@ export default function EditDailyPage({ itemType }: EditDailyPageProps) {
 
   const { items, loadForUserAndType, update } = useItem();
   const [item, setItem] = useState<Item | null>(null);
-  const [localLoading, setLocalLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let mounted = true;
 
     async function load() {
-      setLocalLoading(true);
+      setLoading(true);
       try {
         if (!id) throw new Error('Missing id');
 
@@ -47,33 +47,30 @@ export default function EditDailyPage({ itemType }: EditDailyPageProps) {
         const refreshed = (items ?? []).find(it => String(it.id) === String(id));
         if (mounted) setItem(refreshed ?? null);
       } catch (err: any) {
-        console.error('Failed to load item', err);
         toastRef.current?.show({
           severity: 'error',
           summary: 'Load failed',
           detail: err?.message ?? 'Could not load item',
         });
       } finally {
-        if (mounted) setLocalLoading(false);
+        if (mounted) setLoading(false);
       }
     }
 
     load();
-
     return () => {
       mounted = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, items]);
+  }, [id, items, itemType, loadForUserAndType]);
 
   function handleSaved() {
     const base = itemType === 1 ? '/command/transactions/credits' : '/command/transactions/debits';
     navigate(base);
   }
 
-  if (localLoading) {
+  if (loading) {
     return (
-      <div className="p-4 flex items-center justify-center">
+      <div className="p-4 flex justify-center">
         <ProgressSpinner />
       </div>
     );
@@ -82,7 +79,7 @@ export default function EditDailyPage({ itemType }: EditDailyPageProps) {
   if (!item) {
     return (
       <div className="p-4">
-        <Card>
+        <Card className="w-full">
           <h3 className="text-red-600">Item not found</h3>
         </Card>
       </div>
@@ -90,15 +87,18 @@ export default function EditDailyPage({ itemType }: EditDailyPageProps) {
   }
 
   return (
-    <div className="p-4">
+    <div className="p-0 md:p-4 w-full">
       <Toast ref={toastRef} />
-      <Card>
+
+      {/* Title Card */}
+      <Card className="w-full mb-3 px-4 sm:px-6">
         <h2 className="text-lg font-semibold">
           {itemType === 1 ? 'Edit Daily Credit' : 'Edit Daily Debit'}
         </h2>
       </Card>
 
-      <div className="mt-3">
+      {/* Form Card */}
+      <Card className="w-full">
         <DailyForm
           itemType={itemType}
           initial={item}
@@ -108,7 +108,7 @@ export default function EditDailyPage({ itemType }: EditDailyPageProps) {
           update={update}
           onSaved={handleSaved}
         />
-      </div>
+      </Card>
     </div>
   );
 }

@@ -1,62 +1,56 @@
-// src/features/catalog-command/transactions/components/items/occurrence/daily/DailyForm.tsx
 import React, { useEffect, useState } from 'react';
-import { InputText } from 'primereact/inputtext';
-import { InputNumber } from 'primereact/inputnumber';
-import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { Toast } from 'primereact/toast';
 
 import type { Item } from '../../../../types/Item';
 import { getSessionUserId } from '@/app/state/sessionHelpers';
 
+import { HeaderFields } from '@/features/catalog-command/transactions/components/common/HeaderFields';
+import { TimeFrameSelector } from '@/features/catalog-command/transactions/components/common/TimeFrameSelector';
+import { FormLayout } from '@/features/catalog-command/transactions/components/common/FormLayout';
+
 interface DailyFormProps {
   itemType: number; // 1 = Credit, 2 = Debit
-  initial?: Item | null;
-  onSaved?: () => void;
+  initial: Item | null;
   create: (payload: Item) => Promise<Item>;
   update: (id: number, payload: Item) => Promise<Item>;
+  onSaved: () => void;
 }
 
-export default function DailyForm({ itemType, initial, onSaved, create, update }: DailyFormProps) {
+export default function DailyForm({ itemType, initial, create, update, onSaved }: DailyFormProps) {
   const toastRef = React.useRef<Toast | null>(null);
 
-  const [name, setName] = useState<string>(initial?.name ?? '');
+  const [name, setName] = useState(initial?.name ?? '');
   const [amount, setAmount] = useState<number | null>(initial?.amount ?? null);
+
+  // ⭐ Daily now supports the Date Range toggle (for consistency)
+  const [dateRangeReq, setDateRangeReq] = useState(initial?.dateRangeReq ?? false);
+  const [beginDate, setBeginDate] = useState<Date | null>(
+    initial?.beginDate ? new Date(initial.beginDate) : null,
+  );
+  const [endDate, setEndDate] = useState<Date | null>(
+    initial?.endDate ? new Date(initial.endDate) : null,
+  );
+
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     setName(initial?.name ?? '');
     setAmount(initial?.amount ?? null);
+
+    setDateRangeReq(initial?.dateRangeReq ?? false);
+    setBeginDate(initial?.beginDate ? new Date(initial.beginDate) : null);
+    setEndDate(initial?.endDate ? new Date(initial.endDate) : null);
   }, [initial]);
 
-  async function handleSave(e?: React.FormEvent) {
-    e?.preventDefault();
+  async function handleSave() {
     setSaving(true);
 
     try {
-      // Validate itemType
-      if (!itemType || typeof itemType !== 'number' || itemType <= 0) {
-        toastRef.current?.show({
-          severity: 'error',
-          summary: 'Save failed',
-          detail: 'Missing item type',
-        });
-        setSaving(false);
-        return;
-      }
-
       const userId = getSessionUserId();
-      if (!userId) {
-        toastRef.current?.show({
-          severity: 'error',
-          summary: 'Save failed',
-          detail: 'No user session',
-        });
-        setSaving(false);
-        return;
-      }
+      if (!userId) throw new Error('No user session');
 
-      if (!name?.trim()) {
+      if (!name.trim()) {
         toastRef.current?.show({
           severity: 'warn',
           summary: 'Validation',
@@ -66,7 +60,7 @@ export default function DailyForm({ itemType, initial, onSaved, create, update }
         return;
       }
 
-      if (amount === null || Number.isNaN(amount)) {
+      if (amount === null) {
         toastRef.current?.show({
           severity: 'warn',
           summary: 'Validation',
@@ -76,30 +70,39 @@ export default function DailyForm({ itemType, initial, onSaved, create, update }
         return;
       }
 
-      // ⭐ Daily occurrence has NO beginDate or endDate
       const payload: Item = {
         id: initial?.id,
         userId,
         name: name.trim(),
         amount,
-        fkPeriod: 2, // ⭐ DAILY
-        fkItemType: itemType, // required by backend
-        dateRangeReq: false, // required by backend for validation
-      } as Item;
+        fkItemType: itemType,
+        fkPeriod: 2, // DAILY
+        weeklyDow: null,
 
-      console.debug('DailyForm payload:', payload);
+        // ⭐ Correct Date Range behavior
+        dateRangeReq,
+        beginDate: dateRangeReq && beginDate ? beginDate.toISOString() : null,
+        endDate: dateRangeReq && endDate ? endDate.toISOString() : null,
+      };
 
-      if (initial && initial.id) {
+      if (initial?.id) {
         await update(initial.id, payload);
-        toastRef.current?.show({ severity: 'success', summary: 'Saved', detail: 'Item updated.' });
+        toastRef.current?.show({
+          severity: 'success',
+          summary: 'Updated',
+          detail: 'Item updated successfully.',
+        });
       } else {
         await create(payload);
-        toastRef.current?.show({ severity: 'success', summary: 'Saved', detail: 'Item created.' });
+        toastRef.current?.show({
+          severity: 'success',
+          summary: 'Created',
+          detail: 'Item created successfully.',
+        });
       }
 
-      onSaved?.();
+      onSaved();
     } catch (err: any) {
-      console.error('Save failed', err);
       toastRef.current?.show({
         severity: 'error',
         summary: 'Save failed',
@@ -111,40 +114,38 @@ export default function DailyForm({ itemType, initial, onSaved, create, update }
   }
 
   return (
-    <form onSubmit={handleSave}>
+    <>
       <Toast ref={toastRef} />
-      <Card>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div>
-            <label className="block mb-2">Name</label>
-            <InputText value={name} onChange={e => setName(e.target.value)} />
-          </div>
 
-          <div>
-            <label className="block mb-2">Amount</label>
-            <InputNumber
-              value={amount}
-              onValueChange={e => setAmount(e.value as number)}
-              mode="currency"
-              currency="USD"
-              locale="en-US"
-              showButtons={false}
-            />
-          </div>
+      <div className="p-0 md:p-4 w-full">
+        <Card className="w-full">
+          <FormLayout saving={saving} onCancel={onSaved} onSave={handleSave}>
+            {/* Name + Amount */}
+            <div className="col-span-1 sm:col-span-2">
+              <HeaderFields
+                name={name}
+                amount={amount}
+                onNameChange={setName}
+                onAmountChange={setAmount}
+              />
+            </div>
 
-          {/* ⭐ No date field for Daily */}
-        </div>
-      </Card>
-
-      <div className="mt-3 flex gap-2">
-        <Button label="Save" icon="pi pi-check" type="submit" loading={saving} />
-        <Button
-          label="Cancel"
-          icon="pi pi-times"
-          className="p-button-secondary"
-          onClick={() => onSaved?.()}
-        />
+            {/* ⭐ Daily now shows the Date Range toggle for consistency */}
+            <div className="col-span-1 sm:col-span-2 mt-4">
+              <TimeFrameSelector
+                dateRangeReq={dateRangeReq}
+                beginDate={beginDate}
+                endDate={endDate}
+                onChange={v => {
+                  setDateRangeReq(v.dateRangeReq);
+                  setBeginDate(v.beginDate);
+                  setEndDate(v.endDate);
+                }}
+              />
+            </div>
+          </FormLayout>
+        </Card>
       </div>
-    </form>
+    </>
   );
 }
