@@ -10,8 +10,12 @@ import { useItem } from '../../../../hooks/useItem';
 import { getSessionUserId } from '@/app/state/sessionHelpers';
 import type { Item } from '../../../../types/Item';
 
-export default function EditMonthlyPage({ itemType }: { itemType: number }) {
-  const { id } = useParams();
+interface EditMonthlyPageProps {
+  itemType: number;
+}
+
+export default function EditMonthlyPage({ itemType }: EditMonthlyPageProps) {
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const toastRef = React.useRef<Toast | null>(null);
 
@@ -25,14 +29,16 @@ export default function EditMonthlyPage({ itemType }: { itemType: number }) {
     async function load() {
       setLoading(true);
       try {
-        // Try to find item in existing state
+        if (!id) throw new Error('Missing id');
+
+        // Try to find item in already-loaded items
         const found = items?.find(it => String(it.id) === String(id));
         if (found) {
           if (mounted) setItem(found);
           return;
         }
 
-        // Otherwise load from backend
+        // Otherwise load items for this user + type
         const userId = getSessionUserId();
         if (!userId) throw new Error('No user session');
 
@@ -44,7 +50,7 @@ export default function EditMonthlyPage({ itemType }: { itemType: number }) {
         toastRef.current?.show({
           severity: 'error',
           summary: 'Load failed',
-          detail: err?.message,
+          detail: err?.message ?? 'Could not load item',
         });
       } finally {
         if (mounted) setLoading(false);
@@ -55,7 +61,8 @@ export default function EditMonthlyPage({ itemType }: { itemType: number }) {
     return () => {
       mounted = false;
     };
-  }, [id, items, itemType, loadForUserAndType]);
+    // Depend only on id, itemType, and loader to avoid repeated calls
+  }, [id, itemType, loadForUserAndType, items]);
 
   function handleSaved() {
     const base = itemType === 1 ? '/command/transactions/credits' : '/command/transactions/debits';
@@ -73,34 +80,36 @@ export default function EditMonthlyPage({ itemType }: { itemType: number }) {
   if (!item) {
     return (
       <div className="p-4">
-        <Card>
-          <h3>Item not found</h3>
+        <Card className="w-full">
+          <h3 className="text-red-600">Item not found</h3>
         </Card>
       </div>
     );
   }
 
   return (
-    <div className="p-4">
+    <div className="p-0 md:p-4 w-full">
       <Toast ref={toastRef} />
 
-      <Card>
+      {/* Title Card */}
+      <Card className="w-full mb-3 px-4 sm:px-6">
         <h2 className="text-lg font-semibold">
           {itemType === 1 ? 'Edit Monthly Credit' : 'Edit Monthly Debit'}
         </h2>
       </Card>
 
-      <div className="mt-3">
+      {/* Form Card */}
+      <Card className="w-full">
         <MonthlyForm
           itemType={itemType}
           initial={item}
           create={async () => {
-            throw new Error('create not supported');
+            throw new Error('create not supported here');
           }}
           update={update}
           onSaved={handleSaved}
         />
-      </div>
+      </Card>
     </div>
   );
 }
