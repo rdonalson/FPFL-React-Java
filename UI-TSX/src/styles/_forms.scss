@@ -55,3 +55,18 @@
   margin-top: 0 !important;
   margin-bottom: 0 !important;
 }
+
+/* Responsive half-width class for form fields */
+.responsive-half {
+  box-sizing: border-box;
+  width: 100%; /* SM and below: full width */
+
+  /* If you use a flex row, prevent shrinking/growing */
+  flex: 0 0 100%;
+
+  @media (min-width: 768px) {
+    /* MD and up */
+    width: 49%;
+    flex: 0 0 49%;
+  }
+}

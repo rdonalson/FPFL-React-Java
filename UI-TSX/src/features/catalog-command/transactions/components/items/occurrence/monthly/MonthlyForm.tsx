@@ -175,13 +175,13 @@ export default function MonthlyForm({
 
             {/* Day of Month Selector */}
             <div className="col-span-1 sm:col-span-2 mt-4">
-              <label className="block mb-2">Select Day of Month</label>
+              <label className="block mb-2">Select Day of the Month</label>
               <Dropdown
                 value={monthlyDom}
                 options={[...DAY_NUMBERS]}
                 onChange={e => setMonthlyDom(e.value)}
                 placeholder="Day"
-                style={{ width: '120px' }}
+                className="responsive-half"
               />
             </div>
 
