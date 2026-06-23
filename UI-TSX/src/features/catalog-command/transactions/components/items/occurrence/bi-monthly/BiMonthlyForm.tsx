@@ -2,13 +2,13 @@
 import React, { useEffect, useState } from 'react';
 import { Card } from 'primereact/card';
 import { Toast } from 'primereact/toast';
-import { InputText } from 'primereact/inputtext';
-import { InputNumber } from 'primereact/inputnumber';
-import { Dropdown } from 'primereact/dropdown';
-import { Button } from 'primereact/button';
 
 import type { Item } from '../../../../types/Item';
 import { getSessionUserId } from '@/app/state/sessionHelpers';
+import { HeaderFields } from '@/features/catalog-command/transactions/components/common/HeaderFields';
+import { TimeFrameSelector } from '@/features/catalog-command/transactions/components/common/TimeFrameSelector';
+import { FormLayout } from '@/features/catalog-command/transactions/components/common/FormLayout';
+import { Dropdown } from 'primereact/dropdown';
 
 interface BiMonthlyFormProps {
   itemType: number;
@@ -31,6 +31,16 @@ export default function BiMonthlyForm({
   const [amount, setAmount] = useState<number | null>(initial?.amount ?? null);
   const [biMonthlyDay1, setBiMonthlyDay1] = useState<number | null>(initial?.biMonthlyDay1 ?? null);
   const [biMonthlyDay2, setBiMonthlyDay2] = useState<number | null>(initial?.biMonthlyDay2 ?? null);
+
+  // Date range support (consistent across forms)
+  const [dateRangeReq, setDateRangeReq] = useState(initial?.dateRangeReq ?? false);
+  const [beginDate, setBeginDate] = useState<Date | null>(
+    initial?.beginDate ? new Date(initial.beginDate) : null,
+  );
+  const [endDate, setEndDate] = useState<Date | null>(
+    initial?.endDate ? new Date(initial.endDate) : null,
+  );
+
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -38,6 +48,10 @@ export default function BiMonthlyForm({
     setAmount(initial?.amount ?? null);
     setBiMonthlyDay1(initial?.biMonthlyDay1 ?? null);
     setBiMonthlyDay2(initial?.biMonthlyDay2 ?? null);
+
+    setDateRangeReq(initial?.dateRangeReq ?? false);
+    setBeginDate(initial?.beginDate ? new Date(initial.beginDate) : null);
+    setEndDate(initial?.endDate ? new Date(initial.endDate) : null);
   }, [initial]);
 
   const dayOptions = Array.from({ length: 27 }, (_, i) => ({
@@ -45,8 +59,7 @@ export default function BiMonthlyForm({
     value: i + 1,
   }));
 
-  async function handleSave(e?: React.FormEvent) {
-    e?.preventDefault();
+  async function handleSave() {
     setSaving(true);
 
     try {
@@ -83,16 +96,51 @@ export default function BiMonthlyForm({
         return;
       }
 
+      if (biMonthlyDay1 === biMonthlyDay2) {
+        toastRef.current?.show({
+          severity: 'warn',
+          summary: 'Validation',
+          detail: 'Day 1 and Day 2 must be different.',
+        });
+        setSaving(false);
+        return;
+      }
+
+      // If dateRangeReq is true, ensure begin/end are present and valid
+      if (dateRangeReq) {
+        if (!beginDate || !endDate) {
+          toastRef.current?.show({
+            severity: 'warn',
+            summary: 'Validation',
+            detail: 'Please select both begin and end dates for the date range.',
+          });
+          setSaving(false);
+          return;
+        }
+        if (beginDate > endDate) {
+          toastRef.current?.show({
+            severity: 'warn',
+            summary: 'Validation',
+            detail: 'Begin date must be before or equal to end date.',
+          });
+          setSaving(false);
+          return;
+        }
+      }
+
       const payload: Item = {
         id: initial?.id,
         userId,
         name: name.trim(),
         amount,
         fkItemType: itemType,
-        fkPeriod: 5, // ⭐ BI-MONTHLY
+        fkPeriod: 5, // BI-MONTHLY
         biMonthlyDay1,
         biMonthlyDay2,
-        dateRangeReq: false,
+        // Date range fields for consistency with other forms
+        dateRangeReq,
+        beginDate: dateRangeReq && beginDate ? beginDate.toISOString() : null,
+        endDate: dateRangeReq && endDate ? endDate.toISOString() : null,
       };
 
       if (initial?.id) {
@@ -124,68 +172,65 @@ export default function BiMonthlyForm({
   }
 
   return (
-    <form onSubmit={handleSave}>
+    <>
       <Toast ref={toastRef} />
 
-      <Card>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {/* Name */}
-          <div>
-            <label className="block mb-2">Name</label>
-            <InputText value={name} onChange={e => setName(e.target.value)} className="w-full" />
-          </div>
-
-          {/* Amount */}
-          <div>
-            <label className="block mb-2">Amount</label>
-            <InputNumber
-              value={amount}
-              onValueChange={e => setAmount(e.value as number)}
-              mode="currency"
-              currency="USD"
-              locale="en-US"
-              className="w-full"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-3 mt-2 inline-dropdown-borders">
-            {/* Bi-Monthly Day 1 */}
-            <div>
-              <label className="block mb-2">Day 1</label>
-              <Dropdown
-                value={biMonthlyDay1}
-                options={dayOptions}
-                onChange={e => setBiMonthlyDay1(e.value)}
-                placeholder="Select Day"
-                className="w-full"
+      <div className="p-0 md:p-4 w-full">
+        <Card className="w-full">
+          <FormLayout saving={saving} onCancel={onSaved} onSave={handleSave}>
+            {/* Name + Amount */}
+            <div className="col-span-1 sm:col-span-2">
+              <HeaderFields
+                name={name}
+                amount={amount}
+                onNameChange={setName}
+                onAmountChange={setAmount}
               />
             </div>
 
-            {/* Bi-Monthly Day 2 */}
-            <div>
-              <label className="block mb-2">Day 2</label>
-              <Dropdown
-                value={biMonthlyDay2}
-                options={dayOptions}
-                onChange={e => setBiMonthlyDay2(e.value)}
-                placeholder="Select Day"
-                className="w-full"
+            {/* Bi-Monthly Day selectors */}
+            <div className="col-span-1 sm:col-span-2 mt-4">
+              <div className="grid grid-cols-2 gap-3 inline-dropdown-borders">
+                <div>
+                  <label className="block mb-2">Day 1</label>
+                  <Dropdown
+                    value={biMonthlyDay1}
+                    options={dayOptions}
+                    onChange={e => setBiMonthlyDay1(e.value)}
+                    placeholder="Select Day"
+                    className="w-full"
+                  />
+                </div>
+
+                <div>
+                  <label className="block mb-2">Day 2</label>
+                  <Dropdown
+                    value={biMonthlyDay2}
+                    options={dayOptions}
+                    onChange={e => setBiMonthlyDay2(e.value)}
+                    placeholder="Select Day"
+                    className="w-full"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Time frame / Date Range selector */}
+            <div className="col-span-1 sm:col-span-2 mt-4">
+              <TimeFrameSelector
+                dateRangeReq={dateRangeReq}
+                beginDate={beginDate}
+                endDate={endDate}
+                onChange={v => {
+                  setDateRangeReq(v.dateRangeReq);
+                  setBeginDate(v.beginDate);
+                  setEndDate(v.endDate);
+                }}
               />
             </div>
-          </div>
-        </div>
-      </Card>
-
-      <div className="mt-3 flex gap-2">
-        <Button label="Save" icon="pi pi-check" type="submit" loading={saving} />
-        <Button
-          label="Cancel"
-          icon="pi pi-times"
-          className="p-button-secondary"
-          type="button"
-          onClick={onSaved}
-        />
+          </FormLayout>
+        </Card>
       </div>
-    </form>
+    </>
   );
 }
