@@ -1,3 +1,4 @@
+// src/features/catalog-command/transactions/components/items/occurrence/onetime/OneTimeForm.tsx
 import React, { useEffect, useState } from 'react';
 import { Card } from 'primereact/card';
 import { Toast } from 'primereact/toast';
@@ -7,6 +8,7 @@ import type { Item } from '../../../../types/Item';
 import { getSessionUserId } from '@/app/state/sessionHelpers';
 import { HeaderFields } from '@/features/catalog-command/transactions/components/common/HeaderFields';
 import { FormLayout } from '@/features/catalog-command/transactions/components/common/FormLayout';
+import { parseDateOnlyString, toDateOnlyString } from '@/shared/utils/dateUtils';
 
 interface OneTimeFormProps {
   itemType: number;
@@ -30,7 +32,7 @@ export default function OneTimeForm({
 
   // One-time occurrence uses beginDate only
   const [beginDate, setBeginDate] = useState<Date | null>(
-    initial?.beginDate ? new Date(initial.beginDate) : null,
+    initial?.beginDate ? parseDateOnlyString(initial.beginDate) : null,
   );
 
   const [saving, setSaving] = useState(false);
@@ -38,7 +40,7 @@ export default function OneTimeForm({
   useEffect(() => {
     setName(initial?.name ?? '');
     setAmount(initial?.amount ?? null);
-    setBeginDate(initial?.beginDate ? new Date(initial.beginDate) : null);
+    setBeginDate(initial?.beginDate ? parseDateOnlyString(initial.beginDate) : null);
   }, [initial]);
 
   async function handleSave() {
@@ -87,8 +89,9 @@ export default function OneTimeForm({
         fkPeriod: 1, // One-time occurrence
         weeklyDow: null,
 
+        // One-time always uses a date range with only beginDate
         dateRangeReq: true,
-        beginDate: beginDate.toISOString(),
+        beginDate: toDateOnlyString(beginDate),
         endDate: null,
       };
 

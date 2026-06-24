@@ -5,10 +5,13 @@ import { Toast } from 'primereact/toast';
 
 import type { Item } from '../../../../types/Item';
 import { getSessionUserId } from '@/app/state/sessionHelpers';
+
 import { HeaderFields } from '@/features/catalog-command/transactions/components/common/HeaderFields';
 import { TimeFrameSelector } from '@/features/catalog-command/transactions/components/common/TimeFrameSelector';
 import { FormLayout } from '@/features/catalog-command/transactions/components/common/FormLayout';
 import { Dropdown } from 'primereact/dropdown';
+
+import { parseDateOnlyString, toDateOnlyString } from '@/shared/utils/dateUtils';
 
 interface BiMonthlyFormProps {
   itemType: number;
@@ -32,13 +35,13 @@ export default function BiMonthlyForm({
   const [biMonthlyDay1, setBiMonthlyDay1] = useState<number | null>(initial?.biMonthlyDay1 ?? null);
   const [biMonthlyDay2, setBiMonthlyDay2] = useState<number | null>(initial?.biMonthlyDay2 ?? null);
 
-  // Date range support (consistent across forms)
+  // Date range support
   const [dateRangeReq, setDateRangeReq] = useState(initial?.dateRangeReq ?? false);
   const [beginDate, setBeginDate] = useState<Date | null>(
-    initial?.beginDate ? new Date(initial.beginDate) : null,
+    initial?.beginDate ? parseDateOnlyString(initial.beginDate) : null,
   );
   const [endDate, setEndDate] = useState<Date | null>(
-    initial?.endDate ? new Date(initial.endDate) : null,
+    initial?.endDate ? parseDateOnlyString(initial.endDate) : null,
   );
 
   const [saving, setSaving] = useState(false);
@@ -50,8 +53,8 @@ export default function BiMonthlyForm({
     setBiMonthlyDay2(initial?.biMonthlyDay2 ?? null);
 
     setDateRangeReq(initial?.dateRangeReq ?? false);
-    setBeginDate(initial?.beginDate ? new Date(initial.beginDate) : null);
-    setEndDate(initial?.endDate ? new Date(initial.endDate) : null);
+    setBeginDate(initial?.beginDate ? parseDateOnlyString(initial.beginDate) : null);
+    setEndDate(initial?.endDate ? parseDateOnlyString(initial.endDate) : null);
   }, [initial]);
 
   const dayOptions = Array.from({ length: 27 }, (_, i) => ({
@@ -106,7 +109,6 @@ export default function BiMonthlyForm({
         return;
       }
 
-      // If dateRangeReq is true, ensure begin/end are present and valid
       if (dateRangeReq) {
         if (!beginDate || !endDate) {
           toastRef.current?.show({
@@ -137,10 +139,10 @@ export default function BiMonthlyForm({
         fkPeriod: 5, // BI-MONTHLY
         biMonthlyDay1,
         biMonthlyDay2,
-        // Date range fields for consistency with other forms
+
         dateRangeReq,
-        beginDate: dateRangeReq && beginDate ? beginDate.toISOString() : null,
-        endDate: dateRangeReq && endDate ? endDate.toISOString() : null,
+        beginDate: dateRangeReq ? toDateOnlyString(beginDate) : null,
+        endDate: dateRangeReq ? toDateOnlyString(endDate) : null,
       };
 
       if (initial?.id) {

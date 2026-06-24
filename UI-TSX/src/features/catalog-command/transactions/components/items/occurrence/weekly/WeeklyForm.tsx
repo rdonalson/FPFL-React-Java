@@ -1,13 +1,17 @@
+// src/features/catalog-command/transactions/components/items/occurrence/weekly/WeeklyForm.tsx
 import React, { useEffect, useState } from 'react';
 import { Card } from 'primereact/card';
 import { Toast } from 'primereact/toast';
 
 import type { Item } from '../../../../types/Item';
 import { getSessionUserId } from '@/app/state/sessionHelpers';
+
 import { WeekdayRadioGroup } from '@/features/catalog-command/transactions/components/common/WeekdayRadioGroup';
 import { TimeFrameSelector } from '@/features/catalog-command/transactions/components/common/TimeFrameSelector';
 import { HeaderFields } from '@/features/catalog-command/transactions/components/common/HeaderFields';
 import { FormLayout } from '@/features/catalog-command/transactions/components/common/FormLayout';
+
+import { parseDateOnlyString, toDateOnlyString } from '@/shared/utils/dateUtils';
 
 interface WeeklyFormProps {
   itemType: number;
@@ -32,10 +36,10 @@ export default function WeeklyForm({
 
   const [dateRangeReq, setDateRangeReq] = useState(initial?.dateRangeReq ?? false);
   const [beginDate, setBeginDate] = useState<Date | null>(
-    initial?.beginDate ? new Date(initial.beginDate) : null,
+    initial?.beginDate ? parseDateOnlyString(initial.beginDate) : null,
   );
   const [endDate, setEndDate] = useState<Date | null>(
-    initial?.endDate ? new Date(initial.endDate) : null,
+    initial?.endDate ? parseDateOnlyString(initial.endDate) : null,
   );
 
   const [saving, setSaving] = useState(false);
@@ -46,8 +50,8 @@ export default function WeeklyForm({
     setWeeklyDow(initial?.weeklyDow ?? null);
 
     setDateRangeReq(initial?.dateRangeReq ?? false);
-    setBeginDate(initial?.beginDate ? new Date(initial.beginDate) : null);
-    setEndDate(initial?.endDate ? new Date(initial.endDate) : null);
+    setBeginDate(initial?.beginDate ? parseDateOnlyString(initial.beginDate) : null);
+    setEndDate(initial?.endDate ? parseDateOnlyString(initial.endDate) : null);
   }, [initial]);
 
   async function handleSave() {
@@ -93,12 +97,12 @@ export default function WeeklyForm({
         name: name.trim(),
         amount,
         fkItemType: itemType,
-        fkPeriod: 3,
+        fkPeriod: 3, // WEEKLY
         weeklyDow,
 
         dateRangeReq,
-        beginDate: dateRangeReq && beginDate ? beginDate.toISOString() : null,
-        endDate: dateRangeReq && endDate ? endDate.toISOString() : null,
+        beginDate: dateRangeReq ? toDateOnlyString(beginDate) : null,
+        endDate: dateRangeReq ? toDateOnlyString(endDate) : null,
       };
 
       if (initial?.id) {
@@ -136,6 +140,7 @@ export default function WeeklyForm({
       <div className="p-0 md:p-4 w-full">
         <Card className="w-full">
           <FormLayout saving={saving} onCancel={onSaved} onSave={handleSave}>
+            {/* Name + Amount */}
             <div className="col-span-1 sm:col-span-2">
               <HeaderFields
                 name={name}
@@ -145,11 +150,13 @@ export default function WeeklyForm({
               />
             </div>
 
+            {/* Weekday Selector */}
             <div className="col-span-1 sm:col-span-2 mt-4">
               <label className="block mb-2">Select Weekday</label>
               <WeekdayRadioGroup value={weeklyDow} onChange={setWeeklyDow} />
             </div>
 
+            {/* Date Range Selector */}
             <div className="col-span-1 sm:col-span-2 mt-4">
               <TimeFrameSelector
                 dateRangeReq={dateRangeReq}

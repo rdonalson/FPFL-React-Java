@@ -1,3 +1,4 @@
+// src/features/catalog-command/transactions/components/items/occurrence/daily/DailyForm.tsx
 import React, { useEffect, useState } from 'react';
 import { Card } from 'primereact/card';
 import { Toast } from 'primereact/toast';
@@ -8,6 +9,8 @@ import { getSessionUserId } from '@/app/state/sessionHelpers';
 import { HeaderFields } from '@/features/catalog-command/transactions/components/common/HeaderFields';
 import { TimeFrameSelector } from '@/features/catalog-command/transactions/components/common/TimeFrameSelector';
 import { FormLayout } from '@/features/catalog-command/transactions/components/common/FormLayout';
+
+import { parseDateOnlyString, toDateOnlyString } from '@/shared/utils/dateUtils';
 
 interface DailyFormProps {
   itemType: number; // 1 = Credit, 2 = Debit
@@ -23,13 +26,13 @@ export default function DailyForm({ itemType, initial, create, update, onSaved }
   const [name, setName] = useState(initial?.name ?? '');
   const [amount, setAmount] = useState<number | null>(initial?.amount ?? null);
 
-  // ⭐ Daily now supports the Date Range toggle (for consistency)
+  // Date range support (consistent with MonthlyForm)
   const [dateRangeReq, setDateRangeReq] = useState(initial?.dateRangeReq ?? false);
   const [beginDate, setBeginDate] = useState<Date | null>(
-    initial?.beginDate ? new Date(initial.beginDate) : null,
+    initial?.beginDate ? parseDateOnlyString(initial.beginDate) : null,
   );
   const [endDate, setEndDate] = useState<Date | null>(
-    initial?.endDate ? new Date(initial.endDate) : null,
+    initial?.endDate ? parseDateOnlyString(initial.endDate) : null,
   );
 
   const [saving, setSaving] = useState(false);
@@ -39,8 +42,8 @@ export default function DailyForm({ itemType, initial, create, update, onSaved }
     setAmount(initial?.amount ?? null);
 
     setDateRangeReq(initial?.dateRangeReq ?? false);
-    setBeginDate(initial?.beginDate ? new Date(initial.beginDate) : null);
-    setEndDate(initial?.endDate ? new Date(initial.endDate) : null);
+    setBeginDate(initial?.beginDate ? parseDateOnlyString(initial.beginDate) : null);
+    setEndDate(initial?.endDate ? parseDateOnlyString(initial.endDate) : null);
   }, [initial]);
 
   async function handleSave() {
@@ -70,6 +73,7 @@ export default function DailyForm({ itemType, initial, create, update, onSaved }
         return;
       }
 
+      // Build payload
       const payload: Item = {
         id: initial?.id,
         userId,
@@ -79,10 +83,9 @@ export default function DailyForm({ itemType, initial, create, update, onSaved }
         fkPeriod: 2, // DAILY
         weeklyDow: null,
 
-        // ⭐ Correct Date Range behavior
         dateRangeReq,
-        beginDate: dateRangeReq && beginDate ? beginDate.toISOString() : null,
-        endDate: dateRangeReq && endDate ? endDate.toISOString() : null,
+        beginDate: dateRangeReq ? toDateOnlyString(beginDate) : null,
+        endDate: dateRangeReq ? toDateOnlyString(endDate) : null,
       };
 
       if (initial?.id) {
@@ -130,7 +133,7 @@ export default function DailyForm({ itemType, initial, create, update, onSaved }
               />
             </div>
 
-            {/* ⭐ Daily now shows the Date Range toggle for consistency */}
+            {/* Date Range Selector */}
             <div className="col-span-1 sm:col-span-2 mt-4">
               <TimeFrameSelector
                 dateRangeReq={dateRangeReq}
