@@ -10,6 +10,7 @@ import { TimeFrameSelector } from '@/features/catalog-command/transactions/compo
 import { FormLayout } from '@/features/catalog-command/transactions/components/common/FormLayout';
 import { Dropdown } from 'primereact/dropdown';
 import { DAY_NUMBERS } from '@/features/catalog-command/transactions/constants/days';
+import { parseDateOnlyString, toDateOnlyString } from '@/shared/utils/dateUtils';
 
 interface MonthlyFormProps {
   itemType: number;
@@ -32,13 +33,13 @@ export default function MonthlyForm({
   const [amount, setAmount] = useState<number | null>(initial?.amount ?? null);
   const [monthlyDom, setMonthlyDom] = useState<number | null>(initial?.monthlyDom ?? null);
 
-  // Date range support (consistent across forms)
+  // Date range support
   const [dateRangeReq, setDateRangeReq] = useState(initial?.dateRangeReq ?? false);
   const [beginDate, setBeginDate] = useState<Date | null>(
-    initial?.beginDate ? new Date(initial.beginDate) : null,
+    initial?.beginDate ? parseDateOnlyString(initial.beginDate) : null,
   );
   const [endDate, setEndDate] = useState<Date | null>(
-    initial?.endDate ? new Date(initial.endDate) : null,
+    initial?.endDate ? parseDateOnlyString(initial.endDate) : null,
   );
 
   const [saving, setSaving] = useState(false);
@@ -49,8 +50,8 @@ export default function MonthlyForm({
     setMonthlyDom(initial?.monthlyDom ?? null);
 
     setDateRangeReq(initial?.dateRangeReq ?? false);
-    setBeginDate(initial?.beginDate ? new Date(initial.beginDate) : null);
-    setEndDate(initial?.endDate ? new Date(initial.endDate) : null);
+    setBeginDate(initial?.beginDate ? parseDateOnlyString(initial.beginDate) : null);
+    setEndDate(initial?.endDate ? parseDateOnlyString(initial.endDate) : null);
   }, [initial]);
 
   async function handleSave() {
@@ -90,7 +91,6 @@ export default function MonthlyForm({
         return;
       }
 
-      // Date range validation when enabled
       if (dateRangeReq) {
         if (!beginDate || !endDate) {
           toastRef.current?.show({
@@ -122,10 +122,9 @@ export default function MonthlyForm({
         monthlyDom,
         weeklyDow: null,
 
-        // Date range fields for consistency with other forms
         dateRangeReq,
-        beginDate: dateRangeReq && beginDate ? beginDate.toISOString() : null,
-        endDate: dateRangeReq && endDate ? endDate.toISOString() : null,
+        beginDate: dateRangeReq ? toDateOnlyString(beginDate) : null,
+        endDate: dateRangeReq ? toDateOnlyString(endDate) : null,
       };
 
       if (initial?.id) {
