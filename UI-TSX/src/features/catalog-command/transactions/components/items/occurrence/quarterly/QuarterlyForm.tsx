@@ -2,13 +2,16 @@
 import React, { useEffect, useState } from 'react';
 import { Card } from 'primereact/card';
 import { Toast } from 'primereact/toast';
-import { InputText } from 'primereact/inputtext';
-import { InputNumber } from 'primereact/inputnumber';
-import { Button } from 'primereact/button';
 
 import type { Item } from '../../../../types/Item';
 import { getSessionUserId } from '@/app/state/sessionHelpers';
+
+import { HeaderFields } from '@/features/catalog-command/transactions/components/common/HeaderFields';
+import { TimeFrameSelector } from '@/features/catalog-command/transactions/components/common/TimeFrameSelector';
+import { FormLayout } from '@/features/catalog-command/transactions/components/common/FormLayout';
+
 import MonthDayRow from '../../../common/MonthDayRow';
+import { parseDateOnlyString, toDateOnlyString } from '@/shared/utils/dateUtils';
 
 interface QuarterlyFormProps {
   itemType: number;
@@ -42,6 +45,15 @@ export default function QuarterlyForm({
   const [q4Month, setQ4Month] = useState<number | null>(initial?.quarterly4Month ?? null);
   const [q4Day, setQ4Day] = useState<number | null>(initial?.quarterly4Day ?? null);
 
+  // ⭐ NEW: Date range support (same as Monthly/BiMonthly/etc.)
+  const [dateRangeReq, setDateRangeReq] = useState(initial?.dateRangeReq ?? false);
+  const [beginDate, setBeginDate] = useState<Date | null>(
+    initial?.beginDate ? parseDateOnlyString(initial.beginDate) : null,
+  );
+  const [endDate, setEndDate] = useState<Date | null>(
+    initial?.endDate ? parseDateOnlyString(initial.endDate) : null,
+  );
+
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -59,10 +71,13 @@ export default function QuarterlyForm({
 
     setQ4Month(initial?.quarterly4Month ?? null);
     setQ4Day(initial?.quarterly4Day ?? null);
+
+    setDateRangeReq(initial?.dateRangeReq ?? false);
+    setBeginDate(initial?.beginDate ? parseDateOnlyString(initial.beginDate) : null);
+    setEndDate(initial?.endDate ? parseDateOnlyString(initial.endDate) : null);
   }, [initial]);
 
-  async function handleSave(e?: React.FormEvent) {
-    e?.preventDefault();
+  async function handleSave() {
     setSaving(true);
 
     try {
@@ -108,13 +123,35 @@ export default function QuarterlyForm({
         }
       }
 
+      // ⭐ NEW: Date range validation
+      if (dateRangeReq) {
+        if (!beginDate || !endDate) {
+          toastRef.current?.show({
+            severity: 'warn',
+            summary: 'Validation',
+            detail: 'Please select both begin and end dates for the date range.',
+          });
+          setSaving(false);
+          return;
+        }
+        if (beginDate > endDate) {
+          toastRef.current?.show({
+            severity: 'warn',
+            summary: 'Validation',
+            detail: 'Begin date must be before or equal to end date.',
+          });
+          setSaving(false);
+          return;
+        }
+      }
+
       const payload: Item = {
         id: initial?.id,
         userId,
         name: name.trim(),
         amount,
         fkItemType: itemType,
-        fkPeriod: 7, // ⭐ QUARTERLY
+        fkPeriod: 7, // QUARTERLY
 
         quarterly1Month: q1Month,
         quarterly1Day: q1Day,
@@ -128,7 +165,9 @@ export default function QuarterlyForm({
         quarterly4Month: q4Month,
         quarterly4Day: q4Day,
 
-        dateRangeReq: false,
+        dateRangeReq,
+        beginDate: dateRangeReq ? toDateOnlyString(beginDate) : null,
+        endDate: dateRangeReq ? toDateOnlyString(endDate) : null,
       };
 
       if (initial?.id) {
@@ -160,75 +199,71 @@ export default function QuarterlyForm({
   }
 
   return (
-    <form onSubmit={handleSave}>
+    <>
       <Toast ref={toastRef} />
 
-      <Card>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {/* Name */}
-          <div>
-            <label className="block mb-2">Name</label>
-            <InputText value={name} onChange={e => setName(e.target.value)} className="w-full" />
-          </div>
+      <div className="p-0 md:p-4 w-full">
+        <Card className="w-full">
+          <FormLayout saving={saving} onCancel={onSaved} onSave={handleSave}>
+            {/* Name + Amount */}
+            <div className="col-span-1 sm:col-span-2">
+              <HeaderFields
+                name={name}
+                amount={amount}
+                onNameChange={setName}
+                onAmountChange={setAmount}
+              />
+            </div>
 
-          {/* Amount */}
-          <div>
-            <label className="block mb-2">Amount</label>
-            <InputNumber
-              value={amount}
-              onValueChange={e => setAmount(e.value as number)}
-              mode="currency"
-              currency="USD"
-              locale="en-US"
-              className="w-full"
+            {/* Quarter Rows */}
+            <MonthDayRow
+              label="1st Quarter"
+              month={q1Month}
+              day={q1Day}
+              setMonth={setQ1Month}
+              setDay={setQ1Day}
             />
-          </div>
 
-          {/* Quarter Rows */}
-          <MonthDayRow
-            label="1st Quarter"
-            month={q1Month}
-            day={q1Day}
-            setMonth={setQ1Month}
-            setDay={setQ1Day}
-          />
+            <MonthDayRow
+              label="2nd Quarter"
+              month={q2Month}
+              day={q2Day}
+              setMonth={setQ2Month}
+              setDay={setQ2Day}
+            />
 
-          <MonthDayRow
-            label="2nd Quarter"
-            month={q2Month}
-            day={q2Day}
-            setMonth={setQ2Month}
-            setDay={setQ2Day}
-          />
+            <MonthDayRow
+              label="3rd Quarter"
+              month={q3Month}
+              day={q3Day}
+              setMonth={setQ3Month}
+              setDay={setQ3Day}
+            />
 
-          <MonthDayRow
-            label="3rd Quarter"
-            month={q3Month}
-            day={q3Day}
-            setMonth={setQ3Month}
-            setDay={setQ3Day}
-          />
+            <MonthDayRow
+              label="4th Quarter"
+              month={q4Month}
+              day={q4Day}
+              setMonth={setQ4Month}
+              setDay={setQ4Day}
+            />
 
-          <MonthDayRow
-            label="4th Quarter"
-            month={q4Month}
-            day={q4Day}
-            setMonth={setQ4Month}
-            setDay={setQ4Day}
-          />
-        </div>
-      </Card>
-
-      <div className="mt-3 flex gap-2">
-        <Button label="Save" icon="pi pi-check" type="submit" loading={saving} />
-        <Button
-          label="Cancel"
-          icon="pi pi-times"
-          className="p-button-secondary"
-          type="button"
-          onClick={onSaved}
-        />
+            {/* ⭐ NEW: Date Range Selector */}
+            <div className="col-span-1 sm:col-span-2">
+              <TimeFrameSelector
+                dateRangeReq={dateRangeReq}
+                beginDate={beginDate}
+                endDate={endDate}
+                onChange={v => {
+                  setDateRangeReq(v.dateRangeReq);
+                  setBeginDate(v.beginDate);
+                  setEndDate(v.endDate);
+                }}
+              />
+            </div>
+          </FormLayout>
+        </Card>
       </div>
-    </form>
+    </>
   );
 }

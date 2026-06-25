@@ -6,7 +6,11 @@ import { Card } from 'primereact/card';
 import QuarterlyForm from './QuarterlyForm';
 import { useItem } from '../../../../hooks/useItem';
 
-export default function AddQuarterlyPage({ itemType }: { itemType: number }) {
+interface AddQuarterlyPageProps {
+  itemType: number;
+}
+
+export default function AddQuarterlyPage({ itemType }: AddQuarterlyPageProps) {
   const navigate = useNavigate();
   const { create } = useItem();
 
@@ -17,23 +21,25 @@ export default function AddQuarterlyPage({ itemType }: { itemType: number }) {
 
   return (
     <div className="p-4">
-      <Card>
+      {/* Title Card */}
+      <Card className="w-full mb-3 px-4 sm:px-6 py-3">
         <h2 className="text-lg font-semibold">
           {itemType === 1 ? 'Add Quarterly Credit' : 'Add Quarterly Debit'}
         </h2>
       </Card>
 
-      <div className="mt-3">
+      {/* Form Card */}
+      <Card className="w-full">
         <QuarterlyForm
           itemType={itemType}
           initial={null}
           create={create}
           update={async () => {
-            throw new Error('update not supported');
+            throw new Error('update not supported here');
           }}
           onSaved={handleSaved}
         />
-      </div>
+      </Card>
     </div>
   );
 }
