@@ -151,13 +151,13 @@ export default function WeeklyForm({
             </div>
 
             {/* Weekday Selector */}
-            <div className="col-span-1 sm:col-span-2 mt-4">
+            <div className="col-span-1 sm:col-span-2">
               <label className="block mb-2">Select Weekday</label>
               <WeekdayRadioGroup value={weeklyDow} onChange={setWeeklyDow} />
             </div>
 
             {/* Date Range Selector */}
-            <div className="col-span-1 sm:col-span-2 mt-4">
+            <div className="col-span-1 sm:col-span-2">
               <TimeFrameSelector
                 dateRangeReq={dateRangeReq}
                 beginDate={beginDate}

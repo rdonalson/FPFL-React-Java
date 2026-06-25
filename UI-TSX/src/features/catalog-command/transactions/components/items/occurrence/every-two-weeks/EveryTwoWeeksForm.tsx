@@ -2,14 +2,17 @@
 import React, { useEffect, useState } from 'react';
 import { Card } from 'primereact/card';
 import { Toast } from 'primereact/toast';
-import { InputText } from 'primereact/inputtext';
-import { InputNumber } from 'primereact/inputnumber';
 import { Calendar } from 'primereact/calendar';
-import { Button } from 'primereact/button';
+import { Checkbox } from 'primereact/checkbox';
 
 import type { Item } from '../../../../types/Item';
 import { getSessionUserId } from '@/app/state/sessionHelpers';
+
+import { HeaderFields } from '@/features/catalog-command/transactions/components/common/HeaderFields';
 import { WeekdayRadioGroup } from '@/features/catalog-command/transactions/components/common/WeekdayRadioGroup';
+import { FormLayout } from '@/features/catalog-command/transactions/components/common/FormLayout';
+
+import { parseDateOnlyString, toDateOnlyString } from '@/shared/utils/dateUtils';
 
 interface EveryTwoWeeksFormProps {
   itemType: number;
@@ -30,29 +33,46 @@ export default function EveryTwoWeeksForm({
 
   const [name, setName] = useState(initial?.name ?? '');
   const [amount, setAmount] = useState<number | null>(initial?.amount ?? null);
+
+  // Required inception date
   const [beginDate, setBeginDate] = useState<Date | null>(
-    initial?.beginDate ? new Date(initial.beginDate) : null,
+    initial?.beginDate ? parseDateOnlyString(initial.beginDate) : null,
   );
+
+  // Optional end date
+  const [endDate, setEndDate] = useState<Date | null>(
+    initial?.endDate ? parseDateOnlyString(initial.endDate) : null,
+  );
+
+  // Weekday selector
   const [everyOtherWeekDow, setEveryOtherWeekDow] = useState<number | null>(
     initial?.everyOtherWeekDow ?? null,
   );
+
+  // ⭐ NEW: Date range checkbox (controls only end date)
+  const [dateRangeReq, setDateRangeReq] = useState(initial?.dateRangeReq ?? false);
+
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     setName(initial?.name ?? '');
     setAmount(initial?.amount ?? null);
-    setBeginDate(initial?.beginDate ? new Date(initial.beginDate) : null);
+
+    setBeginDate(initial?.beginDate ? parseDateOnlyString(initial.beginDate) : null);
+    setEndDate(initial?.endDate ? parseDateOnlyString(initial.endDate) : null);
+
     setEveryOtherWeekDow(initial?.everyOtherWeekDow ?? null);
+    setDateRangeReq(initial?.dateRangeReq ?? false);
   }, [initial]);
 
-  async function handleSave(e?: React.FormEvent) {
-    e?.preventDefault();
+  async function handleSave() {
     setSaving(true);
 
     try {
       const userId = getSessionUserId();
       if (!userId) throw new Error('No user session');
 
+      // Validation
       if (!name.trim()) {
         toastRef.current?.show({
           severity: 'warn',
@@ -93,16 +113,31 @@ export default function EveryTwoWeeksForm({
         return;
       }
 
+      // If checkbox is on, end date must be selected
+      if (dateRangeReq && !endDate) {
+        toastRef.current?.show({
+          severity: 'warn',
+          summary: 'Validation',
+          detail: 'Please select an end date.',
+        });
+        setSaving(false);
+        return;
+      }
+
       const payload: Item = {
         id: initial?.id,
         userId,
         name: name.trim(),
         amount,
         fkItemType: itemType,
-        fkPeriod: 4, // ⭐ EVERY TWO WEEKS
-        beginDate: beginDate.toISOString(),
-        everyOtherWeekDow, // ⭐ correct backend field
-        dateRangeReq: false, // required by backend for validation
+        fkPeriod: 4, // EVERY TWO WEEKS
+
+        beginDate: toDateOnlyString(beginDate),
+        endDate: dateRangeReq ? toDateOnlyString(endDate) : null,
+
+        everyOtherWeekDow,
+
+        dateRangeReq,
       };
 
       if (initial?.id) {
@@ -134,59 +169,60 @@ export default function EveryTwoWeeksForm({
   }
 
   return (
-    <form onSubmit={handleSave}>
+    <>
       <Toast ref={toastRef} />
 
-      <Card>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {/* Name */}
-          <div>
-            <label className="block mb-2">Name</label>
-            <InputText value={name} onChange={e => setName(e.target.value)} className="w-full" />
-          </div>
+      <div className="p-0 md:p-4 w-full">
+        <Card className="w-full">
+          <FormLayout saving={saving} onCancel={onSaved} onSave={handleSave}>
+            {/* Name + Amount */}
+            <div className="col-span-1 sm:col-span-2">
+              <HeaderFields
+                name={name}
+                amount={amount}
+                onNameChange={setName}
+                onAmountChange={setAmount}
+              />
+            </div>
 
-          {/* Amount */}
-          <div>
-            <label className="block mb-2">Amount</label>
-            <InputNumber
-              value={amount}
-              onValueChange={e => setAmount(e.value as number)}
-              mode="currency"
-              currency="USD"
-              locale="en-US"
-              className="w-full"
-            />
-          </div>
+            {/* Inception Date */}
+            <div className="col-span-1 sm:col-span-2 ">
+              <label className="block mb-2">Inception Date</label>
+              <Calendar
+                value={beginDate}
+                onChange={e => setBeginDate(e.value as Date)}
+                showIcon
+                className="w-full"
+              />
+            </div>
 
-          {/* Inception Date */}
-          <div>
-            <label className="block mb-2">Inception Date</label>
-            <Calendar
-              value={beginDate}
-              onChange={e => setBeginDate(e.value as Date)}
-              showIcon
-              className="w-full"
-            />
-          </div>
+            {/* Weekday Selector */}
+            <div className="col-span-1 sm:col-span-2 ">
+              <label className="block mb-2">Select Weekday</label>
+              <WeekdayRadioGroup value={everyOtherWeekDow} onChange={setEveryOtherWeekDow} />
+            </div>
 
-          {/* Weekday Selector */}
-          <div className="col-span-2">
-            <label className="block mb-2">Select Weekday</label>
-            <WeekdayRadioGroup value={everyOtherWeekDow} onChange={setEveryOtherWeekDow} />
-          </div>
-        </div>
-      </Card>
+            {/* Date Range Checkbox */}
+            <div className="col-span-1 sm:col-span-2 mt-4 flex items-center gap-2">
+              <Checkbox checked={dateRangeReq} onChange={e => setDateRangeReq(e.checked!)} />
+              <label>Use Time Frame</label>
+            </div>
 
-      <div className="mt-3 flex gap-2">
-        <Button label="Save" icon="pi pi-check" type="submit" loading={saving} />
-        <Button
-          label="Cancel"
-          icon="pi pi-times"
-          className="p-button-secondary"
-          type="button"
-          onClick={onSaved}
-        />
+            {/* End Date (only when checkbox is checked) */}
+            {dateRangeReq && (
+              <div className="col-span-1 sm:col-span-2">
+                <label className="block mb-2">End Date</label>
+                <Calendar
+                  value={endDate}
+                  onChange={e => setEndDate(e.value as Date)}
+                  showIcon
+                  className="w-full"
+                />
+              </div>
+            )}
+          </FormLayout>
+        </Card>
       </div>
-    </form>
+    </>
   );
 }

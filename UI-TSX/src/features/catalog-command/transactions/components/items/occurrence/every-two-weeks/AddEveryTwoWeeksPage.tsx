@@ -6,7 +6,11 @@ import { Card } from 'primereact/card';
 import EveryTwoWeeksForm from './EveryTwoWeeksForm';
 import { useItem } from '../../../../hooks/useItem';
 
-export default function AddEveryTwoWeeksPage({ itemType }: { itemType: number }) {
+interface AddEveryTwoWeeksPageProps {
+  itemType: number;
+}
+
+export default function AddEveryTwoWeeksPage({ itemType }: AddEveryTwoWeeksPageProps) {
   const navigate = useNavigate();
   const { create } = useItem();
 
@@ -17,23 +21,25 @@ export default function AddEveryTwoWeeksPage({ itemType }: { itemType: number })
 
   return (
     <div className="p-4">
-      <Card>
+      {/* Title Card */}
+      <Card className="w-full mb-3 px-4 sm:px-6">
         <h2 className="text-lg font-semibold">
           {itemType === 1 ? 'Add Every Two Weeks Credit' : 'Add Every Two Weeks Debit'}
         </h2>
       </Card>
 
-      <div className="mt-3">
+      {/* Form Card */}
+      <Card className="w-full">
         <EveryTwoWeeksForm
           itemType={itemType}
           initial={null}
           create={create}
           update={async () => {
-            throw new Error('update not supported');
+            throw new Error('update not supported here');
           }}
           onSaved={handleSaved}
         />
-      </div>
+      </Card>
     </div>
   );
 }
