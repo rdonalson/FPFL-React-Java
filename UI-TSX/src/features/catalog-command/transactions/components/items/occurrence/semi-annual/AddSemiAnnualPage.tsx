@@ -6,7 +6,11 @@ import { Card } from 'primereact/card';
 import SemiAnnualForm from './SemiAnnualForm';
 import { useItem } from '../../../../hooks/useItem';
 
-export default function AddSemiAnnualPage({ itemType }: { itemType: number }) {
+interface AddSemiAnnualPageProps {
+  itemType: number;
+}
+
+export default function AddSemiAnnualPage({ itemType }: AddSemiAnnualPageProps) {
   const navigate = useNavigate();
   const { create } = useItem();
 
@@ -17,23 +21,25 @@ export default function AddSemiAnnualPage({ itemType }: { itemType: number }) {
 
   return (
     <div className="p-4">
-      <Card>
+      {/* Title Card */}
+      <Card className="w-full mb-3 px-4 sm:px-6 py-3">
         <h2 className="text-lg font-semibold">
           {itemType === 1 ? 'Add Semi-Annual Credit' : 'Add Semi-Annual Debit'}
         </h2>
       </Card>
 
-      <div className="mt-3">
+      {/* Form Card */}
+      <Card className="w-full">
         <SemiAnnualForm
           itemType={itemType}
           initial={null}
           create={create}
           update={async () => {
-            throw new Error('update not supported');
+            throw new Error('update not supported here');
           }}
           onSaved={handleSaved}
         />
-      </div>
+      </Card>
     </div>
   );
 }
