@@ -173,7 +173,7 @@ export default function MonthlyForm({
             </div>
 
             {/* Day of Month Selector */}
-            <div className="col-span-1 sm:col-span-2 mt-4">
+            <div className="col-span-1 sm:col-span-2 mt-2">
               <label className="block mb-2">Select Day of the Month</label>
               <Dropdown
                 value={monthlyDom}
@@ -185,7 +185,7 @@ export default function MonthlyForm({
             </div>
 
             {/* Time frame / Date Range selector */}
-            <div className="col-span-1 sm:col-span-2 mt-4">
+            <div className="col-span-1 sm:col-span-2 mt-2">
               <TimeFrameSelector
                 dateRangeReq={dateRangeReq}
                 beginDate={beginDate}

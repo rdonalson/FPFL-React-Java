@@ -134,7 +134,7 @@ export default function DailyForm({ itemType, initial, create, update, onSaved }
             </div>
 
             {/* Date Range Selector */}
-            <div className="col-span-1 sm:col-span-2 mt-4">
+            <div className="col-span-1 sm:col-span-2 mt-2">
               <TimeFrameSelector
                 dateRangeReq={dateRangeReq}
                 beginDate={beginDate}

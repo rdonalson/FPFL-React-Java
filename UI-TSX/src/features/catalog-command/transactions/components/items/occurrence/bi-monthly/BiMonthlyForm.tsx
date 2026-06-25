@@ -191,7 +191,7 @@ export default function BiMonthlyForm({
             </div>
 
             {/* Bi-Monthly Day selectors */}
-            <div className="col-span-1 sm:col-span-2 mt-4">
+            <div className="col-span-1 sm:col-span-2 mt-2">
               <div className="grid grid-cols-2 gap-3 inline-dropdown-borders">
                 <div>
                   <label className="block mb-2">Day 1</label>
@@ -218,7 +218,7 @@ export default function BiMonthlyForm({
             </div>
 
             {/* Time frame / Date Range selector */}
-            <div className="col-span-1 sm:col-span-2 mt-4">
+            <div className="col-span-1 sm:col-span-2 mt-2">
               <TimeFrameSelector
                 dateRangeReq={dateRangeReq}
                 beginDate={beginDate}

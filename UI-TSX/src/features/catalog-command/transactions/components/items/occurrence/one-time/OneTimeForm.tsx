@@ -141,7 +141,7 @@ export default function OneTimeForm({
             </div>
 
             {/* Occurrence Date */}
-            <div className="col-span-1 sm:col-span-2 mt-4">
+            <div className="col-span-1 sm:col-span-2 mt-2">
               <label className="block mb-2">Date of Occurrence</label>
               <Calendar
                 value={beginDate}

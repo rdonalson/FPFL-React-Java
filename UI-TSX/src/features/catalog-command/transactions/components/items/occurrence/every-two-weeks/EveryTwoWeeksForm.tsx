@@ -203,7 +203,7 @@ export default function EveryTwoWeeksForm({
             </div>
 
             {/* Date Range Checkbox */}
-            <div className="col-span-1 sm:col-span-2 mt-4 flex items-center gap-2">
+            <div className="col-span-1 sm:col-span-2 mt-2 flex items-center gap-2">
               <Checkbox checked={dateRangeReq} onChange={e => setDateRangeReq(e.checked!)} />
               <label>Use Time Frame</label>
             </div>
