@@ -20,7 +20,6 @@
         <dependency>
             <groupId>com.Financial-Planner</groupId>
             <artifactId>module-common-bc</artifactId>
-            <version>1.0.0</version>
         </dependency>
 
         <!-- JPA (entities + repositories live here) -->

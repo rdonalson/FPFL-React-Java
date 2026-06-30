@@ -16,11 +16,15 @@
 
     <dependencies>
 
-        <!-- Common utilities -->
+        <!-- BC modules -->
         <dependency>
             <groupId>com.Financial-Planner</groupId>
             <artifactId>module-common-bc</artifactId>
-            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.Financial-Planner</groupId>
+            <artifactId>module-items-bc</artifactId>
         </dependency>
 
         <!-- Lombok -->
@@ -49,7 +53,10 @@
             <scope>test</scope>
         </dependency>
 
-
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

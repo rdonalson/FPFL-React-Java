@@ -53,6 +53,31 @@
                 <version>${postgresql.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.Financial-Planner</groupId>
+                <artifactId>module-api</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.Financial-Planner</groupId>
+                <artifactId>module-auth</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.Financial-Planner</groupId>
+                <artifactId>module-common-bc</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.Financial-Planner</groupId>
+                <artifactId>module-items-bc</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.Financial-Planner</groupId>
+                <artifactId>module-display-bc</artifactId>
+                <version>1.0.0</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
