@@ -1,6 +1,7 @@
 package com.financialplanner.moduleitemsbc.domain.service;
 
 import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.Item;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;

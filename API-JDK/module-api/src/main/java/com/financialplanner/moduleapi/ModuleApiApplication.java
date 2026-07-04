@@ -15,11 +15,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * It is designed to initiate and bootstrap the application using the Spring framework.
  */
 @SpringBootApplication(scanBasePackages = {
-    "com.financialplanner.modulecommonbc",
-    "com.financialplanner.moduleitemsbc",
-    "com.financialplanner.moduledisplaybc",
+    "com.financialplanner.moduleapi",
     "com.financialplanner.moduleauth",
-    "com.financialplanner.moduleapi"
+    "com.financialplanner.modulecommonbc",
+    "com.financialplanner.moduledisplaybc",
+    "com.financialplanner.moduleitemsbc",
 })
 public class ModuleApiApplication {
     static void main(String[] args) {
