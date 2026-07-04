@@ -11,11 +11,9 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Implementation of the {@link JpaItemRepositoryCustom} interface providing
- * custom database query operations for {@link Item} entities.
- * This class leverages the {@link EntityManager} to execute criteria-based queries
- * for retrieving items based on complex filtering conditions that are not natively
- * supported by Spring Data JPA repository methods.
+ * Implementation of the {@code JpaItemRepositoryCustom} interface. Provides
+ * custom query methods for retrieving {@link Item} entities based on specific
+ * criteria.
  */
 @Component
 public class JpaItemRepositoryCustomImpl implements JpaItemRepositoryCustom {
@@ -34,7 +32,7 @@ public class JpaItemRepositoryCustomImpl implements JpaItemRepositoryCustom {
      *
      * @return a list of items that belong to the specified user and correspond to the specified item type
      */
-    //@Override
+    @Override
     public List<Item> findByUserIdAndItemTypeId(UUID userId, Long itemTypeId) {
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -46,5 +44,23 @@ public class JpaItemRepositoryCustomImpl implements JpaItemRepositoryCustom {
 
         return entityManager.createQuery(cq)
                             .getResultList();
+    }
+
+    /**
+     * Retrieves a list of items associated with the specified user ID.
+     *
+     * @param userId the unique identifier of the user whose items are to be retrieved
+     * @return a list of items that belong to the specified user
+     */
+    @Override
+    public List<Item> findByUserId(UUID userId) {
+
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Item> cq = cb.createQuery(Item.class);
+        Root<Item> root = cq.from(Item.class);
+
+        cq.where(cb.equal(root.get("UserId"), userId));
+
+        return entityManager.createQuery(cq).getResultList();
     }
 }

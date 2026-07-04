@@ -12,5 +12,6 @@ import java.util.UUID;
  */
 public interface JpaItemRepositoryCustom {
     List<Item> findByUserIdAndItemTypeId(UUID userId, Long itemTypeId);
+    List<Item> findByUserId(UUID userId);
 }
 

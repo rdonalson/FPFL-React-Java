@@ -12,30 +12,23 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Implementation of the {@link ItemService} interface that provides business logic
- * for managing {@link Item} entities. This class is responsible for handling the
- * primary operations related to item entities, including listing, retrieving,
- * creating, updating, and deleting items, as well as querying items by specific
- * parameters.
- * Dependencies:
- * - {@link ItemRepository}: For interaction with the data source containing
- * {@link Item} entities.
- * - {@link ItemEntityMapper}: For mapping properties of {@link Item} entities
- * during updates.
- * Responsibilities:
- * - Retrieve a list of all {@link Item} entities.
- * - Retrieve a specific {@link Item} based on its unique identifier.
- * - Query items by their user ID and associated item type ID.
- * - Create and save new {@link Item} entities.
- * - Update existing {@link Item} entities based on their identifier.
- * - Delete {@link Item} entities by their unique identifier.
- * Validation:
- * - Input parameters such as IDs and entity objects are validated to ensure
- * they meet the necessary constraints. Invalid input results in exceptions
- * such as {@link DomainValidationException}.
- * Error Handling:
- * - Throws {@link ItemNotFoundException} when the requested {@link Item} entity
- * does not exist in the repository.
+ * Implementation of the {@code ItemService} interface.
+ * Provides business logic for operations related to {@code Item} entities.
+ * This service interacts with the {@code ItemRepository} and
+ * uses the {@code ItemEntityMapper} for entity conversion tasks.
+ *
+ * Responsibilities include:
+ * - Retrieving all items
+ * - Retrieving an item by ID
+ * - Finding items by user ID and item type ID
+ * - Finding items by user ID
+ * - Creating a new item
+ * - Updating an existing item
+ * - Deleting an item by ID
+ *
+ * Exceptions thrown by this class:
+ * - {@code DomainValidationException} for invalid input validation
+ * - {@code ItemNotFoundException} for missing entities during retrieval
  */
 @Service
 public class ItemServiceImpl implements ItemService {
@@ -78,6 +71,19 @@ public class ItemServiceImpl implements ItemService {
         }
         // Return the domain model
         return repo.findByUserIdAndItemTypeId(userId, itemTypeId);
+    }
+
+    @Override
+    public List<Item> findByUserId(UUID userId) {
+        // Validate input
+        if (userId == null) {
+            throw new DomainValidationException("UserId cannot be null");
+        }
+
+        // Delegate to repository
+        List<Item> items = repo.findByUserId(userId);
+
+        return items == null ? List.of() : items;
     }
 
     @Override

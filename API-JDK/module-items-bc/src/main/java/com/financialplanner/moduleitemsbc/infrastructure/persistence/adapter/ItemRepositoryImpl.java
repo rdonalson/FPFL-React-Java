@@ -15,21 +15,18 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Implementation of the {@link ItemRepository} interface.
- * This class provides concrete implementations for CRUD operations
- * and custom data access operations for managing {@link Item} entities.
- * It delegates the actual database interactions to the {@link JpaItemRepository}.
+ * Implementation of the {@link ItemRepository} interface for managing {@link Item} entities.
+ * This class provides the actual business logic for data access and persistence operations
+ * using the underlying {@link JpaItemRepository}.
+ *
  * Responsibilities:
- * - Retrieve all {@link Item} entities.
- * - Fetch a specific {@link Item} by its unique identifier.
- * - Retrieve {@link Item} entities based on user ID and item type ID.
+ * - Fetch all {@link Item} entities from the data source.
+ * - Retrieve a specific {@link Item} by its unique identifier.
+ * - Retrieve {@link Item} entities by user ID and item type ID.
+ * - Retrieve all {@link Item} entities for a specific user.
  * - Save a new or updated {@link Item} entity to the data source.
  * - Delete an {@link Item} entity by its unique identifier.
- * Exception Handling:
- * - Converts {@link DataAccessException} into domain-specific exceptions like
- * {@link ItemNotFoundException}, {@link DuplicateItemException}, and {@link RepositoryException}.
- * - Ensures that repository-level exceptions are properly wrapped to provide more contextual
- * error details to the application.
+ * - Handle exceptions during data access operations and provide meaningful error feedback.
  */
 @Component
 public class ItemRepositoryImpl implements ItemRepository {
@@ -65,6 +62,15 @@ public class ItemRepositoryImpl implements ItemRepository {
             return jpa.findByUserIdAndItemTypeId(userId, itemTypeId);
         } catch (DataAccessException ex) {
             throw new RepositoryException("Database failure while fetching Items", ex);
+        }
+    }
+
+    @Override
+    public List<Item> findByUserId(UUID userId) {
+        try {
+            return jpa.findByUserId(userId);
+        } catch (DataAccessException ex) {
+            throw new RepositoryException("Database failure while fetching Items for user " + userId, ex);
         }
     }
 
