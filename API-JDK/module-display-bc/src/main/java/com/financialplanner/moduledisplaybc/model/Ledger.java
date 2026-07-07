@@ -8,14 +8,14 @@ public class Ledger {
     private int rollupKey;
     private int year;
     private LocalDate wDate;
-    private BigDecimal creditSummary = BigDecimal.ZERO;
-    private BigDecimal debitSummary = BigDecimal.ZERO;
-    private BigDecimal net = BigDecimal.ZERO;
-    private BigDecimal runningTotal = BigDecimal.ZERO;
+    private double creditSummary = 0.0;
+    private double debitSummary = 0.0;
+    private double net = 0.0;
+    private double runningTotal = 0.0;
     private LocalDate occurrenceDate;
     private int fkItemType;
     private String itemType;
     private String periodName;
     private String name;
-    private BigDecimal amount = BigDecimal.ZERO;
+    private double amount = 0.0;
 }
