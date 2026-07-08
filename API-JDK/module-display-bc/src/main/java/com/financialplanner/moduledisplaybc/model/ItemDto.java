@@ -1,8 +1,6 @@
 package com.financialplanner.moduledisplaybc.model;
 
-import lombok.Data;
-
-@Data
+@lombok.Data
 public class ItemDto {
     private Integer rollupKey;
     private Integer year;
