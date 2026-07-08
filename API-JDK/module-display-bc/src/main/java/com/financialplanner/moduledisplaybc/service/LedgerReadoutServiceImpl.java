@@ -1,6 +1,8 @@
 package com.financialplanner.moduledisplaybc.service;
 
+import com.financialplanner.moduledisplaybc.model.ItemDto;
 import com.financialplanner.moduledisplaybc.model.Ledger;
+import com.financialplanner.moduledisplaybc.model.LedgerDto;
 import com.financialplanner.moduledisplaybc.model.LedgerRequest;
 import com.financialplanner.moduleitemsbc.domain.service.ItemService;
 import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.Item;
@@ -22,30 +24,35 @@ public class LedgerReadoutServiceImpl implements LedgerReadoutService {
     }
 
     @Override
-    public List<Ledger> buildLedgerReadout(LedgerRequest request) {
+    public List<LedgerDto> buildLedgerReadout(LedgerRequest request) {
         List<Item> userItems = itemService.findByUserId(request.userId());
-        List<Ledger> ledger = buildLedgerTable(request.startDate(), request.endDate());
 
-        // 1. Initial amount (ItemType 3)
-        double initialAmount = extractInitialAmount(userItems);
+        // Convert Items → ItemDto
+        List<ItemDto> itemDtos = mapItemsToDto(userItems);
 
-        // 2. Persist initial running total across all days
+        // Build ledger table (DTO)
+        List<LedgerDto> ledger = buildLedgerTable(request.startDate(), request.endDate());
+
+        // Initial amount (ItemType 3)
+        double initialAmount = extractInitialAmount(itemDtos);
+
+        // Persist initial running total across all days
         applyInitialRunningTotals(ledger, initialAmount);
 
-        // 3. Daily enrichment (add/subtract occurrences)
-        applyDailyEnrichment(ledger, userItems);
+        // Daily enrichment (add/subtract occurrences)
+        applyDailyEnrichment(ledger, itemDtos);
 
         return ledger;
     }
 
-    private List<Ledger> buildLedgerTable(LocalDate start, LocalDate end) {
-        List<Ledger> table = new ArrayList<>();
+    private List<LedgerDto> buildLedgerTable(LocalDate start, LocalDate end) {
+        List<LedgerDto> table = new ArrayList<>();
 
         LocalDate cursor = start;
         int rollupKey = 1;
 
         while (!cursor.isAfter(end)) {
-            Ledger row = new Ledger();
+            LedgerDto row = new LedgerDto();
             row.setRollupKey(rollupKey++);
             row.setYear(cursor.getYear());
             row.setWDate(cursor);
@@ -57,43 +64,44 @@ public class LedgerReadoutServiceImpl implements LedgerReadoutService {
         return table;
     }
 
-    private void applyInitialRunningTotals(List<Ledger> ledger, double initialAmount) {
-        double running;
-        running = initialAmount;
-
-        for (Ledger row : ledger) {
-            row.setRunningTotal(running);
+    private void applyInitialRunningTotals(List<LedgerDto> ledger, double initialAmount) {
+        for (LedgerDto row : ledger) {
+            row.setRunningTotal(initialAmount);
         }
     }
 
-    private double extractInitialAmount(List<Item> userItems) {
-        return userItems.stream()
-            .filter(i -> i.getItemType().getId() == 3)   // ItemType 3 = Initial Amount
+    private double extractInitialAmount(List<ItemDto> items) {
+        return items.stream()
+            .filter(i -> i.getFkItemType() == 3)
             .findFirst()
-            .map(Item::getAmount)
+            .map(ItemDto::getAmount)
             .orElse(0.0);
     }
 
-    private void applyDailyEnrichment(List<Ledger> ledger, List<Item> userItems) {
-        // Filter out items with null dates (or change to sentinel grouping if you prefer)
-        Map<LocalDate, List<Item>> itemsByDate = userItems.stream()
-            .filter(i -> i.getBeginDate() != null)
-            .collect(Collectors.groupingBy(Item::getBeginDate));
+    private void applyDailyEnrichment(List<LedgerDto> ledger, List<ItemDto> items) {
 
-        double running = ledger.isEmpty() ? 0.0 : ledger.get(0).getRunningTotal();
+        // Group items by date
+        Map<LocalDate, List<ItemDto>> itemsByDate = items.stream()
+            .filter(i -> i.getOccurrenceDate() != null)
+            .collect(Collectors.groupingBy(i -> LocalDate.parse(i.getOccurrenceDate())));
 
-        for (Ledger row : ledger) {
+        double running = ledger.get(0).getRunningTotal();
+
+        for (LedgerDto row : ledger) {
             LocalDate date = row.getWDate();
-            List<Item> todaysItems = itemsByDate.getOrDefault(date, List.of());
+
+            List<ItemDto> todaysItems = itemsByDate.getOrDefault(date, List.of());
 
             double credit = 0.0;
             double debit = 0.0;
 
-            for (Item item : todaysItems) {
-                // Defensive: ensure amount is not null (if amount is Double object)
-                double amt = item.getAmount(); // adjust if Item.amount is Double
+            for (ItemDto item : todaysItems) {
+                double amt = item.getAmount() != null ? item.getAmount() : 0.0;
+
                 if (amt > 0.0) credit += amt;
                 else debit += amt;
+
+                row.getItems().add(item); // attach items to ledger day
             }
 
             double net = credit + debit;
@@ -105,4 +113,29 @@ public class LedgerReadoutServiceImpl implements LedgerReadoutService {
             row.setRunningTotal(running);
         }
     }
+
+    private List<ItemDto> mapItemsToDto(List<Item> items) {
+        return items.stream().map(i -> {
+            ItemDto dto = new ItemDto();
+
+            dto.setItemKey(Math.toIntExact(i.getId()));
+            dto.setFkItemType(Math.toIntExact(i.getItemType().getId()));
+            dto.setItemType(i.getItemType().getName());
+            dto.setName(i.getName());
+            dto.setAmount(i.getAmount());
+
+            // occurrenceDate
+            dto.setOccurrenceDate(
+                i.getBeginDate() != null ? i.getBeginDate().toString() : null
+            );
+
+            // period (NULL SAFE)
+            dto.setPeriod(
+                i.getTimePeriod() != null ? i.getTimePeriod().getName() : null
+            );
+
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
 }

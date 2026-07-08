@@ -4,6 +4,7 @@ package com.financialplanner.moduleapi.controllers;
 //import com.financialplanner.modulecommonbc.ledger.LedgerRequest;
 import com.financialplanner.moduleapi.dtos.item.ItemResponse;
 import com.financialplanner.moduledisplaybc.model.Ledger;
+import com.financialplanner.moduledisplaybc.model.LedgerDto;
 import com.financialplanner.moduledisplaybc.model.LedgerRequest;
 import com.financialplanner.moduledisplaybc.service.LedgerReadoutService;
 import com.financialplanner.moduleapi.response.ApiResponse;
@@ -28,11 +29,11 @@ public class DisplayController {
     }
 
     @PostMapping("/ledger")
-    public ResponseEntity<ApiResponse<List<Ledger>>> buildLedger(@RequestBody LedgerRequest request) {
+    public ResponseEntity<ApiResponse<List<LedgerDto>>> buildLedger(@RequestBody LedgerRequest request) {
 
-        List<Ledger> ledger = ledgerReadoutService.buildLedgerReadout(request);
+        List<LedgerDto> ledger = ledgerReadoutService.buildLedgerReadout(request);
         // Build sanitized ApiResponse using ResponseFactory
-        ApiResponse<List<Ledger>> body = responseFactory.success(ledger, "Items retrieved successfully");
+        ApiResponse<List<LedgerDto>> body = responseFactory.success(ledger, "Items retrieved successfully");
         return ResponseEntity.ok(body);
     }
 }
