@@ -1,6 +1,5 @@
 package com.financialplanner.moduledisplaybc.model;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @lombok.Data

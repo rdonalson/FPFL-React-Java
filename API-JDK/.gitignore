@@ -9,6 +9,7 @@ target/
 # Eclipse / IntelliJ / VSCode
 # -------------------------
 .idea/
+API-JDK/.idea/dataSources.xml
 *.iml
 *.ipr
 *.iws
