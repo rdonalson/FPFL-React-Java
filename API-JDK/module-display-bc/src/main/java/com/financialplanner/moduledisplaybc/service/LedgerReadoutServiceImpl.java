@@ -95,13 +95,19 @@ public class LedgerReadoutServiceImpl implements LedgerReadoutService {
             double credit = 0.0;
             double debit = 0.0;
 
+            int itemKeyCounter = 1;   // ⭐ itemKey starts at 1 for each ledger day
+
             for (ItemDto item : todaysItems) {
                 double amt = item.getAmount() != null ? item.getAmount() : 0.0;
 
                 if (amt > 0.0) credit += amt;
                 else debit += amt;
 
-                row.getItems().add(item); // attach items to ledger day
+                // ⭐ Assign itemKey per-day
+                item.setItemKey(itemKeyCounter++);
+
+                // Attach item to ledger day
+                row.getItems().add(item);
             }
 
             double net = credit + debit;
@@ -124,12 +130,11 @@ public class LedgerReadoutServiceImpl implements LedgerReadoutService {
             dto.setName(i.getName());
             dto.setAmount(i.getAmount());
 
-            // occurrenceDate
             dto.setOccurrenceDate(
                 i.getBeginDate() != null ? i.getBeginDate().toString() : null
             );
 
-            // period (NULL SAFE)
+            // FIX: TimePeriod may be null (especially for Initial Amount)
             dto.setPeriod(
                 i.getTimePeriod() != null ? i.getTimePeriod().getName() : null
             );
