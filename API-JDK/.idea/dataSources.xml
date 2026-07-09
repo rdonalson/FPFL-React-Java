@@ -15,7 +15,7 @@
       </jdbc-additional-properties>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="jdbc:postgresql://localhost:5432/FPFL-V2 [DEBUG]" group="​ModuleApiApplication" uuid="9f92e00e-52b4-488f-a7b9-0c69609ae486">
+    <data-source source="LOCAL" name="jdbc:postgresql://localhost:5432/FPFL-V2 [DEBUG]" group="​ModuleApiApplication" uuid="b106cde5-f137-4a79-be9c-5bbe05aa7764">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <imported>true</imported>

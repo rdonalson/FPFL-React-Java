@@ -1,11 +1,11 @@
 package com.financialplanner.moduledisplaybc.service;
 
 import com.financialplanner.moduledisplaybc.model.ItemDto;
-import com.financialplanner.moduledisplaybc.model.Ledger;
 import com.financialplanner.moduledisplaybc.model.LedgerDto;
 import com.financialplanner.moduledisplaybc.model.LedgerRequest;
 import com.financialplanner.moduleitemsbc.domain.service.ItemService;
 import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.Item;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -71,46 +71,40 @@ public class LedgerReadoutServiceImpl implements LedgerReadoutService {
     }
 
     private double extractInitialAmount(List<ItemDto> items) {
-        return items.stream()
-            .filter(i -> i.getFkItemType() == 3)
-            .findFirst()
-            .map(ItemDto::getAmount)
-            .orElse(0.0);
+        return items.stream().filter(i -> i.getFkItemType() == 3).findFirst().map(ItemDto::getAmount).orElse(0.0);
     }
 
     private void applyDailyEnrichment(List<LedgerDto> ledger, List<ItemDto> items) {
 
-        // Group items by date
-        Map<LocalDate, List<ItemDto>> itemsByDate = items.stream()
-            .filter(i -> i.getOccurrenceDate() != null)
-            .collect(Collectors.groupingBy(i -> LocalDate.parse(i.getOccurrenceDate())));
+        // Group items by LocalDate
+        Map<LocalDate, List<ItemDto>> itemsByDate = items.stream().filter(i -> i.getOccurrenceDate() != null).collect(Collectors.groupingBy(i -> LocalDate.parse(i.getOccurrenceDate())));
 
-        double running = ledger.get(0).getRunningTotal();
+        double running = ledger.getFirst().getRunningTotal(); // initial amount
 
         for (LedgerDto row : ledger) {
             LocalDate date = row.getWDate();
-
             List<ItemDto> todaysItems = itemsByDate.getOrDefault(date, List.of());
 
             double credit = 0.0;
             double debit = 0.0;
 
-            int itemKeyCounter = 1;   // ⭐ itemKey starts at 1 for each ledger day
+            int itemKeyCounter = 1;
 
             for (ItemDto item : todaysItems) {
                 double amt = item.getAmount() != null ? item.getAmount() : 0.0;
 
-                if (amt > 0.0) credit += amt;
-                else debit += amt;
+                switch (item.getFkItemType()) {
+                    case 1 -> credit += amt; // credit (positive)
+                    case 2 -> debit += amt; // debit stored negative
+                    default -> {
+                    } // ignore others
+                }
 
-                // ⭐ Assign itemKey per-day
                 item.setItemKey(itemKeyCounter++);
-
-                // Attach item to ledger day
                 row.getItems().add(item);
             }
 
-            double net = credit + debit;
+            double net = credit + debit; // explicit subtraction
             running += net;
 
             row.setCreditSummary(credit);
@@ -124,23 +118,28 @@ public class LedgerReadoutServiceImpl implements LedgerReadoutService {
         return items.stream().map(i -> {
             ItemDto dto = new ItemDto();
 
+            @NotNull int itemType = Math.toIntExact(i.getItemType().getId());
+            double rawAmount = i.getAmount() != null ? i.getAmount() : 0.0;
+
+            // Apply sign based on itemType
+            double signedAmount = switch (itemType) {
+                case 1 -> rawAmount; // CREDIT → positive
+                case 2 -> -rawAmount; // DEBIT → negative
+                case 3 -> rawAmount; // INITIAL AMOUNT → positive
+                default -> rawAmount; // fallback
+            };
+
             dto.setItemKey(Math.toIntExact(i.getId()));
-            dto.setFkItemType(Math.toIntExact(i.getItemType().getId()));
+            dto.setFkItemType(Math.toIntExact(itemType));
             dto.setItemType(i.getItemType().getName());
             dto.setName(i.getName());
-            dto.setAmount(i.getAmount());
+            dto.setAmount(signedAmount);
 
-            dto.setOccurrenceDate(
-                i.getBeginDate() != null ? i.getBeginDate().toString() : null
-            );
+            dto.setOccurrenceDate(i.getBeginDate() != null ? i.getBeginDate().toString() : null);
 
-            // FIX: TimePeriod may be null (especially for Initial Amount)
-            dto.setPeriod(
-                i.getTimePeriod() != null ? i.getTimePeriod().getName() : null
-            );
+            dto.setPeriod(i.getTimePeriod() != null ? i.getTimePeriod().getName() : null);
 
             return dto;
         }).collect(Collectors.toList());
     }
-
 }
