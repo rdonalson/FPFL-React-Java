@@ -10,12 +10,10 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
- * A utility class that expands weekly recurring items into a list of dated occurrences
- * represented by {@link ItemDto} objects. Non-recurring or non-weekly items are processed
- * and returned directly without generating multiple occurrences.
- *
- * This class maps {@link Item} objects to {@link ItemDto} objects using a provided mapping
- * function and considers weekly recurrence rules based on a specific day of the week.
+ * A utility class that expands recurring weekly items into individual dated occurrences.
+ * The WeeklyRecurrenceExpander is designed to handle a list of items, expand the weekly recurring
+ * items into specific dates between a given start and end date, and map each occurrence to an
+ * instance of {@link ItemDto}. Non-weekly items are directly mapped and returned as single occurrences.
  */
 public class WeeklyRecurrenceExpander {
 

@@ -8,6 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * The DailyRecurrenceExpander class processes a list of items and expands any daily recurring
+ * items into their respective dated occurrences within a specified date range. Non-daily items
+ * are mapped directly and included as single occurrences in the output.
+ */
 public class DailyRecurrenceExpander {
 
     private final Function<Item, ItemDto> mapper;
@@ -63,12 +68,6 @@ public class DailyRecurrenceExpander {
         }
 
         return expanded;
-    }
-
-    public boolean isDaily(Item item) {
-        if (item == null || item.getTimePeriod() == null) return false;
-        int pid = Math.toIntExact(item.getTimePeriod().getId());
-        return pid == 2; // daily = 2
     }
 
     private static List<LocalDate> computeDailyDates(LocalDate start, LocalDate end) {

@@ -9,8 +9,10 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
- * Maps one-time items to ItemDto occurrences.
- * Non one-time items are ignored (not mapped) so other expanders can handle them.
+ * The {@code OneTimeOccurrenceExpander} class is responsible for extracting
+ * and mapping one-time item occurrences within a specified ledger date range.
+ * Non one-time items are ignored, and their handling is delegated to other
+ * expanders.
  */
 public class OneTimeOccurrenceExpander {
 
@@ -29,7 +31,7 @@ public class OneTimeOccurrenceExpander {
 
         for (Item item : items) {
 
-            if (!isOneTime(item)) {
+            if (isOneTime(item)) {
                 // skip non one-time items; other expanders will handle them
                 continue;
             }
@@ -52,14 +54,14 @@ public class OneTimeOccurrenceExpander {
     }
 
     public boolean isOneTime(Item item) {
-        if (item == null) return false;
+        if (item == null) return true;
 
         // Treat missing TimePeriod as one-time (preserves previous behavior)
-        if (item.getTimePeriod() == null) return true;
+        if (item.getTimePeriod() == null) return false;
 
         int pid = Math.toIntExact(item.getTimePeriod().getId());
         // Domain rule: id == 1 => one-time
-        return pid == 1;
+        return pid != 1;
     }
 
 }
