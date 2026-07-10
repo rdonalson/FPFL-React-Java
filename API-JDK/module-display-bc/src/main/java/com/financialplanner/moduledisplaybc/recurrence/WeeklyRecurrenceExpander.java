@@ -49,7 +49,7 @@ public class WeeklyRecurrenceExpander {
             }
 
             DayOfWeek dow = DayOfWeek.of(weeklyDow);
-            List<LocalDate> weeklyDates = RecurrenceUtils.computeWeeklyDates(ledgerStart, ledgerEnd, dow);
+            List<LocalDate> weeklyDates = computeWeeklyDates(ledgerStart, ledgerEnd, dow);
 
             for (LocalDate date : weeklyDates) {
                 ItemDto dto = mapper.apply(item);
@@ -59,5 +59,31 @@ public class WeeklyRecurrenceExpander {
         }
 
         return expanded;
+    }
+
+    public boolean isWeekly(Item item) {
+        if (item == null || item.getTimePeriod() == null) return false;
+        int pid = Math.toIntExact(item.getTimePeriod().getId());
+        return pid == 3; // weekly = 3
+    }
+
+    private static List<LocalDate> computeWeeklyDates(LocalDate start, LocalDate end, DayOfWeek targetDay) {
+        List<LocalDate> dates = new ArrayList<>();
+
+        LocalDate cursor = start;
+        // advance to first matching day (safe even if start already matches)
+        while (cursor.getDayOfWeek() != targetDay) {
+            cursor = cursor.plusDays(1);
+            if (cursor.isAfter(end)) {
+                return dates; // no occurrences in range
+            }
+        }
+
+        while (!cursor.isAfter(end)) {
+            dates.add(cursor);
+            cursor = cursor.plusWeeks(1);
+        }
+
+        return dates;
     }
 }
