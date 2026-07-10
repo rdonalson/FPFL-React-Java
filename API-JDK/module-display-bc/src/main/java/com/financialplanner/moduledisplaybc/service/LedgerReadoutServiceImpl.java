@@ -3,33 +3,66 @@ package com.financialplanner.moduledisplaybc.service;
 import com.financialplanner.moduledisplaybc.model.ItemDto;
 import com.financialplanner.moduledisplaybc.model.LedgerDto;
 import com.financialplanner.moduledisplaybc.model.LedgerRequest;
+import com.financialplanner.moduledisplaybc.recurrence.OneTimeOccurrenceExpander;
+import com.financialplanner.moduledisplaybc.recurrence.WeeklyRecurrenceExpander;
 import com.financialplanner.moduleitemsbc.domain.service.ItemService;
 import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.Item;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Service implementation responsible for generating ledger readouts based on user inputs.
+ * This class processes and expands user-defined financial items into daily ledger entries
+ * that include credits, debits, and running totals.
+ *
+ * The generated ledger contains aggregated daily financial information enriched with
+ * item-specific details, supporting both one-time and recurring (weekly) events.
+ *
+ * The service is designed to apply an initial running total, daily enrichment based on
+ * expanded financial items, and summarizes the daily credit and debit values for each
+ * ledger entry.
+ *
+ * This implementation relies on the following components:
+ * - {@link ItemService} for fetching financial items associated with a given user.
+ * - {@link WeeklyRecurrenceExpander} for handling weekly recurring events.
+ * - {@link OneTimeOccurrenceExpander} for handling one-time financial events.
+ */
 @Service
 public class LedgerReadoutServiceImpl implements LedgerReadoutService {
 
     private final ItemService itemService;
+    private final WeeklyRecurrenceExpander weeklyExpander;
+    private final OneTimeOccurrenceExpander oneTimeExpander;
 
     public LedgerReadoutServiceImpl(ItemService itemService) {
         this.itemService = itemService;
+        this.weeklyExpander = new WeeklyRecurrenceExpander(this::mapItemToDto);
+        this.oneTimeExpander = new OneTimeOccurrenceExpander(this::mapItemToDto);
     }
 
     @Override
-    public List<LedgerDto> buildLedgerReadout(LedgerRequest request) {
+    public List<LedgerDto> buildLedgerReadout(@NonNull LedgerRequest request) {
         List<Item> userItems = itemService.findByUserId(request.userId());
+        // 1) One-time occurrences (mapped only for items that are one-time)
+        List<ItemDto> oneTimeDtos = oneTimeExpander.expand(userItems, request.startDate(), request.endDate());
 
-        // Expand weekly items BEFORE mapping to DTO
-        List<ItemDto> itemDtos = expandWeeklyItems(userItems, request.startDate(), request.endDate());
+        // 2) Weekly occurrences (pass only non-one-time items to avoid duplicates)
+        List<Item> nonOneTimeItems = userItems.stream()
+            .filter(i -> !oneTimeExpander.isOneTime(i))
+            .collect(Collectors.toList());
 
+        List<ItemDto> weeklyDtos = weeklyExpander.expand(nonOneTimeItems, request.startDate(), request.endDate());
+
+        // 3) Combine
+        List<ItemDto> itemDtos = new ArrayList<>();
+        itemDtos.addAll(oneTimeDtos);
+        itemDtos.addAll(weeklyDtos);
         // Build ledger table (DTO)
         List<LedgerDto> ledger = buildLedgerTable(request.startDate(), request.endDate());
 
@@ -43,72 +76,6 @@ public class LedgerReadoutServiceImpl implements LedgerReadoutService {
         applyDailyEnrichment(ledger, itemDtos);
 
         return ledger;
-    }
-
-    private List<ItemDto> expandWeeklyItems(
-        List<Item> items,
-        LocalDate ledgerStart,
-        LocalDate ledgerEnd
-    ) {
-        List<ItemDto> expanded = new ArrayList<>();
-
-        for (Item item : items) {
-
-            // Determine periodId safely
-            int periodId = Math.toIntExact(item.getTimePeriod() != null ? item.getTimePeriod().getId() : 0);
-
-            // Not weekly → map normally
-            if (periodId != 3) {
-                expanded.add(mapItemToDto(item));
-                continue;
-            }
-
-            // Weekly item → weeklyDow MUST exist
-            Integer weeklyDow = item.getWeeklyDow();
-
-            if (weeklyDow == null) {
-                // Avoid 500 errors — treat as single occurrence
-                expanded.add(mapItemToDto(item));
-                continue;
-            }
-
-            // Convert weeklyDow → DayOfWeek (1=Mon ... 7=Sun)
-            DayOfWeek dow = DayOfWeek.of(weeklyDow);
-
-            // Compute weekly dates
-            List<LocalDate> weeklyDates = computeWeeklyDates(ledgerStart, ledgerEnd, dow);
-
-            // Clone item for each weekly date
-            for (LocalDate date : weeklyDates) {
-                ItemDto dto = mapItemToDto(item);
-                dto.setOccurrenceDate(date.toString());
-                expanded.add(dto);
-            }
-        }
-
-        return expanded;
-    }
-
-    private List<LocalDate> computeWeeklyDates(LocalDate start, LocalDate end, DayOfWeek targetDay) {
-        List<LocalDate> dates = new ArrayList<>();
-
-        // Move cursor to the first occurrence of targetDay
-        LocalDate cursor = start;
-        while (cursor.getDayOfWeek() != targetDay) {
-            cursor = cursor.plusDays(1);
-        }
-
-        // Collect all weekly occurrences
-        while (!cursor.isAfter(end)) {
-            dates.add(cursor);
-            cursor = cursor.plusWeeks(1);
-        }
-
-        return dates;
-    }
-
-    private DayOfWeek convertDow(int weeklyDow) {
-        return DayOfWeek.of(weeklyDow); // 1 = Monday, 7 = Sunday
     }
 
     private List<LedgerDto> buildLedgerTable(LocalDate start, LocalDate end) {
@@ -203,20 +170,14 @@ public class LedgerReadoutServiceImpl implements LedgerReadoutService {
         dto.setName(i.getName());
         dto.setAmount(signedAmount);
 
-        dto.setOccurrenceDate(
-            i.getBeginDate() != null ? i.getBeginDate().toString() : null
-        );
+        dto.setOccurrenceDate(i.getBeginDate() != null ? i.getBeginDate().toString() : null);
 
-        dto.setPeriod(
-            i.getTimePeriod() != null ? i.getTimePeriod().getName() : null
-        );
+        dto.setPeriod(i.getTimePeriod() != null ? i.getTimePeriod().getName() : null);
 
         return dto;
     }
 
-    private List<ItemDto> mapItemsToDto(List<Item> items) {
-        return items.stream()
-            .map(this::mapItemToDto)
-            .collect(Collectors.toList());
+    private List<ItemDto> mapItemsToDto(@NonNull List<Item> items) {
+        return items.stream().map(this::mapItemToDto).collect(Collectors.toList());
     }
 }
