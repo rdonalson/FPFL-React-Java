@@ -5,9 +5,9 @@ import com.financialplanner.moduledisplaybc.model.LedgerDto;
 import com.financialplanner.moduledisplaybc.model.LedgerRequest;
 import com.financialplanner.moduleitemsbc.domain.service.ItemService;
 import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.Item;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +27,8 @@ public class LedgerReadoutServiceImpl implements LedgerReadoutService {
     public List<LedgerDto> buildLedgerReadout(LedgerRequest request) {
         List<Item> userItems = itemService.findByUserId(request.userId());
 
-        // Convert Items → ItemDto
-        List<ItemDto> itemDtos = mapItemsToDto(userItems);
+        // Expand weekly items BEFORE mapping to DTO
+        List<ItemDto> itemDtos = expandWeeklyItems(userItems, request.startDate(), request.endDate());
 
         // Build ledger table (DTO)
         List<LedgerDto> ledger = buildLedgerTable(request.startDate(), request.endDate());
@@ -43,6 +43,72 @@ public class LedgerReadoutServiceImpl implements LedgerReadoutService {
         applyDailyEnrichment(ledger, itemDtos);
 
         return ledger;
+    }
+
+    private List<ItemDto> expandWeeklyItems(
+        List<Item> items,
+        LocalDate ledgerStart,
+        LocalDate ledgerEnd
+    ) {
+        List<ItemDto> expanded = new ArrayList<>();
+
+        for (Item item : items) {
+
+            // Determine periodId safely
+            int periodId = Math.toIntExact(item.getTimePeriod() != null ? item.getTimePeriod().getId() : 0);
+
+            // Not weekly → map normally
+            if (periodId != 3) {
+                expanded.add(mapItemToDto(item));
+                continue;
+            }
+
+            // Weekly item → weeklyDow MUST exist
+            Integer weeklyDow = item.getWeeklyDow();
+
+            if (weeklyDow == null) {
+                // Avoid 500 errors — treat as single occurrence
+                expanded.add(mapItemToDto(item));
+                continue;
+            }
+
+            // Convert weeklyDow → DayOfWeek (1=Mon ... 7=Sun)
+            DayOfWeek dow = DayOfWeek.of(weeklyDow);
+
+            // Compute weekly dates
+            List<LocalDate> weeklyDates = computeWeeklyDates(ledgerStart, ledgerEnd, dow);
+
+            // Clone item for each weekly date
+            for (LocalDate date : weeklyDates) {
+                ItemDto dto = mapItemToDto(item);
+                dto.setOccurrenceDate(date.toString());
+                expanded.add(dto);
+            }
+        }
+
+        return expanded;
+    }
+
+    private List<LocalDate> computeWeeklyDates(LocalDate start, LocalDate end, DayOfWeek targetDay) {
+        List<LocalDate> dates = new ArrayList<>();
+
+        // Move cursor to the first occurrence of targetDay
+        LocalDate cursor = start;
+        while (cursor.getDayOfWeek() != targetDay) {
+            cursor = cursor.plusDays(1);
+        }
+
+        // Collect all weekly occurrences
+        while (!cursor.isAfter(end)) {
+            dates.add(cursor);
+            cursor = cursor.plusWeeks(1);
+        }
+
+        return dates;
+    }
+
+    private DayOfWeek convertDow(int weeklyDow) {
+        return DayOfWeek.of(weeklyDow); // 1 = Monday, 7 = Sunday
     }
 
     private List<LedgerDto> buildLedgerTable(LocalDate start, LocalDate end) {
@@ -114,32 +180,43 @@ public class LedgerReadoutServiceImpl implements LedgerReadoutService {
         }
     }
 
+    private ItemDto mapItemToDto(Item i) {
+        ItemDto dto = new ItemDto();
+
+        // Extract itemType once
+        int itemType = Math.toIntExact((i.getItemType() != null ? i.getItemType().getId() : 0));
+
+        // Raw amount (null-safe)
+        double rawAmount = (i.getAmount() != null ? i.getAmount() : 0.0);
+
+        // Apply sign based on itemType
+        double signedAmount = switch (itemType) {
+            case 1 -> rawAmount;        // CREDIT → positive
+            case 2 -> -rawAmount;       // DEBIT → negative
+            case 3 -> rawAmount;        // INITIAL AMOUNT → positive
+            default -> rawAmount;       // fallback
+        };
+
+        dto.setItemKey(Math.toIntExact(i.getId()));
+        dto.setFkItemType(itemType);
+        dto.setItemType(i.getItemType() != null ? i.getItemType().getName() : null);
+        dto.setName(i.getName());
+        dto.setAmount(signedAmount);
+
+        dto.setOccurrenceDate(
+            i.getBeginDate() != null ? i.getBeginDate().toString() : null
+        );
+
+        dto.setPeriod(
+            i.getTimePeriod() != null ? i.getTimePeriod().getName() : null
+        );
+
+        return dto;
+    }
+
     private List<ItemDto> mapItemsToDto(List<Item> items) {
-        return items.stream().map(i -> {
-            ItemDto dto = new ItemDto();
-
-            @NotNull int itemType = Math.toIntExact(i.getItemType().getId());
-            double rawAmount = i.getAmount() != null ? i.getAmount() : 0.0;
-
-            // Apply sign based on itemType
-            double signedAmount = switch (itemType) {
-                case 1 -> rawAmount; // CREDIT → positive
-                case 2 -> -rawAmount; // DEBIT → negative
-                case 3 -> rawAmount; // INITIAL AMOUNT → positive
-                default -> rawAmount; // fallback
-            };
-
-            dto.setItemKey(Math.toIntExact(i.getId()));
-            dto.setFkItemType(Math.toIntExact(itemType));
-            dto.setItemType(i.getItemType().getName());
-            dto.setName(i.getName());
-            dto.setAmount(signedAmount);
-
-            dto.setOccurrenceDate(i.getBeginDate() != null ? i.getBeginDate().toString() : null);
-
-            dto.setPeriod(i.getTimePeriod() != null ? i.getTimePeriod().getName() : null);
-
-            return dto;
-        }).collect(Collectors.toList());
+        return items.stream()
+            .map(this::mapItemToDto)
+            .collect(Collectors.toList());
     }
 }
