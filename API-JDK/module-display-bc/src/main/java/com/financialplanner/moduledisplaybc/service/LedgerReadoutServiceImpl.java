@@ -3,6 +3,7 @@ package com.financialplanner.moduledisplaybc.service;
 import com.financialplanner.moduledisplaybc.model.ItemDto;
 import com.financialplanner.moduledisplaybc.model.LedgerDto;
 import com.financialplanner.moduledisplaybc.model.LedgerRequest;
+import com.financialplanner.moduledisplaybc.recurrence.BiWeeklyRecurrenceExpander;
 import com.financialplanner.moduledisplaybc.recurrence.DailyRecurrenceExpander;
 import com.financialplanner.moduledisplaybc.recurrence.OneTimeOccurrenceExpander;
 import com.financialplanner.moduledisplaybc.recurrence.WeeklyRecurrenceExpander;
@@ -17,10 +18,23 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Implementation of the {@link LedgerReadoutService} that generates a financial ledger
- * readout for a specified user and date range. This service handles the expansion of
- * recurring items and one-time occurrences, processes financial transactions, and
- * enriches the ledger entries with detailed calculations.
+ * Implementation of the {@link LedgerReadoutService} interface. This service is responsible for
+ * constructing a detailed ledger readout for a specific user over a given time period. It processes
+ * recurring and one-time items, grouping and aggregating them into a comprehensive list of ledger
+ * entries that includes credits, debits, net amounts, and running totals for each day.
+ * This implementation uses various recurrence expanders to handle different types of items:
+ * - Weekly recurring items
+ * - Bi-weekly recurring items
+ * - Daily recurring items
+ * - One-time occurrences
+ * The service performs the following high-level tasks:
+ * - Fetches user-specific items from the underlying data source
+ * - Maps items to DTO representations
+ * - Expands recurring items based on their recurrence type and date range
+ * - Constructs a ledger table for the given time range
+ * - Applies running totals, credit, debit, and net calculations to the ledger
+ * - Groups and applies daily transaction enrichment for accurate representation
+ * The implementation is stateless and relies on dependency injection for managing its components.
  */
 @Service
 public class LedgerReadoutServiceImpl implements LedgerReadoutService {
@@ -29,56 +43,48 @@ public class LedgerReadoutServiceImpl implements LedgerReadoutService {
     private final WeeklyRecurrenceExpander weeklyExpander;
     private final OneTimeOccurrenceExpander oneTimeExpander;
     private final DailyRecurrenceExpander dailyExpander;
+    private final BiWeeklyRecurrenceExpander biWeeklyExpander;
 
     public LedgerReadoutServiceImpl(ItemService itemService) {
         this.itemService = itemService;
         this.weeklyExpander = new WeeklyRecurrenceExpander(this::mapItemToDto);
         this.oneTimeExpander = new OneTimeOccurrenceExpander(this::mapItemToDto);
         this.dailyExpander = new DailyRecurrenceExpander(this::mapItemToDto);
+        this.biWeeklyExpander = new BiWeeklyRecurrenceExpander(this::mapItemToDto);
     }
 
     /**
-     * Builds a ledger readout for a specified user and date range.
-     * This method processes user items, filters them based on occurrence periods
-     * (one-time, weekly, and daily), converts them to DTOs, and generates a ledger
-     * consisting of enriched daily transactions with a running total.
+     * Builds a ledger readout for a specific user and time period, aggregating and enriching recurring
+     * and one-time items into a structured list of ledger entries.
      *
-     * @param request the {@code LedgerRequest} object containing the user ID,
-     *                start date, and end date for which the ledger is to be generated.
-     * @return a {@code List<LedgerDto>} containing the ledger entries, enriched with
-     *         daily transactions and a running total for the specified date range.
+     * @param request the ledger request containing the user ID and date range for the ledger readout
+     * @return a list of ledger entries (LedgerDto) representing the user's financial activity
+     *         within the specified date range
      */
     @Override
     public List<LedgerDto> buildLedgerReadout(LedgerRequest request) {
         List<Item> userItems = itemService.findByUserId(request.userId());
 
-        // 1) One-time occurrences (periodId == 1)
-        List<ItemDto> oneTimeDtos = oneTimeExpander.expand(userItems, request.startDate(), request.endDate());
+        LocalDate start = request.startDate();
+        LocalDate end = request.endDate();
 
-        // 2) Filter out one-time items
-        List<Item> nonOneTime = userItems.stream()
-            .filter(oneTimeExpander::isOneTime)
-            .collect(Collectors.toList());
+        // Each expander evaluates ALL items and expands only its own period.
+        // Non-matching items are ignored inside the expander.
 
-        // 3) Weekly occurrences (periodId == 3)
-        List<ItemDto> weeklyDtos = weeklyExpander.expand(nonOneTime, request.startDate(), request.endDate());
+        List<ItemDto> oneTimeDtos   = oneTimeExpander.expand(userItems, start, end);
+        List<ItemDto> weeklyDtos    = weeklyExpander.expand(userItems, start, end);
+        List<ItemDto> biWeeklyDtos  = biWeeklyExpander.expand(userItems, start, end);
+        List<ItemDto> dailyDtos     = dailyExpander.expand(userItems, start, end);
 
-        // 4) Filter out weekly items
-        List<Item> nonWeekly = nonOneTime.stream()
-            .filter(i -> !weeklyExpander.isWeekly(i))
-            .collect(Collectors.toList());
-
-        // 5) Daily occurrences (periodId == 2)
-        List<ItemDto> dailyDtos = dailyExpander.expand(nonWeekly, request.startDate(), request.endDate());
-
-        // 6) Combine all DTOs
+        // Combine all occurrences from all recurrence types
         List<ItemDto> itemDtos = new ArrayList<>();
         itemDtos.addAll(oneTimeDtos);
         itemDtos.addAll(weeklyDtos);
+        itemDtos.addAll(biWeeklyDtos);
         itemDtos.addAll(dailyDtos);
 
         // Build ledger table (DTO)
-        List<LedgerDto> ledger = buildLedgerTable(request.startDate(), request.endDate());
+        List<LedgerDto> ledger = buildLedgerTable(start, end);
 
         // Initial amount (ItemType 3)
         double initialAmount = extractInitialAmount(itemDtos);
@@ -92,12 +98,15 @@ public class LedgerReadoutServiceImpl implements LedgerReadoutService {
         return ledger;
     }
 
+
     /**
-     * Builds a ledger table containing a list of ledger entries for each day in the given date range.
+     * Constructs a ledger table containing a list of {@code LedgerDto} objects for each date
+     * within the provided start and end date range, inclusive. Each ledger row includes the rollup key,
+     * the year, and the specific date.
      *
-     * @param start the start date for the ledger table
-     * @param end the end date for the ledger table
-     * @return a list of {@code LedgerDto} objects representing the ledger rows for each day in the date range
+     * @param start the starting date of the ledger table (inclusive)
+     * @param end the ending date of the ledger table (inclusive)
+     * @return a list of {@code LedgerDto} objects representing the ledger table for the given date range
      */
     private List<LedgerDto> buildLedgerTable(LocalDate start, LocalDate end) {
         List<LedgerDto> table = new ArrayList<>();
@@ -119,11 +128,10 @@ public class LedgerReadoutServiceImpl implements LedgerReadoutService {
     }
 
     /**
-     * Updates the running total for each entry in the provided ledger by applying the initial amount.
-     * The running total for all rows will be set to the specified initial amount.
+     * Updates each entry in the provided ledger with an initial running total amount.
      *
-     * @param ledger the list of {@code LedgerDto} objects representing the ledger entries to be updated
-     * @param initialAmount the initial amount to be applied as the running total for each ledger entry
+     * @param ledger the list of ledger entries that will have their running totals updated
+     * @param initialAmount the initial amount to set as the running total for each ledger entry
      */
     private void applyInitialRunningTotals(List<LedgerDto> ledger, double initialAmount) {
         for (LedgerDto row : ledger) {
@@ -132,26 +140,24 @@ public class LedgerReadoutServiceImpl implements LedgerReadoutService {
     }
 
     /**
-     * Extracts the initial amount from a list of financial items by identifying the first
-     * item with an item type matching the identifier for "Initial Amount" (itemType = 3).
-     * If no such item is found, the method returns 0.0.
+     * Extracts the initial amount from a list of items by filtering items of type 3
+     * and retrieving the amount of the first matching item. If no matching item is
+     * found, returns a default value of 0.0.
      *
-     * @param items the list of {@code ItemDto} objects representing financial items to scan.
-     * @return the amount of the first item with item type 3, or 0.0 if no such item exists.
+     * @param items the list of {@code ItemDto} objects to search for the initial amount
+     * @return the initial amount as a double; 0.0 if no matching item is found
      */
     private double extractInitialAmount(List<ItemDto> items) {
         return items.stream().filter(i -> i.getFkItemType() == 3).findFirst().map(ItemDto::getAmount).orElse(0.0);
     }
 
     /**
-     * Applies daily enrichment to the given ledger by processing a list of items and updating
-     * the ledger with calculated credit, debit, net, and running totals for each date, along
-     * with adding the items to the corresponding ledger entries.
+     * Applies daily enrichment to a list of ledger entries by processing a list of items
+     * and updating the ledger with credit, debit, and running total calculations.
+     * Items are grouped by their occurrence date and mapped to corresponding ledger entries.
      *
-     * @param ledger the list of LedgerDto representing the ledger data to be enriched.
-     *               Each entry in the ledger corresponds to a specific date.
-     * @param items the list of ItemDto representing the items to be processed and
-     *              grouped by their occurrence date for enrichment of the ledger.
+     * @param ledger the list of ledger entries to be updated. Each entry represents a daily record.
+     * @param items the list of items containing transaction details that are to be grouped by their occurrence date and applied to the ledger.
      */
     private void applyDailyEnrichment(List<LedgerDto> ledger, List<ItemDto> items) {
 
@@ -194,12 +200,13 @@ public class LedgerReadoutServiceImpl implements LedgerReadoutService {
     }
 
     /**
-     * Converts an {@link Item} entity to an {@link ItemDto}.
-     * Maps relevant fields from the source {@code Item} object to the target {@code ItemDto}.
-     * This includes processing and transforming data such as the amount, item type, and related dates.
+     * Maps an {@link Item} entity to an {@link ItemDto} instance.
+     * Converts and sets properties from an {@link Item} to an {@link ItemDto},
+     * handling null-safety and applying business logic such as amount sign determination
+     * based on the item type.
      *
-     * @param i The {@code Item} object to be mapped. Must not be null.
-     * @return The mapped {@code ItemDto} containing the transformed data from the input {@code Item}.
+     * @param i the {@link Item} entity to be mapped. Must not be null.
+     * @return an {@link ItemDto} representation of the provided {@link Item}.
      */
     private ItemDto mapItemToDto(Item i) {
         ItemDto dto = new ItemDto();
