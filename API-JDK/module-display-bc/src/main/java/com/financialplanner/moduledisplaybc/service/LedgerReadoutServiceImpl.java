@@ -70,7 +70,6 @@ public class LedgerReadoutServiceImpl implements LedgerReadoutService {
 
         // Each expander evaluates ALL items and expands only its own period.
         // Non-matching items are ignored inside the expander.
-
         List<ItemDto> oneTimeDtos   = oneTimeExpander.expand(userItems, start, end);
         List<ItemDto> dailyDtos     = dailyExpander.expand(userItems, start, end);
         List<ItemDto> weeklyDtos    = weeklyExpander.expand(userItems, start, end);

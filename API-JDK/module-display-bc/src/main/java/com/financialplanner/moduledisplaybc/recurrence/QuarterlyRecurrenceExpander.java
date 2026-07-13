@@ -1,7 +1,8 @@
 package com.financialplanner.moduledisplaybc.recurrence;
 
-import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.Item;
 import com.financialplanner.moduledisplaybc.model.ItemDto;
+import com.financialplanner.moduledisplaybc.utility.RecurrenceRange;
+import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.Item;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -10,10 +11,10 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
- * The QuarterlyRecurrenceExpander class provides functionality to expand a list of items
- * into occurrences based on quarterly recurrence rules. It processes items that are
- * configured with quarterly recurrence and ensures those occurrences fall within a specified
- * date range.
+ * A utility class for expanding a collection of items into their quarterly occurrences
+ * based on predefined rules and a specified ledger range. This class processes items
+ * flagged as quarterly and calculates their occurrences within an effective date range.
+ * The resulting occurrences are mapped and returned as DTO objects.
  */
 public class QuarterlyRecurrenceExpander {
 
@@ -24,28 +25,44 @@ public class QuarterlyRecurrenceExpander {
     }
 
     /**
-     * Expands a list of items into a list of {@code ItemDto} objects by generating occurrence dates
-     * based on quarterly recurrence rules within the specified ledger period.
-     * Only items with a quarterly time period are processed.
+     * Expands a list of items into their quarterly occurrences based on a specified ledger range.
+     * Only items that are defined as quarterly are processed, and their occurrences are calculated
+     * within the effective range determined by either the default ledger range or a resolved date range.
      *
-     * @param items the list of items to be expanded; each item may contain quarterly recurrence information
-     * @param ledgerStart the start date of the ledger period; items occurring before this date are ignored
-     * @param ledgerEnd the end date of the ledger period; items occurring after this date are ignored
-     * @return a list of {@code ItemDto} objects, each representing an occurrence of an item within the specified ledger period
+     * @param items the list of items to be expanded
+     * @param ledgerStart the start date of the ledger range
+     * @param ledgerEnd the end date of the ledger range
+     * @return a list of {@code ItemDto} objects representing the expanded items with their occurrences
      */
     public List<ItemDto> expand(List<Item> items, LocalDate ledgerStart, LocalDate ledgerEnd) {
         List<ItemDto> expanded = new ArrayList<>();
 
-        for (Item item : items) {
+        // Filter quarterly items first (periodId = 7)
+        List<Item> quarterlyItems = items.stream()
+            .filter(this::isQuarterly)
+            .toList();
 
-            int periodId = Math.toIntExact(item.getTimePeriod() != null ? item.getTimePeriod().getId() : 0);
+        for (Item item : quarterlyItems) {
 
-            // Only handle quarterly (periodId = 7)
-            if (periodId != 7) {
-                continue;
+            // Default effective range = ledger range
+            LocalDate effStart = ledgerStart;
+            LocalDate effEnd   = ledgerEnd;
+
+            // Only call resolveRange() when DateRangeReq == true
+            Boolean req = item.getDateRangeReq();
+            if (req != null && req) {
+                LocalDate[] range = RecurrenceRange.resolveRange(item, ledgerStart, ledgerEnd);
+
+                if (range == null) {
+                    // No overlap → skip item entirely
+                    continue;
+                }
+
+                effStart = range[0];
+                effEnd   = range[1];
             }
 
-            // Extract the four quarterly anchors
+            // Extract quarterly anchors
             Integer[] months = {
                 item.getQuarterly1Month(),
                 item.getQuarterly2Month(),
@@ -60,28 +77,13 @@ public class QuarterlyRecurrenceExpander {
                 item.getQuarterly4Day()
             };
 
-            // Expand year-by-year
-            int startYear = ledgerStart.getYear();
-            int endYear = ledgerEnd.getYear();
+            // Compute quarterly dates using the effective range
+            List<LocalDate> quarterlyDates = computeQuarterlyDates(effStart, effEnd, months, days);
 
-            for (int year = startYear; year <= endYear; year++) {
-
-                for (int i = 0; i < 4; i++) {
-                    Integer month = months[i];
-                    Integer day = days[i];
-
-                    if (month == null || day == null) {
-                        continue; // skip undefined quarterly anchors
-                    }
-
-                    LocalDate occurrence = safeDate(year, month, day);
-
-                    if (!occurrence.isBefore(ledgerStart) && !occurrence.isAfter(ledgerEnd)) {
-                        ItemDto dto = mapper.apply(item);
-                        dto.setOccurrenceDate(occurrence.toString());
-                        expanded.add(dto);
-                    }
-                }
+            for (LocalDate date : quarterlyDates) {
+                ItemDto dto = mapper.apply(item);
+                dto.setOccurrenceDate(date.toString());
+                expanded.add(dto);
             }
         }
 
@@ -89,27 +91,76 @@ public class QuarterlyRecurrenceExpander {
     }
 
     /**
-     * Returns a valid LocalDate for the given year/month/day.
-     * If the day exceeds the number of days in the month (e.g., 31 in February),
-     * it snaps to the last day of the month.
-     */
-    private LocalDate safeDate(int year, int month, int day) {
-        YearMonth ym = YearMonth.of(year, month);
-        int lastDay = ym.lengthOfMonth();
-        int safeDay = Math.min(day, lastDay);
-        return ym.atDay(safeDay);
-    }
-
-    /**
-     * Determines if the given item is marked as having a quarterly recurrence.
+     * Determines if the given item has a quarterly recurrence.
      *
-     * @param item the item to evaluate; may be null
-     * @return true if the item is non-null, has a time period, and its time period ID
-     *         corresponds to quarterly recurrence (e.g., ID 7); false otherwise
+     * @param item the item to be checked; must not be null and must have a time period associated with it for the method to return true.
+     * @return true if the item's time period ID is 7 (quarterly), false otherwise or if the item or its time period is null.
      */
     public boolean isQuarterly(Item item) {
         if (item == null || item.getTimePeriod() == null) return false;
         int pid = Math.toIntExact(item.getTimePeriod().getId());
-        return pid == 7; // or whatever ID you assign
+        return pid == 7; // quarterly = 7
+    }
+
+    /**
+     * Computes the quarterly occurrence dates within the specified date range, based on the
+     * provided months and days for each quarter.
+     *
+     * This method calculates a list of dates for quarterly occurrences by iterating through each
+     * year within the specified range. For each quarter, it uses the month and day values provided
+     * to determine the exact date of the occurrence. If the computed date falls within the given
+     * range, it is included in the resulting list.
+     *
+     * @param start the start date of the range; must not be null.
+     * @param end the end date of the range; must not be null and must not be before the start date.
+     * @param months an array of integers representing the months for each quarter; must have a length of 4.
+     *               Null values indicate skipped quarters.
+     * @param days an array of integers representing the days for each quarter; must have a length of 4.
+     *             Null values indicate skipped quarters.
+     * @return a list of {@code LocalDate} objects representing all computed quarterly dates within the specified range.
+     */
+    private static List<LocalDate> computeQuarterlyDates(LocalDate start, LocalDate end,
+                                                         Integer[] months, Integer[] days) {
+
+        List<LocalDate> dates = new ArrayList<>();
+
+        int startYear = start.getYear();
+        int endYear   = end.getYear();
+
+        for (int year = startYear; year <= endYear; year++) {
+
+            for (int i = 0; i < 4; i++) {
+                Integer month = months[i];
+                Integer day   = days[i];
+
+                if (month == null || day == null) {
+                    continue; // skip undefined quarterly anchors
+                }
+
+                LocalDate occurrence = safeDate(year, month, day);
+
+                if (!occurrence.isBefore(start) && !occurrence.isAfter(end)) {
+                    dates.add(occurrence);
+                }
+            }
+        }
+
+        return dates;
+    }
+
+    /**
+     * Safely creates a {@code LocalDate} object by adjusting the day of the month to ensure
+     * it falls within the valid range for the specified year and month.
+     *
+     * @param year the year component of the date
+     * @param month the month component of the date (1-based, i.e., 1 for January, 12 for December)
+     * @param day the day component of the date, which will be clamped to the last valid day if it exceeds the month's length
+     * @return a {@code LocalDate} object representing the adjusted date
+     */
+    private static LocalDate safeDate(int year, int month, int day) {
+        YearMonth ym = YearMonth.of(year, month);
+        int lastDay = ym.lengthOfMonth();
+        int safeDay = Math.min(day, lastDay);
+        return ym.atDay(safeDay);
     }
 }

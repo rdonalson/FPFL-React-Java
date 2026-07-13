@@ -9,6 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * A utility class for expanding daily recurring {@code Item} objects into individual
+ * occurrences represented as {@code ItemDto} objects over a specified date range.
+ * The class processes items with daily recurrence, computes their occurrence dates
+ * within a given range, and generates corresponding DTOs for each occurrence.
+ */
 public class DailyRecurrenceExpander {
 
     private final Function<Item, ItemDto> mapper;
@@ -17,6 +23,15 @@ public class DailyRecurrenceExpander {
         this.mapper = mapper;
     }
 
+    /**
+     * Expands a list of daily recurring {@code Item} objects into a list of {@code ItemDto} objects,
+     * generating individual occurrences for each day within the specified date range.
+     *
+     * @param items a list of {@code Item} objects to be expanded
+     * @param ledgerStart the start date of the ledger range
+     * @param ledgerEnd the end date of the ledger range
+     * @return a list of {@code ItemDto} objects with occurrences for each applicable date
+     */
     public List<ItemDto> expand(List<Item> items, LocalDate ledgerStart, LocalDate ledgerEnd) {
         List<ItemDto> expanded = new ArrayList<>();
 
@@ -58,12 +73,28 @@ public class DailyRecurrenceExpander {
         return expanded;
     }
 
+    /**
+     * Determines if the given item has a daily recurrence pattern.
+     *
+     * An item is considered to have a daily recurrence pattern if its time period
+     * is non-null and the associated period ID is equal to 2.
+     *
+     * @param item The item to be checked. May be null.
+     * @return {@code true} if the item has a daily recurrence pattern, {@code false} otherwise.
+     */
     public boolean isDaily(Item item) {
         if (item == null || item.getTimePeriod() == null) return false;
         int pid = Math.toIntExact(item.getTimePeriod().getId());
         return pid == 2;
     }
 
+    /**
+     * Computes a list of daily dates within a specified range, inclusive of the start and end dates.
+     *
+     * @param start the start date of the range; must not be null.
+     * @param end the end date of the range; must not be null and must not be before the start date.
+     * @return a list of {@code LocalDate} objects representing all dates from the start date to the end date, inclusive.
+     */
     private static List<LocalDate> computeDailyDates(LocalDate start, LocalDate end) {
         List<LocalDate> dates = new ArrayList<>();
         LocalDate cursor = start;

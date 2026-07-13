@@ -9,10 +9,11 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
- * The {@code OneTimeOccurrenceExpander} class is responsible for extracting
- * and mapping one-time item occurrences within a specified ledger date range.
- * Non one-time items are ignored, and their handling is delegated to other
- * expanders.
+ * A utility class responsible for expanding and mapping one-time occurrences
+ * within a provided range of ledger dates. This class processes a list of
+ * domain-specific items, filters for one-time occurrences, maps them to
+ * presentation-friendly DTOs, and returns the results. Non one-time items
+ * are ignored and delegated to external processors.
  */
 public class OneTimeOccurrenceExpander {
 
@@ -23,8 +24,15 @@ public class OneTimeOccurrenceExpander {
     }
 
     /**
-     * Return ItemDto occurrences for items that are one-time and whose occurrence
-     * falls within the ledger range. Non one-time items are skipped.
+     * Expands a list of items by extracting and mapping one-time occurrences
+     * within the specified ledger date range. Non one-time items are ignored,
+     * and their handling is delegated to other expanders.
+     *
+     * @param items the list of items to be expanded and processed
+     * @param ledgerStart the start of the ledger date range
+     * @param ledgerEnd the end of the ledger date range
+     * @return a list of {@code ItemDto} objects representing one-time occurrences
+     *         mapped within the specified ledger date range
      */
     public List<ItemDto> expand(List<Item> items, LocalDate ledgerStart, LocalDate ledgerEnd) {
         List<ItemDto> result = new ArrayList<>();
@@ -53,6 +61,17 @@ public class OneTimeOccurrenceExpander {
         return result;
     }
 
+    /**
+     * Determines whether the specified {@code Item} is considered a one-time occurrence.
+     * An item is treated as one-time based on the associated {@code TimePeriod}'s ID.
+     * If the item is {@code null}, it is considered one-time by default.
+     * If the {@code TimePeriod} of the item is {@code null}, it is not considered one-time.
+     * When the ID of the {@code TimePeriod} is equal to 1, the item is classified as one-time.
+     * Otherwise, it is not considered one-time.
+     *
+     * @param item the {@code Item} to evaluate; can be {@code null}
+     * @return {@code true} if the given {@code Item} is a one-time occurrence; {@code false} otherwise
+     */
     public boolean isOneTime(Item item) {
         if (item == null) return true;
 

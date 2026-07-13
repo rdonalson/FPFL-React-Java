@@ -1,7 +1,8 @@
 package com.financialplanner.moduledisplaybc.recurrence;
 
-import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.Item;
 import com.financialplanner.moduledisplaybc.model.ItemDto;
+import com.financialplanner.moduledisplaybc.utility.RecurrenceRange;
+import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.Item;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -10,12 +11,14 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
- * A utility class for expanding a collection of items with semi-annual recurrence patterns
- * into a list of event occurrences (as {@code ItemDto} objects) within a specified date range.
- *
- * This class is designed to process items that conform to predefined semi-annual recurrence
- * rules. For eligible items, the recurrence anchors are used to calculate the exact dates of
- * occurrence, which are then mapped into {@code ItemDto} objects for further consumption.
+ * The {@code SemiAnnualRecurrenceExpander} class provides functionality to expand a list of items
+ * into their corresponding semi-annual occurrences within a specified date range. It processes
+ * items configured for semi-annual recurrence and computes their occurrence dates based on the
+ * defined recurrence rules.
+ * The class filters items for a semi-annual recurrence type, resolves the applicable effective
+ * date range, and computes occurrence dates that fall within the specified range. The resulting
+ * occurrences are returned as a list of data transfer objects (DTOs) with the specific occurrence
+ * dates.
  */
 public class SemiAnnualRecurrenceExpander {
 
@@ -26,30 +29,44 @@ public class SemiAnnualRecurrenceExpander {
     }
 
     /**
-     * Expands a list of items into a list of {@code ItemDto} based on semi-annual recurrence rules
-     * within the specified ledger date range.
+     * Expands a list of items into their corresponding semi-annual occurrences within a specified date range.
+     * Filters and processes semi-annual items, resolves their effective date ranges, and computes their
+     * semi-annual occurrence dates. Returns a list of corresponding DTOs for the computed occurrences.
      *
-     * Only items associated with a semi-annual recurrence pattern are expanded. For each matching item,
-     * occurrences are generated for the specified ledger date range using predefined semi-annual anchors.
-     *
-     * @param items the list of items to expand; each item may have a semi-annual recurrence pattern
-     * @param ledgerStart the start date of the ledger range for generating occurrences
-     * @param ledgerEnd the end date of the ledger range for generating occurrences
-     * @return a list of {@code ItemDto} objects, each containing occurrence details for a single semi-annual event
+     * @param items the list of {@link Item} objects to be expanded
+     * @param ledgerStart the start date of the ledger range
+     * @param ledgerEnd the end date of the ledger range
+     * @return a list of {@link ItemDto} objects corresponding to the computed semi-annual occurrences
      */
     public List<ItemDto> expand(List<Item> items, LocalDate ledgerStart, LocalDate ledgerEnd) {
         List<ItemDto> expanded = new ArrayList<>();
 
-        for (Item item : items) {
+        // Filter semi-annual items first (periodId = 8)
+        List<Item> semiAnnualItems = items.stream()
+            .filter(this::isSemiAnnual)
+            .toList();
 
-            int periodId = Math.toIntExact(item.getTimePeriod() != null ? item.getTimePeriod().getId() : 0);
+        for (Item item : semiAnnualItems) {
 
-            // Only handle semi-annual (periodId = 8)
-            if (periodId != 8) {
-                continue;
+            // Default effective range = ledger range
+            LocalDate effStart = ledgerStart;
+            LocalDate effEnd   = ledgerEnd;
+
+            // Only call resolveRange() when DateRangeReq == true
+            Boolean req = item.getDateRangeReq();
+            if (req != null && req) {
+                LocalDate[] range = RecurrenceRange.resolveRange(item, ledgerStart, ledgerEnd);
+
+                if (range == null) {
+                    // No overlap → skip item entirely
+                    continue;
+                }
+
+                effStart = range[0];
+                effEnd   = range[1];
             }
 
-            // Extract the two semi-annual anchors
+            // Extract semi-annual anchors
             Integer[] months = {
                 item.getSemiAnnual1Month(),
                 item.getSemiAnnual2Month()
@@ -60,27 +77,13 @@ public class SemiAnnualRecurrenceExpander {
                 item.getSemiAnnual2Day()
             };
 
-            int startYear = ledgerStart.getYear();
-            int endYear = ledgerEnd.getYear();
+            // Compute semi-annual dates using the effective range
+            List<LocalDate> semiAnnualDates = computeSemiAnnualDates(effStart, effEnd, months, days);
 
-            for (int year = startYear; year <= endYear; year++) {
-
-                for (int i = 0; i < 2; i++) {
-                    Integer month = months[i];
-                    Integer day = days[i];
-
-                    if (month == null || day == null) {
-                        continue; // skip undefined anchors
-                    }
-
-                    LocalDate occurrence = safeDate(year, month, day);
-
-                    if (!occurrence.isBefore(ledgerStart) && !occurrence.isAfter(ledgerEnd)) {
-                        ItemDto dto = mapper.apply(item);
-                        dto.setOccurrenceDate(occurrence.toString());
-                        expanded.add(dto);
-                    }
-                }
+            for (LocalDate date : semiAnnualDates) {
+                ItemDto dto = mapper.apply(item);
+                dto.setOccurrenceDate(date.toString());
+                expanded.add(dto);
             }
         }
 
@@ -88,38 +91,77 @@ public class SemiAnnualRecurrenceExpander {
     }
 
     /**
-     * Adjusts the given year, month, and day inputs to create a safe and valid {@link LocalDate}.
+     * Determines whether the given item is associated with a semi-annual time period.
      *
-     * If the provided day exceeds the number of days in the specified month, this method adjusts the
-     * day to the last valid day of that month. For example, if the day is 31 and the month is February,
-     * the method adjusts the day to 28 (or 29 in leap years).
-     *
-     * @param year the year to use for constructing the date
-     * @param month the month to use for constructing the date (1 for January, 12 for December)
-     * @param day the day of the month to use; may be clamped to the last valid day of the specified month
-     * @return a {@link LocalDate} object representing the adjusted date
-     */
-    private LocalDate safeDate(int year, int month, int day) {
-        YearMonth ym = YearMonth.of(year, month);
-        int lastDay = ym.lengthOfMonth();
-        int safeDay = Math.min(day, lastDay);
-        return ym.atDay(safeDay);
-    }
-
-    /**
-     * Determines if the given item is associated with a semi-annual recurrence pattern.
-     *
-     * A semi-annual pattern is identified based on the time period ID
-     * of the item, which should match a predefined value (e.g., 8).
-     *
-     * @param item the item to check, which may contain a time period definition.
-     *             If the item or its time period is null, this method returns false.
-     * @return true if the item's time period ID corresponds to a semi-annual recurrence;
-     *         false otherwise.
+     * @param item The item to evaluate. It may be null or have a null time period.
+     * @return {@code true} if the item's time period corresponds to semi-annual (ID = 8),
+     *         otherwise {@code false}.
      */
     public boolean isSemiAnnual(Item item) {
         if (item == null || item.getTimePeriod() == null) return false;
         int pid = Math.toIntExact(item.getTimePeriod().getId());
-        return pid == 8; // or whatever ID you assign
+        return pid == 8; // semi-annual = 8
+    }
+
+    /**
+     * Computes a list of semi-annual dates within a specified range, based on the
+     * given months and days for each occurrence in a year. The method verifies
+     * that each computed date falls within the specified start and end range.
+     *
+     * @param start the start date of the range; must not be null.
+     * @param end the end date of the range; must not be null and must not be before the start date.
+     * @param months an array of two integers representing the months of the semi-annual occurrences.
+     *        Each value must be a valid month (1-12) or null if skipped.
+     * @param days an array of two integers representing the days of the semi-annual occurrences.
+     *        Each value must be a valid day (1-31) or null if skipped. Days exceeding the valid
+     *        number of days in the month are adjusted to the last valid day of the month.
+     * @return a list of {@code LocalDate} objects representing the semi-annual dates that
+     *         fall within the specified range. The list is empty if no dates meet the conditions.
+     */
+    private static List<LocalDate> computeSemiAnnualDates(LocalDate start, LocalDate end,
+                                                          Integer[] months, Integer[] days) {
+
+        List<LocalDate> dates = new ArrayList<>();
+
+        int startYear = start.getYear();
+        int endYear   = end.getYear();
+
+        for (int year = startYear; year <= endYear; year++) {
+
+            for (int i = 0; i < 2; i++) {
+                Integer month = months[i];
+                Integer day   = days[i];
+
+                if (month == null || day == null) {
+                    continue; // skip undefined anchors
+                }
+
+                LocalDate occurrence = safeDate(year, month, day);
+
+                if (!occurrence.isBefore(start) && !occurrence.isAfter(end)) {
+                    dates.add(occurrence);
+                }
+            }
+        }
+
+        return dates;
+    }
+
+    /**
+     * Ensures that the provided day value is within the valid range for the given year and month.
+     * If the specified day exceeds the number of days in the month, it will be adjusted to the
+     * last valid day of the month.
+     *
+     * @param year the year part of the desired date
+     * @param month the month part of the desired date (1-based; e.g., 1 for January, 12 for December)
+     * @param day the day part of the desired date
+     * @return a {@code LocalDate} representing a valid date with the given year, month, and day values,
+     *         where the day is adjusted if necessary to fit the number of days in the month
+     */
+    private static LocalDate safeDate(int year, int month, int day) {
+        YearMonth ym = YearMonth.of(year, month);
+        int lastDay = ym.lengthOfMonth();
+        int safeDay = Math.min(day, lastDay);
+        return ym.atDay(safeDay);
     }
 }
