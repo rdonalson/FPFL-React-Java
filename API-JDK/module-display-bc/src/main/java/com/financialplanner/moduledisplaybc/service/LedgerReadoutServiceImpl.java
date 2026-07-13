@@ -60,9 +60,13 @@ public class LedgerReadoutServiceImpl implements LedgerReadoutService {
     @Override
     public List<LedgerDto> buildLedgerReadout(LedgerRequest request) {
         List<Item> userItems = itemService.findByUserId(request.userId());
+        // Initial amount (ItemType 3)
+        double initialAmount = extractInitialAmount(userItems);
+        // remove initial amount from further processing
+        userItems = userItems.stream().filter(i -> i.getItemType() == null || i.getItemType().getId() != 3).toList();
 
-        LocalDate start = request.startDate();
-        LocalDate end = request.endDate();
+        LocalDate start = request.ledgerStartDate();
+        LocalDate end = request.ledgerEndDate();
 
         // Each expander evaluates ALL items and expands only its own period.
         // Non-matching items are ignored inside the expander.
@@ -91,9 +95,6 @@ public class LedgerReadoutServiceImpl implements LedgerReadoutService {
 
         // Build ledger table (DTO)
         List<LedgerDto> ledger = buildLedgerTable(start, end);
-
-        // Initial amount (ItemType 3)
-        double initialAmount = extractInitialAmount(itemDtos);
 
         // Persist initial running total across all days
         applyInitialRunningTotals(ledger, initialAmount);
@@ -149,8 +150,8 @@ public class LedgerReadoutServiceImpl implements LedgerReadoutService {
      * @param items the list of items to process
      * @return the amount of the first item with an item type of 3, or 0.0 if no such item exists
      */
-    private double extractInitialAmount(List<ItemDto> items) {
-        return items.stream().filter(i -> i.getFkItemType() == 3).findFirst().map(ItemDto::getAmount).orElse(0.0);
+    private double extractInitialAmount(List<Item> items) {
+        return items.stream().filter(i -> i.getItemType() != null && i.getItemType().getId() == 3).findFirst().map(Item::getAmount).orElse(0.0);
     }
 
     /**
@@ -165,7 +166,9 @@ public class LedgerReadoutServiceImpl implements LedgerReadoutService {
     private void applyDailyEnrichment(List<LedgerDto> ledger, List<ItemDto> items) {
 
         // Group items by LocalDate
-        Map<LocalDate, List<ItemDto>> itemsByDate = items.stream().filter(i -> i.getOccurrenceDate() != null).collect(Collectors.groupingBy(i -> LocalDate.parse(i.getOccurrenceDate())));
+        Map<LocalDate, List<ItemDto>> itemsByDate = items.stream()
+            .filter(i -> i.getOccurrenceDate() != null)
+            .collect(Collectors.groupingBy(i -> LocalDate.parse(i.getOccurrenceDate())));
 
         double running = ledger.getFirst().getRunningTotal(); // initial amount
 

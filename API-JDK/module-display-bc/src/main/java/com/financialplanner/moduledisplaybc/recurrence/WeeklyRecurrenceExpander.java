@@ -1,6 +1,7 @@
 package com.financialplanner.moduledisplaybc.recurrence;
 
 import com.financialplanner.moduledisplaybc.model.ItemDto;
+import com.financialplanner.moduledisplaybc.utility.RecurrenceRange;
 import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.Item;
 
 import java.time.DayOfWeek;
@@ -9,12 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-/**
- * A utility class that expands recurring weekly items into individual dated occurrences.
- * The WeeklyRecurrenceExpander is designed to handle a list of items, expand the weekly recurring
- * items into specific dates between a given start and end date, and map each occurrence to an
- * instance of {@link ItemDto}. Non-weekly items are directly mapped and returned as single occurrences.
- */
 public class WeeklyRecurrenceExpander {
 
     private final Function<Item, ItemDto> mapper;
@@ -23,31 +18,44 @@ public class WeeklyRecurrenceExpander {
         this.mapper = mapper;
     }
 
-    /**
-     * Expand weekly items into dated ItemDto occurrences between ledgerStart and ledgerEnd.
-     * Non-weekly items are mapped once and returned.
-     */
     public List<ItemDto> expand(List<Item> items, LocalDate ledgerStart, LocalDate ledgerEnd) {
         List<ItemDto> expanded = new ArrayList<>();
 
-        for (Item item : items) {
-            int periodId = Math.toIntExact(item.getTimePeriod() != null ? item.getTimePeriod().getId() : 0);
+        // Filter weekly items first (periodId = 3)
+        List<Item> weeklyItems = items.stream()
+            .filter(this::isWeekly)
+            .toList();
 
-            // Weekly = periodId 3 (domain rule)
-            if (periodId != 3) {
-                expanded.add(mapper.apply(item));
-                continue;
+        for (Item item : weeklyItems) {
+
+            // Default effective range = ledger range
+            LocalDate effStart = ledgerStart;
+            LocalDate effEnd   = ledgerEnd;
+
+            // Only call resolveRange() when DateRangeReq == true
+            Boolean req = item.getDateRangeReq();
+            if (req != null && req) {
+                LocalDate[] range = RecurrenceRange.resolveRange(item, ledgerStart, ledgerEnd);
+
+                if (range == null) {
+                    // No overlap → skip item entirely
+                    continue;
+                }
+
+                effStart = range[0];
+                effEnd   = range[1];
             }
 
             Integer weeklyDow = item.getWeeklyDow();
             if (weeklyDow == null) {
-                // missing data: treat as single occurrence to avoid NPEs
-                expanded.add(mapper.apply(item));
+                // Missing data → skip weekly expansion
                 continue;
             }
 
             DayOfWeek dow = DayOfWeek.of(weeklyDow);
-            List<LocalDate> weeklyDates = computeWeeklyDates(ledgerStart, ledgerEnd, dow);
+
+            // Compute weekly dates using the effective range
+            List<LocalDate> weeklyDates = computeWeeklyDates(effStart, effEnd, dow);
 
             for (LocalDate date : weeklyDates) {
                 ItemDto dto = mapper.apply(item);
@@ -62,14 +70,15 @@ public class WeeklyRecurrenceExpander {
     public boolean isWeekly(Item item) {
         if (item == null || item.getTimePeriod() == null) return false;
         int pid = Math.toIntExact(item.getTimePeriod().getId());
-        return pid == 3; // weekly = 3
+        return pid == 3;
     }
 
     private static List<LocalDate> computeWeeklyDates(LocalDate start, LocalDate end, DayOfWeek targetDay) {
         List<LocalDate> dates = new ArrayList<>();
 
         LocalDate cursor = start;
-        // advance to first matching day (safe even if start already matches)
+
+        // Advance to first matching weekday
         while (cursor.getDayOfWeek() != targetDay) {
             cursor = cursor.plusDays(1);
             if (cursor.isAfter(end)) {
@@ -77,6 +86,7 @@ public class WeeklyRecurrenceExpander {
             }
         }
 
+        // Add weekly occurrences
         while (!cursor.isAfter(end)) {
             dates.add(cursor);
             cursor = cursor.plusWeeks(1);

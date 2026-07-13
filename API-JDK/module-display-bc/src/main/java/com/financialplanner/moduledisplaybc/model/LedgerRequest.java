@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public record LedgerRequest(
     UUID userId,
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate ledgerStartDate,
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate ledgerEndDate,
     boolean includeGrouping
 ) {}
