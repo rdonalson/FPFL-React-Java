@@ -45,12 +45,11 @@ import AddQuarterlyPage from '@/features/catalog-command/transactions/components
 // Semi-Annual
 import AddSemiAnnualPage from '@/features/catalog-command/transactions/components/items/occurrence/semi-annual/AddSemiAnnualPage';
 import EditSemiAnnualPage from '@/features/catalog-command/transactions/components/items/occurrence/semi-annual/EditSemiAnnualPage';
-import EditAnnualPage from '@/features/catalog-command/transactions/components/items/occurrence/annual/EditAnnualPage';
-import AddAnnualPage from '@/features/catalog-command/transactions/components/items/occurrence/annual/AddAnnualPage';
 
 // Annual
-// import AddAnnualPage from '@/features/catalog-command/transactions/components/items/occurrence/annual/AddAnnualPage';
-// import EditAnnualPage from '@/features/catalog-command/transactions/components/items/occurrence/annual/EditAnnualPage';
+import AddAnnualPage from '@/features/catalog-command/transactions/components/items/occurrence/annual/AddAnnualPage';
+import EditAnnualPage from '@/features/catalog-command/transactions/components/items/occurrence/annual/EditAnnualPage';
+import DisplayPage from '@/features/catalog-query/display/DisplayPage';
 
 export function AppRouter() {
   return (
@@ -164,6 +163,11 @@ export function AppRouter() {
             <Route path="new/9" element={<AddAnnualPage itemType={2} />} />
             <Route path="9/:id/edit" element={<EditAnnualPage itemType={2} />} />
           </Route>
+
+          {/* ====================================================== */}
+          {/*                     DEBIT FLOWS (2)                    */}
+          {/* ====================================================== */}
+          <Route path="/query/display" element={<DisplayPage />} />
         </Route>
       </Route>
 

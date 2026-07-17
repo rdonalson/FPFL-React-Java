@@ -51,18 +51,25 @@ export function HomePage() {
           )}
 
           {/* EVERYONE CAN SEE */}
+          {/* ⭐ DISPLAY BUTTON */}
+          <Button
+            label="Display"
+            icon="pi pi-chart-bar"
+            onClick={() => navigate('/query/display')}
+          />
+          {/* ⭐ INITIAL AMOUNT BUTTON */}
           <Button
             label="Initial Amount"
             icon="pi pi-dollar"
             onClick={() => navigate('/command/transactions/initial-amount')}
           />
-          {/* ⭐ NEW CREDIT BUTTON */}
+          {/* ⭐ CREDIT BUTTON */}
           <Button
             label="Credits"
             icon="pi pi-plus-circle"
             onClick={() => navigate('/command/transactions/credits')}
           />
-          {/* ⭐ NEW DEBIT BUTTON */}
+          {/* ⭐ DEBIT BUTTON */}
           <Button
             label="Debits"
             icon="pi pi-minus-circle"

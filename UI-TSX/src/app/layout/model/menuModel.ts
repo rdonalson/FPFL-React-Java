@@ -32,6 +32,11 @@ export const menuModel: MenuItem[] = [
   /** EVERYONE CAN SEE THESE ITEMS */
   /** Note: The "to" paths here should match the routes defined in AppRouter.tsx */
   {
+    label: 'Display',
+    icon: 'pi pi-chart-bar',
+    to: '/query/display',
+  },
+  {
     label: 'Initial Amount',
     icon: 'pi pi-dollar',
     to: '/command/transactions/initial-amount',
