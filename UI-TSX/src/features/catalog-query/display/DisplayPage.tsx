@@ -3,9 +3,13 @@ import React, { useEffect, useState } from 'react';
 import * as RadixTabs from '@radix-ui/react-tabs';
 
 import { getSessionUserId } from '@/app/state/sessionHelpers';
+
 import { DateRangePanel } from '../range/DateRangePanel';
 import type { DisplayRequest } from '../types/DisplayRequest';
 import { fetchDisplayLedger } from '../api/displayApi';
+
+import type { LedgerDto } from '../types/DispayResponse';
+import { ChartPanel } from '../chart/ChartPanel'; // <-- your new chart panel
 
 export default function DisplayPage() {
   const [criteria, setCriteria] = useState<DisplayRequest>(() => ({
@@ -15,6 +19,7 @@ export default function DisplayPage() {
     includeGrouping: true,
   }));
 
+  const [ledgerRows, setLedgerRows] = useState<LedgerDto[] | null>(null);
   const [activeTab, setActiveTab] = useState<'date' | 'chart' | 'ledger'>('date');
 
   // theme detection (unchanged)
@@ -63,9 +68,7 @@ export default function DisplayPage() {
   const handleCalculate = async () => {
     try {
       const result = await fetchDisplayLedger(criteria);
-      console.log('Display API result:', result);
-
-      // TODO: store result for chart + ledger tabs
+      setLedgerRows(result);
       setActiveTab('chart');
     } catch (err) {
       console.error('Display API error:', err);
@@ -119,7 +122,7 @@ export default function DisplayPage() {
           </RadixTabs.List>
 
           <div className="pt-4">
-            {/* DATE RANGE PANEL (now extracted) */}
+            {/* DATE RANGE PANEL */}
             <RadixTabs.Content value="date" className="outline-none">
               <DateRangePanel
                 criteria={criteria}
@@ -130,15 +133,16 @@ export default function DisplayPage() {
               />
             </RadixTabs.Content>
 
-            {/* CHART */}
-            <RadixTabs.Content value="chart" className="outline-none">
-              <div className="p-4">
-                <h3 className="text-lg font-semibold mb-2">Chart Output</h3>
-                <p>The chart will appear here after calculation.</p>
-              </div>
+            {/* CHART PANEL */}
+            <RadixTabs.Content
+              value="chart"
+              className="outline-none"
+              style={{ minHeight: '900px', height: '900px' }}
+            >
+              <ChartPanel ledger={ledgerRows} />
             </RadixTabs.Content>
 
-            {/* LEDGER */}
+            {/* LEDGER PANEL (placeholder) */}
             <RadixTabs.Content value="ledger" className="outline-none">
               <div className="p-4">
                 <h3 className="text-lg font-semibold mb-2">Ledger Details</h3>

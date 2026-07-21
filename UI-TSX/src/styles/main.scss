@@ -2,3 +2,11 @@
 
 /* Load everything through the index module */
 @use 'index';
+
+.p-chart {
+  height: 100% !important;
+  min-height: 100% !important;
+}
+.p-chart canvas {
+  height: 100% !important;
+}
