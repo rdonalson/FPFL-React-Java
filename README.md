@@ -214,23 +214,6 @@ The UI runs on **<http://localhost:4000>** and communicates with the API on Dock
 
 ---
 
-# **🧪 Testing**
-
-### Backend
-
-```bash
-mvn -pl API-JDK test
-```
-
-### Frontend
-
-```bash
-cd UI-TSX
-npm test
-```
-
----
-
 # **📦 Production Build**
 
 ### Backend
