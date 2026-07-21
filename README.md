@@ -22,7 +22,7 @@ FPFL-React-Java/
 
 ### 🔗 Direct Links
 
-- **React UI** → [https://github.com/rdonalson/FPFL-React-Java/tree/main/API-JDK](https://github.com/rdonalson/FPFL-React-Java/tree/main/API-JDK)
+- **React UI** → [hhttps://github.com/rdonalson/FPFL-React-Java/tree/main/UI-TSX](https://github.com/rdonalson/FPFL-React-Java/tree/main/UI-TSX)
 - **Java API** → [https://github.com/rdonalson/FPFL-React-Java/tree/main/API-JDK](https://github.com/rdonalson/FPFL-React-Java/tree/main/API-JDK)
 
 Each subproject contains its own dedicated README with deeper details.

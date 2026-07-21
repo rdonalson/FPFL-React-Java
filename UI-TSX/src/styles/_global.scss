@@ -3,3 +3,11 @@
 a {
   color: variables.$brand-primary;
 }
+
+.p-chart {
+  height: 100% !important;
+  min-height: 100% !important;
+}
+.p-chart canvas {
+  height: 100% !important;
+}
