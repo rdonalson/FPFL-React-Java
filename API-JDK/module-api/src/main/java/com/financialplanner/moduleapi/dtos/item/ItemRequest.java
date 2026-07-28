@@ -69,8 +69,8 @@ public record ItemRequest(@NotNull UUID userId, @NotNull String name, @NotNull D
             throw new DomainValidationException("ItemType is required and must be a positive integer");
         }
         if (TYPES_REQUIRING_PERIOD.contains(fkItemType)) {
-            if (fkPeriod == null || fkPeriod < 1 || fkPeriod > 9) {
-                throw new DomainValidationException("Time Period must be between 1 and 9");
+            if (fkPeriod == null || fkPeriod < 1 || fkPeriod > 10) {
+                throw new DomainValidationException("Time Period must be between 1 and 10");
             }
         }
     }
