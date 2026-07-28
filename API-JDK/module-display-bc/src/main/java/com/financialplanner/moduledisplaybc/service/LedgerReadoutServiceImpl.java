@@ -33,6 +33,7 @@ public class LedgerReadoutServiceImpl implements LedgerReadoutService {
     private final QuarterlyRecurrenceExpander quarterlyExpander;
     private final SemiAnnualRecurrenceExpander semiAnnualExpander;
     private final AnnualRecurrenceExpander annualExpander;
+    private final NthWeekdayRecurrenceExpander nthWeekdayExpander;
 
     public LedgerReadoutServiceImpl(ItemService itemService) {
         this.itemService = itemService;
@@ -45,6 +46,7 @@ public class LedgerReadoutServiceImpl implements LedgerReadoutService {
         this.quarterlyExpander = new QuarterlyRecurrenceExpander(this::mapItemToDto);
         this.semiAnnualExpander = new SemiAnnualRecurrenceExpander(this::mapItemToDto);
         this.annualExpander = new AnnualRecurrenceExpander(this::mapItemToDto);
+        this.nthWeekdayExpander = new NthWeekdayRecurrenceExpander(this::mapItemToDto);
     }
 
     /**
@@ -79,6 +81,7 @@ public class LedgerReadoutServiceImpl implements LedgerReadoutService {
         List<ItemDto> quarterlyDtos = quarterlyExpander.expand(userItems, start, end);
         List<ItemDto> semiAnnualDtos = semiAnnualExpander.expand(userItems, start, end);
         List<ItemDto> annualDtos = annualExpander.expand(userItems, start, end);
+        List<ItemDto> nthWeekdayDtos = nthWeekdayExpander.expand(userItems, start, end);
 
         // Combine all occurrences from all recurrence types
         List<ItemDto> itemDtos = new ArrayList<>();
@@ -91,7 +94,7 @@ public class LedgerReadoutServiceImpl implements LedgerReadoutService {
         itemDtos.addAll(quarterlyDtos);
         itemDtos.addAll(semiAnnualDtos);
         itemDtos.addAll(annualDtos);
-
+        itemDtos.addAll(nthWeekdayDtos);
         // Build ledger table (DTO)
         List<LedgerDto> ledger = buildLedgerTable(start, end);
 

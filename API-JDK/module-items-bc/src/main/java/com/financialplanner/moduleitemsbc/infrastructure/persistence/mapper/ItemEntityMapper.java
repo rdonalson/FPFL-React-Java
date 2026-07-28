@@ -19,7 +19,7 @@ public class ItemEntityMapper {
                         entity.getQuarterly2Month(), entity.getQuarterly2Day(), entity.getQuarterly3Month(),
                         entity.getQuarterly3Day(), entity.getQuarterly4Month(), entity.getQuarterly4Day(),
                         entity.getSemiAnnual1Month(), entity.getSemiAnnual1Day(), entity.getSemiAnnual2Month(),
-                        entity.getSemiAnnual2Day(), entity.getAnnualMoy(), entity.getAnnualDom(),
-                        entity.getDateRangeReq());
+                        entity.getSemiAnnual2Day(), entity.getAnnualMoy(), entity.getAnnualDom(), entity.getNthDow(),
+                        entity.getNthIndex(), entity.getDateRangeReq());
     }
 }

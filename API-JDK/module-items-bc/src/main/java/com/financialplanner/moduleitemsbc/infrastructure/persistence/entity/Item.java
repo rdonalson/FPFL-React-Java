@@ -126,6 +126,12 @@ public class Item {
     @Column(name = "annual_dom")
     private Integer AnnualDom;
 
+    @Column(name = "nth_dow")
+    private Integer NthDow;
+
+    @Column(name = "nth_index")
+    private Integer NthIndex;
+
     /**
      * Represents a flag indicating whether a date range is required for a specific operation or process.
      * This variable is stored in the database as a bit value, with conversion handled by the
@@ -197,7 +203,7 @@ public class Item {
                 Integer quarterly1Day, Integer quarterly2Month, Integer quarterly2Day, Integer quarterly3Month,
                 Integer quarterly3Day, Integer quarterly4Month, Integer quarterly4Day, Integer semiAnnual1Month,
                 Integer semiAnnual1Day, Integer semiAnnual2Month, Integer semiAnnual2Day, Integer annualMoy,
-                Integer annualDom, Boolean dateRangeReq) {
+                Integer annualDom, Integer nthDow, Integer nthIndex, Boolean dateRangeReq) {
         Id                = id;
         UserId            = userId;
         Name              = name;
@@ -225,6 +231,8 @@ public class Item {
         SemiAnnual2Day    = semiAnnual2Day;
         AnnualMoy         = annualMoy;
         AnnualDom         = annualDom;
+        NthDow            = nthDow;
+        NthIndex          = nthIndex;
         DateRangeReq      = dateRangeReq;
     }
 

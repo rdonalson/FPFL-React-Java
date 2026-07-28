@@ -55,7 +55,8 @@ public class ItemMapper {
                                 domain.getQuarterly2Day(), domain.getQuarterly3Month(), domain.getQuarterly3Day(),
                                 domain.getQuarterly4Month(), domain.getQuarterly4Day(), domain.getSemiAnnual1Month(),
                                 domain.getSemiAnnual1Day(), domain.getSemiAnnual2Month(), domain.getSemiAnnual2Day(),
-                                domain.getAnnualMoy(), domain.getAnnualDom(), domain.getDateRangeReq());
+                                domain.getAnnualMoy(), domain.getAnnualDom(), domain.getNthDow(), domain.getNthIndex(),
+                                domain.getDateRangeReq());
     }
 
     public Item toEntity(ItemRequest request) {
@@ -73,6 +74,7 @@ public class ItemMapper {
                         request.quarterly2Day(), request.quarterly3Month(), request.quarterly3Day(),
                         request.quarterly4Month(), request.quarterly4Day(), request.semiAnnual1Month(),
                         request.semiAnnual1Day(), request.semiAnnual2Month(), request.semiAnnual2Day(),
-                        request.annualMoy(), request.annualDom(), request.dateRangeReq());
+                        request.annualMoy(), request.annualDom(), request.nthDow(), request.nthIndex(),
+                        request.dateRangeReq());
     }
 }

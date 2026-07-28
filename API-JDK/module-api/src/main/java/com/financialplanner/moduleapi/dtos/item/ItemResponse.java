@@ -46,5 +46,5 @@ public record ItemResponse(Long id, UUID userId, String name, Double amount, Ite
                            Integer quarterly3Month, Integer quarterly3Day, Integer quarterly4Month,
                            Integer quarterly4Day, Integer semiAnnual1Month, Integer semiAnnual1Day,
                            Integer semiAnnual2Month, Integer semiAnnual2Day, Integer annualMoy, Integer annualDom,
-                           Boolean dateRangeReq
+                           Integer nthDow, Integer nthIndex, Boolean dateRangeReq
 ) {}
