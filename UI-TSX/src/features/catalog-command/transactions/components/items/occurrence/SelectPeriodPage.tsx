@@ -24,6 +24,7 @@ const FALLBACK_PERIODS: { id: number; name: string }[] = [
   { id: 7, name: 'Quarterly' },
   { id: 8, name: 'Semi-Annually' },
   { id: 9, name: 'Annually' },
+  { id: 10, name: 'Nth-Weekday' }, // <-- NEW
 ];
 
 export default function SelectPeriodPage({ itemType }: SelectPeriodPageProps) {
@@ -67,6 +68,9 @@ export default function SelectPeriodPage({ itemType }: SelectPeriodPageProps) {
         break;
       case 9:
         navigate(`${base}/new/9`);
+        break;
+      case 10:
+        navigate(`${base}/new/10`);
         break;
       default:
         console.warn('Unknown periodId:', periodId);

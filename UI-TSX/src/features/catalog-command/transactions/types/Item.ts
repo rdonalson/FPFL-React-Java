@@ -43,6 +43,8 @@ export interface Item {
   semiAnnual2Day?: number | null;
   annualMoy?: number | null;
   annualDom?: number | null;
+  nthDow?: number | null;
+  nthIndex?: number | null;
   dateRangeReq: boolean | false;
 
   // POST/PUT fields expected by backend

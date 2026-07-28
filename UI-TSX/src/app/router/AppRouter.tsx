@@ -49,6 +49,12 @@ import EditSemiAnnualPage from '@/features/catalog-command/transactions/componen
 // Annual
 import AddAnnualPage from '@/features/catalog-command/transactions/components/items/occurrence/annual/AddAnnualPage';
 import EditAnnualPage from '@/features/catalog-command/transactions/components/items/occurrence/annual/EditAnnualPage';
+
+// Nth-Weekday
+import EditNthWeekdayPage from '@/features/catalog-command/transactions/components/items/occurrence/nth-weekday/EditNthWeekdayPage';
+import AddNthWeekdayPage from '@/features/catalog-command/transactions/components/items/occurrence/nth-weekday/AddNthWeekdayPage';
+
+// Display Page (Query)
 import DisplayPage from '@/features/catalog-query/display/DisplayPage';
 
 export function AppRouter() {
@@ -115,6 +121,10 @@ export function AppRouter() {
             {/* Annual (Period 9) */}
             <Route path="new/9" element={<AddAnnualPage itemType={1} />} />
             <Route path="9/:id/edit" element={<EditAnnualPage itemType={1} />} />
+
+            {/* Nth-Weekday (Period 10) */}
+            <Route path="new/10" element={<AddNthWeekdayPage itemType={1} />} />
+            <Route path="10/:id/edit" element={<EditNthWeekdayPage itemType={1} />} />
           </Route>
 
           {/* ====================================================== */}
@@ -162,11 +172,16 @@ export function AppRouter() {
             {/* Annual (Period 9) */}
             <Route path="new/9" element={<AddAnnualPage itemType={2} />} />
             <Route path="9/:id/edit" element={<EditAnnualPage itemType={2} />} />
+
+            {/* Nth-Weekday (Period 10) */}
+            <Route path="new/10" element={<AddNthWeekdayPage itemType={2} />} />
+            <Route path="10/:id/edit" element={<EditNthWeekdayPage itemType={2} />} />
           </Route>
 
           {/* ====================================================== */}
-          {/*                     DEBIT FLOWS (2)                    */}
+          {/*                     QUERY DISPLAY PAGE                   */}
           {/* ====================================================== */}
+          {/* Display Page (Query) */}
           <Route path="/query/display" element={<DisplayPage />} />
         </Route>
       </Route>
