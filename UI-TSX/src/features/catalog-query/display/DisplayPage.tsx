@@ -10,6 +10,7 @@ import { fetchDisplayLedger } from '../api/displayApi';
 
 import type { LedgerDto } from '../types/DispayResponse';
 import { ChartPanel } from '../chart/ChartPanel'; // <-- your new chart panel
+import { LedgerPanel } from '../ledger/LedgerPanel';
 
 export default function DisplayPage() {
   const [criteria, setCriteria] = useState<DisplayRequest>(() => ({
@@ -144,10 +145,7 @@ export default function DisplayPage() {
 
             {/* LEDGER PANEL (placeholder) */}
             <RadixTabs.Content value="ledger" className="outline-none">
-              <div className="p-4">
-                <h3 className="text-lg font-semibold mb-2">Ledger Details</h3>
-                <p>This tab will contain the expandable ledger list.</p>
-              </div>
+              <LedgerPanel ledger={ledgerRows} />
             </RadixTabs.Content>
           </div>
         </RadixTabs.Root>
