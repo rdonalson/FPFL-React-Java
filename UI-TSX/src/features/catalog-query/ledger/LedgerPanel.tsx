@@ -73,11 +73,21 @@ export function LedgerPanel({ ledger }: LedgerPanelProps) {
           <div className="ledger-detail-columns" role="list">
             {row.items?.map((it: ItemDto, idx: number) => (
               <div key={idx} className="ledger-detail-row-item" role="listitem">
-                <div className="col col-type" style={{ color: it.amount < 0 ? '#EF5350' : '#066F3B', fontWeight: 700 }}>
+                <div
+                  className="col col-type"
+                  style={{ color: it.amount < 0 ? '#EF5350' : '#066F3B', fontWeight: 700 }}
+                >
                   {it.itemType}
                 </div>
 
-                <div className="col col-amount" style={{ color: it.amount < 0 ? '#EF5350' : '#066F3B', fontVariantNumeric: 'tabular-nums', fontWeight: 700 }}>
+                <div
+                  className="col col-amount"
+                  style={{
+                    color: it.amount < 0 ? '#EF5350' : '#066F3B',
+                    fontVariantNumeric: 'tabular-nums',
+                    fontWeight: 700,
+                  }}
+                >
                   {formatCurrency(it.amount)}
                 </div>
 
@@ -150,14 +160,18 @@ export function LedgerPanel({ ledger }: LedgerPanelProps) {
         <Column
           field="creditSummary"
           header="Credit Summary"
-          body={(row: LedgerDto) => <span style={{ color: '#66BB6A' }}>{formatCurrency(row.creditSummary)}</span>}
+          body={(row: LedgerDto) => (
+            <span style={{ color: '#66BB6A' }}>{formatCurrency(row.creditSummary)}</span>
+          )}
         />
 
         <Column
           header={() => <div ref={setDebitHeader}>Debit Summary</div>}
           field="debitSummary"
           headerClassName="col-debit-header"
-          body={(row: LedgerDto) => <span style={{ color: '#EF5350' }}>{formatCurrency(row.debitSummary)}</span>}
+          body={(row: LedgerDto) => (
+            <span style={{ color: '#EF5350' }}>{formatCurrency(row.debitSummary)}</span>
+          )}
           style={{ textAlign: 'right' }}
           className="col-debit"
         />
@@ -166,14 +180,18 @@ export function LedgerPanel({ ledger }: LedgerPanelProps) {
           field="net"
           header="Net Change"
           body={(row: LedgerDto) => (
-            <span style={{ color: row.net < 0 ? '#EF5350' : '#66BB6A' }}>{formatCurrency(row.net)}</span>
+            <span style={{ color: row.net < 0 ? '#EF5350' : '#66BB6A' }}>
+              {formatCurrency(row.net)}
+            </span>
           )}
         />
 
         <Column
           field="runningTotal"
           header="Balance"
-          body={(row: LedgerDto) => <span style={{ fontWeight: 600 }}>{formatCurrency(row.runningTotal)}</span>}
+          body={(row: LedgerDto) => (
+            <span style={{ fontWeight: 600 }}>{formatCurrency(row.runningTotal)}</span>
+          )}
         />
       </DataTable>
     </div>
