@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import type { LedgerDto, ItemDto } from '../types/DispayResponse';
@@ -25,6 +25,24 @@ const formatLedgerDate = (iso: string) => {
 
 export function LedgerPanel({ ledger }: LedgerPanelProps) {
   const [expandedRows, setExpandedRows] = useState<any>({});
+  const debitHeaderRef = useRef<HTMLDivElement | null>(null);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+
+  const setDebitHeader = useCallback((el: HTMLDivElement | null) => {
+    debitHeaderRef.current = el;
+  }, []);
+
+  useEffect(() => {
+    const setWidth = () => {
+      const w = debitHeaderRef.current?.getBoundingClientRect().width ?? 160;
+      if (rootRef.current) {
+        rootRef.current.style.setProperty('--debit-col-width', `${Math.round(w)}px`);
+      }
+    };
+    setWidth();
+    window.addEventListener('resize', setWidth);
+    return () => window.removeEventListener('resize', setWidth);
+  }, []);
 
   if (!ledger || ledger.length === 0) {
     return (
@@ -35,31 +53,47 @@ export function LedgerPanel({ ledger }: LedgerPanelProps) {
     );
   }
 
+  // Horizontal columns item template
   const itemTemplate = (row: LedgerDto) => (
-    <div className="p-3">
-      <h4 className="font-semibold mb-2">Items</h4>
+    <div
+      className="p-3 ledger-detail-row"
+      role="region"
+      aria-label={`Details for ${row.rollupKey}`}
+      id={`detail-${row.rollupKey}`}
+    >
+      <div className="ledger-detail-panel-container">
+        <div className="ledger-detail-panel">
+          <div className="ledger-detail-columns-header" aria-hidden>
+            <div className="col col-type">Type</div>
+            <div className="col col-amount">Amount</div>
+            <div className="col col-name">Name</div>
+            <div className="col col-period">Period</div>
+          </div>
 
-      <DataTable value={row.items} size="small">
-        <Column field="name" header="Item Name" />
+          <div className="ledger-detail-columns" role="list">
+            {row.items?.map((it: ItemDto, idx: number) => (
+              <div key={idx} className="ledger-detail-row-item" role="listitem">
+                <div className="col col-type" style={{ color: it.amount < 0 ? '#EF5350' : '#066F3B', fontWeight: 700 }}>
+                  {it.itemType}
+                </div>
 
-        <Column
-          field="amount"
-          header="Amount"
-          body={(item: ItemDto) => (
-            <span style={{ color: item.amount < 0 ? '#EF5350' : '#66BB6A' }}>
-              {formatCurrency(item.amount)}
-            </span>
-          )}
-        />
+                <div className="col col-amount" style={{ color: it.amount < 0 ? '#EF5350' : '#066F3B', fontVariantNumeric: 'tabular-nums', fontWeight: 700 }}>
+                  {formatCurrency(it.amount)}
+                </div>
 
-        <Column field="period" header="Period" />
-        <Column field="itemType" header="Type" />
-      </DataTable>
+                <div className="col col-name">{it.name}</div>
+
+                <div className="col col-period">{it.period}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 
   return (
-    <div className="p-4">
+    <div className="p-4" ref={rootRef}>
       <h3 className="text-lg font-semibold mb-4">Ledger Details</h3>
 
       <DataTable
@@ -68,8 +102,8 @@ export function LedgerPanel({ ledger }: LedgerPanelProps) {
         expandedRows={expandedRows}
         onRowToggle={e => setExpandedRows(e.data)}
         rowExpansionTemplate={itemTemplate}
+        className="ledger-table"
       >
-        {/* Conditional expander */}
         <Column
           header=""
           style={{ width: '3rem' }}
@@ -98,6 +132,8 @@ export function LedgerPanel({ ledger }: LedgerPanelProps) {
                     };
                   })
                 }
+                aria-expanded={!!expandedRows?.[row.rollupKey]}
+                aria-controls={`detail-${row.rollupKey}`}
               >
                 <span className={`pi ${isExpanded ? 'pi-chevron-down' : 'pi-chevron-right'}`} />
               </button>
@@ -105,49 +141,39 @@ export function LedgerPanel({ ledger }: LedgerPanelProps) {
           }}
         />
 
-        {/* Date */}
         <Column
           field="wDate"
           header="Date"
           body={(row: LedgerDto) => formatLedgerDate(row.wDate)}
         />
 
-        {/* Credit Summary */}
         <Column
           field="creditSummary"
           header="Credit Summary"
-          body={(row: LedgerDto) => (
-            <span style={{ color: '#66BB6A' }}>{formatCurrency(row.creditSummary)}</span>
-          )}
+          body={(row: LedgerDto) => <span style={{ color: '#66BB6A' }}>{formatCurrency(row.creditSummary)}</span>}
         />
 
-        {/* Debit Summary */}
         <Column
+          header={() => <div ref={setDebitHeader}>Debit Summary</div>}
           field="debitSummary"
-          header="Debit Summary"
-          body={(row: LedgerDto) => (
-            <span style={{ color: '#EF5350' }}>{formatCurrency(row.debitSummary)}</span>
-          )}
+          headerClassName="col-debit-header"
+          body={(row: LedgerDto) => <span style={{ color: '#EF5350' }}>{formatCurrency(row.debitSummary)}</span>}
+          style={{ textAlign: 'right' }}
+          className="col-debit"
         />
 
-        {/* Net Change */}
         <Column
           field="net"
           header="Net Change"
           body={(row: LedgerDto) => (
-            <span style={{ color: row.net < 0 ? '#EF5350' : '#66BB6A' }}>
-              {formatCurrency(row.net)}
-            </span>
+            <span style={{ color: row.net < 0 ? '#EF5350' : '#66BB6A' }}>{formatCurrency(row.net)}</span>
           )}
         />
 
-        {/* Balance */}
         <Column
           field="runningTotal"
           header="Balance"
-          body={(row: LedgerDto) => (
-            <span style={{ fontWeight: 600 }}>{formatCurrency(row.runningTotal)}</span>
-          )}
+          body={(row: LedgerDto) => <span style={{ fontWeight: 600 }}>{formatCurrency(row.runningTotal)}</span>}
         />
       </DataTable>
     </div>

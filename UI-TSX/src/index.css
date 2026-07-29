@@ -1,3 +1,131 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+:root {
+  --debit-col-width: 160px;
+  --detail-bg: #fbfdfe;
+  --detail-contrast: #eef7f6;
+  --debit-accent: #8b1f1f;
+}
+
+/* Main table debit header */
+.p-datatable .p-datatable-thead > tr > th.col-debit-header {
+  text-align: right;
+  color: var(--debit-accent);
+  background: var(--detail-contrast);
+  font-weight: 700;
+}
+.p-datatable .p-datatable-tbody > tr > td.col-debit {
+  text-align: right;
+}
+
+/* Expanded detail row */
+.ledger-detail-row {
+  background: var(--detail-bg);
+  border-top: 1px solid #e6e9ee;
+  padding: 10px 0;
+}
+
+/* Panel container: 85% width and right aligned */
+.ledger-detail-panel-container {
+  width: 85%;
+  margin-left: auto;
+  box-sizing: border-box;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+/* Inner panel */
+.ledger-detail-panel {
+  background: #ffffff;
+  border: 1px solid rgba(15,23,42,0.04);
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 1px 0 rgba(16,24,40,0.02);
+  box-sizing: border-box;
+}
+
+/* Header row for columns (labels) */
+.ledger-detail-columns-header {
+  display: grid;
+  grid-template-columns: 1fr 120px 1.6fr 100px; /* adjust column widths */
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+/* Column label style */
+.ledger-detail-columns-header .col {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--debit-accent);
+  background: var(--detail-contrast);
+  padding: 6px 8px;
+  border-radius: 6px;
+  text-align: left;
+}
+
+/* Rows of items laid out horizontally to match header */
+.ledger-detail-columns {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Each item row uses the same grid as header */
+.ledger-detail-row-item {
+  display: grid;
+  grid-template-columns: 1fr 120px 1.6fr 100px;
+  gap: 12px;
+  align-items: center;
+  padding: 8px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, rgba(15,23,42,0.01), rgba(255,255,255,0));
+  border: 1px solid rgba(15,23,42,0.03);
+}
+
+/* Column cell styles */
+.ledger-detail-row-item .col {
+  font-size: 13px;
+  color: #0f172a;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Amount column right aligned */
+.ledger-detail-row-item .col-amount {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Name and period muted */
+.ledger-detail-row-item .col-name,
+.ledger-detail-row-item .col-period {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1100px) {
+  .ledger-detail-panel-container { width: 90%; }
+  .ledger-detail-columns-header,
+  .ledger-detail-row-item {
+    grid-template-columns: 1fr 100px 1fr 90px;
+  }
+}
+@media (max-width: 720px) {
+  .ledger-detail-panel-container { width: 100%; margin-left: 0; padding-left: 0; padding-right: 0; }
+  .ledger-detail-panel { padding: 10px; }
+  /* Stack columns vertically on very small screens */
+  .ledger-detail-columns-header { display: none; }
+  .ledger-detail-row-item {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .ledger-detail-row-item .col-amount { text-align: left; }
+}
