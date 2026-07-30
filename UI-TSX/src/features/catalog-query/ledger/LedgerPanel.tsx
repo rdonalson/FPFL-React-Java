@@ -53,6 +53,12 @@ export function LedgerPanel({ ledger }: LedgerPanelProps) {
     );
   }
 
+  function renderCurrencyOrDash(value?: number, color?: string) {
+    if (value == null) return <span>--</span>;
+    if (value === 0) return <span>--</span>;
+    return <span style={{ color }}>{formatCurrency(value)}</span>;
+  }
+
   // Horizontal columns item template
   const itemTemplate = (row: LedgerDto) => (
     <div
@@ -162,27 +168,25 @@ export function LedgerPanel({ ledger }: LedgerPanelProps) {
         <Column
           field="creditSummary"
           header="Credit Summary"
-          body={(row: LedgerDto) => (
-            <span style={{ color: '#66BB6A' }}>{formatCurrency(row.creditSummary)}</span>
-          )}
+          body={(row: LedgerDto) => renderCurrencyOrDash(row.creditSummary, '#66BB6A')}
         />
 
         <Column
           header={() => <div ref={setDebitHeader}>Debit Summary</div>}
           field="debitSummary"
-          body={(row: LedgerDto) => (
-            <span style={{ color: '#EF5350' }}>{formatCurrency(row.debitSummary)}</span>
-          )}
+          body={(row: LedgerDto) => renderCurrencyOrDash(row.debitSummary, '#EF5350')}
         />
 
         <Column
           field="net"
           header="Net Change"
-          body={(row: LedgerDto) => (
-            <span style={{ color: row.net < 0 ? '#EF5350' : '#66BB6A' }}>
-              {formatCurrency(row.net)}
-            </span>
-          )}
+          body={(row: LedgerDto) => {
+            const v = row.net ?? 0;
+            if (v === 0) return <span>--</span>;
+            return (
+              <span style={{ color: v < 0 ? '#EF5350' : '#66BB6A' }}>{formatCurrency(v)}</span>
+            );
+          }}
         />
 
         <Column
