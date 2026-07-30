@@ -155,6 +155,8 @@ export function LedgerPanel({ ledger }: LedgerPanelProps) {
           field="wDate"
           header="Date"
           body={(row: LedgerDto) => formatLedgerDate(row.wDate)}
+          headerClassName="p-column-header-content-date"
+          style={{ textAlign: 'left' }}
         />
 
         <Column
@@ -168,12 +170,9 @@ export function LedgerPanel({ ledger }: LedgerPanelProps) {
         <Column
           header={() => <div ref={setDebitHeader}>Debit Summary</div>}
           field="debitSummary"
-          headerClassName="col-debit-header"
           body={(row: LedgerDto) => (
             <span style={{ color: '#EF5350' }}>{formatCurrency(row.debitSummary)}</span>
           )}
-          style={{ textAlign: 'right' }}
-          className="col-debit"
         />
 
         <Column
