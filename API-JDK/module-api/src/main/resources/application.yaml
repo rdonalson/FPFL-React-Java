@@ -14,6 +14,21 @@ spring:
                 dialect: org.hibernate.dialect.PostgreSQLDialect
                 default_schema: FPFL
 
+#    datasource:
+#        url: jdbc:postgresql://pg-fpfl-v2.postgres.database.azure.com:5432/FPFL-V2
+#        username: postgres
+#        password: password
+#        hikari:
+#            maximum-pool-size: 10
+#
+#    jpa:
+#        hibernate:
+#            ddl-auto: update
+#        properties:
+#            hibernate:
+#                dialect: org.hibernate.dialect.PostgreSQLDialect
+#                default_schema: FPFL
+
 server:
     port: 8000
 
@@ -34,3 +49,10 @@ security:
 
         # 7 days
         #refresh-token-expiration-ms: 604800000
+
+
+#    export PGHOST=pg-fpfl-v2.postgres.database.azure.com
+#    export PGUSER=postgres
+#    export PGPORT=5432
+#    export PGDATABASE=postgres
+#    export PGPASSWORD="{your-password}"
