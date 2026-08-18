@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         user.setEmail(email);
         user.setPasswordHash(passwordEncoder.encode(rawPassword));
-        user.setRoles(roles);
+        // user.setRoles(roles);
         user.setFirst(first);
         user.setLast(last);
 

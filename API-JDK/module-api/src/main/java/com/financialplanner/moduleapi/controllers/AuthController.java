@@ -6,7 +6,7 @@ import com.financialplanner.moduleapi.response.ApiResponseFactory;
 import com.financialplanner.moduleapi.security.JwtService;
 import com.financialplanner.moduleauth.application.service.RefreshTokenServiceImpl;
 import com.financialplanner.moduleauth.domain.service.AuthService;
-import com.financialplanner.moduleauth.infrastructure.persistence.entity.Role;
+import com.financialplanner.moduleauth.domain.service.UserRolesService;
 import com.financialplanner.moduleauth.infrastructure.persistence.entity.User;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -26,13 +26,18 @@ public class AuthController {
     private final RefreshTokenServiceImpl refreshTokenService;
     private final JwtService jwtService;
     private final ApiResponseFactory responseFactory;
+    private final UserRolesService userRolesService;
 
-    public AuthController(AuthService authService, RefreshTokenServiceImpl refreshTokenService, JwtService jwtService,
-                          ApiResponseFactory responseFactory) {
+    public AuthController(AuthService authService,
+                          RefreshTokenServiceImpl refreshTokenService,
+                          JwtService jwtService,
+                          ApiResponseFactory responseFactory,
+                          UserRolesService userRolesService) {
         this.authService         = authService;
         this.refreshTokenService = refreshTokenService;
         this.jwtService          = jwtService;
         this.responseFactory     = responseFactory;
+        this.userRolesService    = userRolesService;
     }
 
     @PostMapping("/register")
@@ -40,17 +45,22 @@ public class AuthController {
 
         User user = authService.register(request.email(), request.password(), request.first(), request.last());
 
-        var roleNames = user.getRoles()
-                            .stream()
-                            .map(Role::getName)
-                            .toList();
+        var roleNames = userRolesService.getRoleNamesForUser(user.getId());
 
         var accessToken = jwtService.generateToken(user.getEmail(), Map.of("roles", roleNames));
 
         var refreshToken = refreshTokenService.createRefreshToken(user.getId());
 
-        var authResponse = new AuthResponse(accessToken, refreshToken.getToken(), user.getId(), user.getEmail(),
-                                            user.getUserId(), user.getFirst(), user.getLast(), Set.copyOf(roleNames));
+        var authResponse = new AuthResponse(
+            accessToken,
+            refreshToken.getToken(),
+            user.getId(),
+            user.getEmail(),
+            user.getUserId(),
+            user.getFirst(),
+            user.getLast(),
+            Set.copyOf(roleNames)
+        );
 
         return ResponseEntity.ok(responseFactory.success(authResponse, "Registration successful"));
     }
@@ -60,17 +70,22 @@ public class AuthController {
 
         User user = authService.login(request.email(), request.password());
 
-        var roleNames = user.getRoles()
-                            .stream()
-                            .map(Role::getName)
-                            .toList();
+        var roleNames = userRolesService.getRoleNamesForUser(user.getId());
 
         var accessToken = jwtService.generateToken(user.getEmail(), Map.of("roles", roleNames));
 
         var refreshToken = refreshTokenService.createRefreshToken(user.getId());
 
-        var authResponse = new AuthResponse(accessToken, refreshToken.getToken(), user.getId(), user.getEmail(),
-                                            user.getUserId(), user.getFirst(), user.getLast(), Set.copyOf(roleNames));
+        var authResponse = new AuthResponse(
+            accessToken,
+            refreshToken.getToken(),
+            user.getId(),
+            user.getEmail(),
+            user.getUserId(),
+            user.getFirst(),
+            user.getLast(),
+            Set.copyOf(roleNames)
+        );
 
         return ResponseEntity.ok(responseFactory.success(authResponse, "Login successful"));
     }
@@ -83,16 +98,16 @@ public class AuthController {
 
         var user = refreshToken.getUser();
 
-        var roleNames = user.getRoles()
-                            .stream()
-                            .map(Role::getName)
-                            .toList();
+        var roleNames = userRolesService.getRoleNamesForUser(user.getId());
 
         var newAccessToken = jwtService.generateToken(user.getEmail(), Map.of("roles", roleNames));
 
         var newRefreshToken = refreshTokenService.createRefreshToken(user.getId());
 
-        var tokens = Map.of("accessToken", newAccessToken, "refreshToken", newRefreshToken.getToken());
+        var tokens = Map.of(
+            "accessToken", newAccessToken,
+            "refreshToken", newRefreshToken.getToken()
+        );
 
         return ResponseEntity.ok(responseFactory.success(tokens, "Token refreshed"));
     }
@@ -101,17 +116,13 @@ public class AuthController {
     public ResponseEntity<ApiResponse<AuthResponse>> changePassword(
         @Valid @RequestBody ChangePasswordRequest request) {
 
-        // Service call using the request object
         User user = authService.changePassword(
             request.id(),
             request.currentPassword(),
             request.newPassword()
-                                              );
+        );
 
-        var roleNames = user.getRoles()
-                            .stream()
-                            .map(Role::getName)
-                            .toList();
+        var roleNames = userRolesService.getRoleNamesForUser(user.getId());
 
         var accessToken = jwtService.generateToken(user.getEmail(), Map.of("roles", roleNames));
         var refreshToken = refreshTokenService.createRefreshToken(user.getId());
@@ -129,6 +140,6 @@ public class AuthController {
 
         return ResponseEntity.ok(
             responseFactory.success(authResponse, "Password changed successfully")
-                                );
+        );
     }
 }

@@ -1,8 +1,9 @@
 package com.financialplanner.moduleauth.infrastructure.persistence.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
-@lombok.Data
+@Data
 @Entity
 @Table(name = "roles", schema = "fpfl")
 public class Role {
