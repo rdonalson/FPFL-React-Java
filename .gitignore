@@ -19,7 +19,7 @@ target/
 .project
 .settings/
 out/
-package-lock.json
+#package-lock.json
 
 # -------------------------
 # OS files
