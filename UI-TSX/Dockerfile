@@ -5,11 +5,11 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files separately so dependency changes bust cache
-COPY package.json package-lock.json ./
+# Copy package metadata separately so dependency changes bust cache
+COPY package.json ./
 
-# Always reinstall dependencies (forces fresh build)
-RUN npm ci
+# Install dependencies from package.json when no lockfile is committed
+RUN npm install
 
 # Copy the rest of the source code
 COPY . .
