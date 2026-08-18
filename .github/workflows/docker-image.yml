@@ -14,5 +14,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+    - name: Build the API Docker image
+      run: docker build ./API-JDK --file API-JDK/Dockerfile --tag fpfl-api:$(date +%s)
+    - name: Build the UI Docker image
+      run: docker build ./UI-TSX --file UI-TSX/Dockerfile --tag fpfl-ui:$(date +%s)
