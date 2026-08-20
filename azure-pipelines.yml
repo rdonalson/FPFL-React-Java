@@ -1,6 +1,6 @@
 # Docker
 # Build and push an image to Azure Container Registry
-# Deploy API to AKS cluster with public LoadBalancer
+# Deploy API to Azure Web App (Docker Container)
 
 trigger:
 - main
@@ -9,14 +9,11 @@ resources:
 - repo: self
 
 variables:
-  # Container registry service connection established during pipeline creation
   dockerRegistryServiceConnection: 'caf955c7-ff86-42e4-9969-096bd1d5978d'
   imageRepository: 'fpflapijdkv2'
   containerRegistry: 'fpflregistry.azurecr.io'
   dockerfilePath: '$(Build.SourcesDirectory)/API-JDK/Dockerfile'
   tag: '$(Build.BuildId)'
-
-  # Agent VM image name
   vmImageName: 'ubuntu-latest'
 
 stages:
@@ -43,31 +40,45 @@ stages:
           $(tag)
 
 # ---------------------------------------------------------
-# DEPLOY STAGE
+# DEPLOY STAGE (WEB APP)
 # ---------------------------------------------------------
 - stage: Deploy
-  displayName: Deploy API to AKS
+  displayName: Deploy API to Azure Web App
   dependsOn: Build
   jobs:
   - job: Deploy
-    displayName: Deploy API to AKS
+    displayName: Deploy API Container
     pool:
       vmImage: $(vmImageName)
     steps:
     - task: AzureCLI@2
-      displayName: Update fpfl-api deployment in AKS
+      displayName: Create Web App (if not exists) and deploy container
       inputs:
         azureSubscription: 'Azure Resource Manager'
         scriptType: bash
         scriptLocation: inlineScript
         inlineScript: |
-          echo "Connecting to AKS cluster..."
-          az aks get-credentials --resource-group rg-fpfl-v2 --name aks-fpfl-v2-cluster
+          echo "Logging into Azure..."
+          az account show
 
-          echo "Updating fpfl-api deployment with new image tag..."
-          kubectl set image deployment/fpfl-api fpfl-api=$(containerRegistry)/$(imageRepository):$(tag)
+          echo "Creating App Service Plan (if not exists)..."
+          az appservice plan create \
+            --name fpfl-app-plan \
+            --resource-group rg-fpfl-v2 \
+            --sku B1 \
+            --is-linux
 
-          echo "Applying API LoadBalancer service..."
-          kubectl apply -f k8s/fpfl-api-service.yaml
+          echo "Creating Web App (if not exists)..."
+          az webapp create \
+            --resource-group rg-fpfl-v2 \
+            --plan fpfl-app-plan \
+            --name fpfl-api-jdk-wa \
+            --deployment-container-image-name $(containerRegistry)/$(imageRepository):$(tag)
+
+          echo "Updating Web App container image..."
+          az webapp config container set \
+            --name fpfl-api-jdk-wa \
+            --resource-group rg-fpfl-v2 \
+            --docker-custom-image-name $(containerRegistry)/$(imageRepository):$(tag)
 
           echo "Deployment complete."
