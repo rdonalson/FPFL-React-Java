@@ -52,33 +52,17 @@ stages:
       vmImage: $(vmImageName)
     steps:
     - task: AzureCLI@2
-      displayName: Create Web App (if not exists) and deploy container
+      displayName: Deploy container to existing Web App
       inputs:
         azureSubscription: 'Azure Resource Manager'
         scriptType: bash
         scriptLocation: inlineScript
         inlineScript: |
-          echo "Logging into Azure..."
-          az account show
+          echo "Deploying container image to Web App..."
 
-          echo "Creating App Service Plan (if not exists)..."
-          az appservice plan create \
-            --name fpfl-app-plan \
-            --resource-group rg-fpfl-v2 \
-            --sku B1 \
-            --is-linux
-
-          echo "Creating Web App (if not exists)..."
-          az webapp create \
-            --resource-group rg-fpfl-v2 \
-            --plan fpfl-app-plan \
-            --name fpfl-api-jdk-wa \
-            --deployment-container-image-name $(containerRegistry)/$(imageRepository):$(tag)
-
-          echo "Updating Web App container image..."
           az webapp config container set \
             --name fpfl-api-jdk-wa \
             --resource-group rg-fpfl-v2 \
-            --docker-custom-image-name $(containerRegistry)/$(imageRepository):$(tag)
+            --container-image-name $(containerRegistry)/$(imageRepository):$(tag)
 
           echo "Deployment complete."
