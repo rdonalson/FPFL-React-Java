@@ -5,7 +5,7 @@ spring:
 #    datasource:
 #        url: jdbc:postgresql://localhost:5432/FPFL-V2
 #        username: postgres
-#        password: xbt20o19A
+#        password: password
 #    jpa:
 #        hibernate:
 #            ddl-auto: update
@@ -18,7 +18,7 @@ spring:
     datasource:
         url: jdbc:postgresql://pg-fpfl-v2.postgres.database.azure.com:5432/FPFL-V2
         username: postgres
-        password: xbt20o19A
+        password: password
         hikari:
             maximum-pool-size: 10
 
