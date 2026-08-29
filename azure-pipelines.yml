@@ -10,7 +10,7 @@ resources:
 
 variables:
   dockerRegistryServiceConnection: 'caf955c7-ff86-42e4-9969-096bd1d5978d'
-  imageRepository: 'fpflapijdkv2'
+  imageRepository: 'fpflapijdk'
   containerRegistry: 'fpflregistry.azurecr.io'
   dockerfilePath: '$(Build.SourcesDirectory)/API-JDK/Dockerfile'
   tag: '$(Build.BuildId)'
