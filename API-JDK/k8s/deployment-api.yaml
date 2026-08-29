@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: fpfl-api
+    namespace: fpfl
+    labels:
+        app: fpfl-api
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: fpfl-api
+    template:
+        metadata:
+            labels:
+                app: fpfl-api
+        spec:
+            containers:
+                - name: fpfl-api
+                  image: fpflregistry.azurecr.io/fpflapijdk:latest
+                  imagePullPolicy: Always
+                  ports:
+                      - containerPort: 8080
+                  env:
+                      - name: SPRING_DATASOURCE_URL
+                        value: "jdbc:postgresql://fpfl-postgres:5432/FPFL-V2"
+                      - name: SPRING_DATASOURCE_USERNAME
+                        value: "postgres"
+                      - name: SPRING_DATASOURCE_PASSWORD
+                        value: "xbt20o19A"
+                      - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+                        value: "update"
+                      - name: SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA
+                        value: "fpfl"
+                      - name: SERVER_PORT
+                        value: "8080"

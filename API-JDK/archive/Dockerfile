@@ -33,8 +33,8 @@ WORKDIR /app
 # Copy the fat JAR from the build stage
 COPY --from=build /app/module-api/target/module-api-1.0.0.jar app.jar
 
-# Expose the API port (recommended for AKS)
-EXPOSE 8080
+# Expose the API port
+EXPOSE 9000
 
 # Run the Spring Boot application
 ENTRYPOINT ["java", "-jar", "app.jar"]
