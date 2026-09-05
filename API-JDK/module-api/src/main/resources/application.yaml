@@ -2,36 +2,36 @@ spring:
     application:
         name: module-api
 
-#    datasource:
-#        url: jdbc:postgresql://localhost:5432/FPFL-V2
-#        username: postgres
-#        password: password
-#    jpa:
-#        hibernate:
-#            ddl-auto: update
-#        show-sql: false
-#        properties:
-#            hibernate:
-#                dialect: org.hibernate.dialect.PostgreSQLDialect
-#                default_schema: FPFL
-
     datasource:
-        url: jdbc:postgresql://pg-fpfl-v2.postgres.database.azure.com:5432/FPFL-V2
-        username: postgres
-        password: password
-        hikari:
-            maximum-pool-size: 10
-
+        url: ${DB_URL}
+        username: ${DB_USERNAME}
+        password: ${DB_PASSWORD}
     jpa:
         hibernate:
             ddl-auto: update
+        show-sql: false
         properties:
             hibernate:
                 dialect: org.hibernate.dialect.PostgreSQLDialect
                 default_schema: FPFL
 
-server:
-    port: 8000
+#    datasource:
+#        url: jdbc:postgresql://pg-fpfl-v2.postgres.database.azure.com:5432/FPFL-V2
+#        username: postgres
+#        password: password
+#        hikari:
+#            maximum-pool-size: 10
+#
+#    jpa:
+#        hibernate:
+#            ddl-auto: update
+#        properties:
+#            hibernate:
+#                dialect: org.hibernate.dialect.PostgreSQLDialect
+#                default_schema: FPFL
+#
+#server:
+#    port: 8080
 
 security:
     jwt:
