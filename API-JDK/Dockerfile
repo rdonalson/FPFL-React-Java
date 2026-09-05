@@ -33,7 +33,7 @@ WORKDIR /app
 # Copy the fat JAR from the build stage
 COPY --from=build /app/module-api/target/module-api-1.0.0.jar app.jar
 
-# Expose the API port (recommended for AKS)
+# Expose the API port
 EXPOSE 8080
 
 # Run the Spring Boot application
