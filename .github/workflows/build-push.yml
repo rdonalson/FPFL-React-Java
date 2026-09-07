@@ -6,7 +6,7 @@ on:
     branches: [main]
 
 env:
-  REGISTRY: fpflregistry.azurecr.io
+  REGISTRY: fpflacr.azurecr.io
   IMAGE_NAME: fpflapijdkimg
 
 jobs:
