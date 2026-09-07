@@ -3,6 +3,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        VITE_NODE_ENV: docker
+        VITE_API_URL: http://localhost:8080
+        VITE_API_TIMEOUT_MS: 30000
+        VITE_SESSION_WARNING_MS: 60000
+        VITE_SESSION_DEBUG: "false"
     image: fpfluitsximg
     container_name: fpfl-ui-tsx
     ports:
