@@ -5,10 +5,15 @@ metadata:
     namespace: fpfl
     annotations:
         kubernetes.io/ingress.class: nginx
+        cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
     ingressClassName: nginx
+    tls:
+        - hosts:
+              - api-jdk.ledger-finance.com
+          secretName: fpfl-api-tls
     rules:
-        - host: api.ledger-finance.com
+        - host: api-jdk.ledger-finance.com
           http:
               paths:
                   - path: /

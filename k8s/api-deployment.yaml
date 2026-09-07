@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: api
+    namespace: fpfl
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: fpfl-api
+    template:
+        metadata:
+            labels:
+                app: fpfl-api
+        spec:
+            containers:
+                - name: api
+                  image: fpflacr.azurecr.io/fpflapijdkimg:latest
+                  ports:
+                      - containerPort: 8080
+                  env:
+                      - name: SERVER_PORT
+                        value: "8080"
+                      - name: SPRING_DATASOURCE_URL
+                        valueFrom:
+                            secretKeyRef:
+                                name: api-db-secret
+                                key: DB_URL
+                      - name: SPRING_DATASOURCE_USERNAME
+                        valueFrom:
+                            secretKeyRef:
+                                name: api-db-secret
+                                key: DB_USERNAME
+                      - name: SPRING_DATASOURCE_PASSWORD
+                        valueFrom:
+                            secretKeyRef:
+                                name: api-db-secret
+                                key: DB_PASSWORD
+                      - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+                        value: "update"
+                      - name: SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA
+                        value: "fpfl"
+                  resources:
+                      requests:
+                          memory: "384Mi"
+                          cpu: "250m"
+                      limits:
+                          memory: "768Mi"
+                          cpu: "500m"
