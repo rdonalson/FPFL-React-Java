@@ -5,16 +5,19 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy package metadata separately so dependency changes bust cache
+ARG VITE_API_URL
+ARG VITE_NODE_ENV=production
+ARG VITE_API_TIMEOUT_MS=30000
+ARG VITE_SESSION_WARNING_MS=60000
+ARG VITE_SESSION_DEBUG=false
+
 COPY package.json ./
-
-# Install dependencies from package.json when no lockfile is committed
 RUN npm install
-
-# Copy the rest of the source code
 COPY . .
 
-# Build Vite production bundle
+RUN printf "VITE_NODE_ENV=%s\nVITE_API_URL=%s\nVITE_API_TIMEOUT_MS=%s\nVITE_SESSION_WARNING_MS=%s\nVITE_SESSION_DEBUG=%s\n" \
+    "$VITE_NODE_ENV" "$VITE_API_URL" "$VITE_API_TIMEOUT_MS" "$VITE_SESSION_WARNING_MS" "$VITE_SESSION_DEBUG" > .env.production
+
 RUN npm run build
 
 
@@ -31,6 +34,6 @@ COPY --from=builder /app/package.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 
-EXPOSE 9500
+EXPOSE 80
 
-CMD ["npm", "run", "preview", "--", "--port", "9500", "--host"]
+CMD ["npm", "run", "preview", "--", "--port", "80", "--host"]

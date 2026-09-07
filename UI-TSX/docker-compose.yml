@@ -3,8 +3,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: FPFL-UI-TSX-V2
+    image: fpfluitsximg
+    container_name: fpfl-ui-tsx
     ports:
-      - '9500:9500'
+      - '80:80'
     env_file:
       - .env.docker
