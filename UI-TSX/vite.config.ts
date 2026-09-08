@@ -25,4 +25,9 @@ export default defineConfig({
     port: 4000,
     open: true, // opens your default system browser
   },
+  preview: {
+    host: true,
+    port: 80,
+    allowedHosts: ['ledger-finance.com', 'api-jdk.ledger-finance.com', 'localhost'],
+  },
 });
