@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+    name: fpfl-ui-ingress
+    namespace: fpfl
+    annotations:
+        kubernetes.io/ingress.class: nginx
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+    ingressClassName: nginx
+    tls:
+        - hosts:
+              - ledger-finance.com
+          secretName: fpfl-ui-tls
+    rules:
+        - host: ledger-finance.com
+          http:
+              paths:
+                  - path: /
+                    pathType: Prefix
+                    backend:
+                        service:
+                            name: fpfl-ui-service
+                            port:
+                                number: 80

@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: ui
+    namespace: fpfl
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: fpfl-ui
+    template:
+        metadata:
+            labels:
+                app: fpfl-ui
+        spec:
+            containers:
+                - name: ui
+                  image: fpflacr.azurecr.io/fpfluitsximg:latest
+                  ports:
+                      - containerPort: 80
+                  resources:
+                      requests:
+                          memory: "128Mi"
+                          cpu: "100m"
+                      limits:
+                          memory: "256Mi"
+                          cpu: "250m"

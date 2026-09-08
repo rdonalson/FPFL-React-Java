@@ -1,0 +1,47 @@
+name: Build and Push UI to ACR
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'UI-TSX/**'
+
+env:
+  REGISTRY: fpflacr.azurecr.io
+  IMAGE_NAME: fpfluitsximg
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Log in to Azure Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./UI-TSX
+          file: ./UI-TSX/Dockerfile
+          push: true
+          build-args: |
+            VITE_NODE_ENV=production
+            VITE_API_URL=https://api-jdk.ledger-finance.com
+            VITE_API_TIMEOUT_MS=30000
+            VITE_SESSION_WARNING_MS=60000
+            VITE_SESSION_DEBUG=false
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

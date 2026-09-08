@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "preview": "vite preview",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "build:prod": "tsc -b && vite build --mode prod"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
