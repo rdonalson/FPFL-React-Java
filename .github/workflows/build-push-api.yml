@@ -1,18 +1,18 @@
-name: Build and Push UI to ACR
+name: Build and Push API to ACR
 
 on:
   workflow_dispatch:
   push:
     branches: [main]
     paths:
-      - 'UI-TSX/**'
-      - 'k8s/UI/ui-deployment.yaml'
-      - 'k8s/UI/ui-service.yaml'
-      - 'k8s/UI/ui-ingress.yaml'
+      - 'API-JDK/**'
+      - 'k8s/API/api-deployment.yaml'
+      - 'k8s/API/api-service.yaml'
+      - 'k8s/API/api-ingress.yaml'
 
 env:
   REGISTRY: fpflacr.azurecr.io
-  IMAGE_NAME: fpfluitsximg
+  IMAGE_NAME: fpflapijdkimg
 
 jobs:
   build-and-push:
@@ -34,18 +34,14 @@ jobs:
       - name: Build and push image
         uses: docker/build-push-action@v6
         with:
-          context: ./UI-TSX
-          file: ./UI-TSX/Dockerfile
+          context: ./API-JDK
+          file: ./API-JDK/Dockerfile
           push: true
-          build-args: |
-            VITE_NODE_ENV=production
-            VITE_API_URL=https://api-jdk.ledger-finance.com
-            VITE_API_TIMEOUT_MS=30000
-            VITE_SESSION_WARNING_MS=60000
-            VITE_SESSION_DEBUG=false
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   deploy:
     needs: build-and-push
@@ -67,11 +63,11 @@ jobs:
 
       - name: Apply Kubernetes manifests
         run: |
-          kubectl apply -f k8s/UI/ui-service.yaml
-          kubectl apply -f k8s/UI/ui-deployment.yaml
-          kubectl apply -f k8s/UI/ui-ingress.yaml
+          kubectl apply -f k8s/API/api-service.yaml
+          kubectl apply -f k8s/API/api-deployment.yaml
+          kubectl apply -f k8s/API/api-ingress.yaml
 
       - name: Force rollout to pull new image
         run: |
-          kubectl rollout restart deployment/ui -n fpfl
-          kubectl rollout status deployment/ui -n fpfl --timeout=120s
+          kubectl rollout restart deployment/api -n fpfl
+          kubectl rollout status deployment/api -n fpfl --timeout=120s
