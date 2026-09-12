@@ -32,6 +32,20 @@ spring:
 #
 #server:
 #    port: 8080
+management:
+    endpoints:
+        web:
+            exposure:
+                include: health,info
+    endpoint:
+        health:
+            show-details: always
+            show-components: always
+    info:
+        build:
+            enabled: true
+        env:
+            enabled: true
 
 security:
     jwt:
