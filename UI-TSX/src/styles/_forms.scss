@@ -107,3 +107,61 @@
 @media (max-width: 480px) {
   .qa-grid { grid-template-columns: 1fr; }
 }
+
+/* StatusPage */
+.status-page {
+  --status-page-max-width: 1600px; /* set to none for full-bleed */
+  --status-card-min: 560px;        /* narrowest a card may get before stacking */
+
+  width: 100%;
+  max-width: var(--status-page-max-width);
+  margin-inline: auto;
+
+  /* If an ancestor is a flex container, grow instead of shrinking to content */
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Neutralize a fixed width coming from the Card (theme or layout CSS).
+   PrimeReact nests: .p-card > .p-card-body > .p-card-content */
+.status-page .p-card,
+.status-page .p-card-body,
+.status-page .p-card-content {
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+}
+
+/* Same for the panel holding the raw JSON */
+.status-page .p-panel,
+.status-page .p-panel-content {
+  width: 100%;
+  max-width: none;
+}
+
+/* Tables should use the full card width and scroll only when truly needed */
+.status-page .p-datatable,
+.status-page .p-datatable-wrapper,
+.status-page .p-datatable-table {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Long detail strings shouldn't force the table wider than the card */
+.status-page .p-datatable td {
+  overflow-wrap: anywhere;
+}
+
+/* Two cards side by side only when each can be at least --status-card-min wide;
+   otherwise they stack full width. Replaces the col-12 lg:col-6 split, which
+   halved the cards the moment the viewport crossed 992px. */
+.status-cards {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(var(--status-card-min), 1fr));
+  align-items: stretch;
+}
+
+.status-cards > * {
+  min-width: 0; /* let grid items shrink instead of overflowing */
+}

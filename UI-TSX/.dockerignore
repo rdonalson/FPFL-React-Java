@@ -1,5 +1,15 @@
 ﻿node_modules
 dist
-.env
-.env.docker
+build
 .git
+.gitignore
+.env
+.env.*
+!.env.example
+npm-debug.log*
+coverage
+.vscode
+.idea
+Dockerfile
+docker-compose.yml
+ 

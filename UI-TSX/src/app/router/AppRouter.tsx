@@ -1,9 +1,10 @@
-// src/app/router/AppRouter.tsx
+import StatusPage from '@/app/components/StatusPage';
+// Quarterly
 import { Routes, Route } from 'react-router-dom';
 
 import AppLayout from '../layout/AppLayout';
 
-import { HomePage } from '../pages/HomePage';
+import { HomePage } from '../components/HomePage';
 import { ItemTypeTablePage } from '@/features/catalog-command/admin/itemType/components/ItemTypeTablePage';
 import { TimePeriodTablePage } from '@/features/catalog-command/admin/timePeriod/components/TimePeriodTablePage';
 import InitialAmountPage from '@/features/catalog-command/transactions/components/initial-amount/InitialAmountPage';
@@ -70,7 +71,7 @@ export function AppRouter() {
           <Route element={<AdminRouteGuard />}>
             <Route path="/command/admin/item-types" element={<ItemTypeTablePage />} />
             <Route path="/command/admin/time-periods" element={<TimePeriodTablePage />} />
-            <Route path="/status" element={<div>Status Page Coming Soon</div>} />
+            <Route path="/status" element={<StatusPage />} />
           </Route>
 
           {/* Shared authenticated */}

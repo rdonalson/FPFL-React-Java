@@ -42,7 +42,7 @@ const buildDefaults: AppConfigShape = {
     nodeEnv: import.meta.env.VITE_NODE_ENV ?? 'development',
   },
   api: {
-    baseUrl: import.meta.env.VITE_API_URL ?? 'http://localhost:9000',
+    baseUrl: import.meta.env.VITE_API_URL ?? 'http://localhost:8080',
     timeoutMs: Number(import.meta.env.VITE_API_TIMEOUT_MS ?? 10000),
   },
   session: {
