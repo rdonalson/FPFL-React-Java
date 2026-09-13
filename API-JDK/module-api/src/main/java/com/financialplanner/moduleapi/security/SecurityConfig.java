@@ -40,37 +40,28 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
 
                 // Static + frontend assets
-                .requestMatchers("/", "/home", "/index.html", "/favicon.ico", "/static/**", "/assets/**", "/images/**",
-                                 "/icon.svg")
-                .permitAll()
+                .requestMatchers("/", "/home", "/index.html", "/favicon.ico", "/static/**", "/assets/**", "/images/**", "/icon.svg").permitAll()
 
                 // Actuator health
-                .requestMatchers("/actuator/health")
-                .permitAll()
+                .requestMatchers("/actuator/health").permitAll()
 
                 // Authentication endpoints
-                .requestMatchers("/auth/**")
-                .permitAll()
+                .requestMatchers("/auth/**").permitAll()
 
                 // Client log endpoint
-                .requestMatchers("/client-logs")
-                .permitAll()
+                .requestMatchers("/client-logs").permitAll()
 
                 // Public catalog endpoints
-                .requestMatchers("/item-types/**", "/time-periods/**", "/items/**")
-                .permitAll()
+                .requestMatchers("/item-types/**", "/time-periods/**", "/items/**").permitAll()
 
                 // Swagger / OpenAPI
-                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
-                .permitAll()
+                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
 
                 // Allow preflight OPTIONS requests
-                .requestMatchers(HttpMethod.OPTIONS, "/**")
-                .permitAll()
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                 // Everything else requires JWT
-                .anyRequest()
-                .authenticated())
+                .anyRequest().authenticated())
 
             // Stateless JWT sessions
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -95,7 +86,7 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         // Your frontend origin
-        config.setAllowedOrigins(List.of("https://ledger-finance.com","http://localhost:4000","http://localhost"));
+        config.setAllowedOrigins(List.of("https://ui-tsx.ledger-finance.com", "https://ledger-finance.com", "http://localhost:4000", "http://localhost"));
 
         // Allowed HTTP methods
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
