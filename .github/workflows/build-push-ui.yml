@@ -1,4 +1,4 @@
-name: Build and Push UI to ACR
+name: Build and Push FPFL UI-TSX to ACR
 
 on:
   workflow_dispatch:
