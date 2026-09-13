@@ -1,4 +1,4 @@
-name: Build and Push API to ACR
+name: Build and Push FPFL API-JDK to ACR
 
 on:
   workflow_dispatch:
