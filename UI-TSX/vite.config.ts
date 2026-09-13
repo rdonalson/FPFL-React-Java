@@ -29,7 +29,6 @@ export default defineConfig({
     host: true,
     port: 80,
     allowedHosts: [
-      'ledger-finance.com',
       'ui-tsx.ledger-finance.com',
       'api-jdk.ledger-finance.com',
       'localhost',
