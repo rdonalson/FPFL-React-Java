@@ -10,9 +10,20 @@ spec:
     ingressClassName: nginx
     tls:
         - hosts:
+              - ui-tsx.ledger-finance.com
               - ledger-finance.com
           secretName: fpfl-ui-tls
     rules:
+        - host: ui-tsx.ledger-finance.com
+          http:
+              paths:
+                  - path: /
+                    pathType: Prefix
+                    backend:
+                        service:
+                            name: fpfl-ui-service
+                            port:
+                                number: 80
         - host: ledger-finance.com
           http:
               paths:
