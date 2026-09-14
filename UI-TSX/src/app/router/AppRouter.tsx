@@ -5,6 +5,7 @@ import { Routes, Route } from 'react-router-dom';
 import AppLayout from '../layout/AppLayout';
 
 import { HomePage } from '../components/HomePage';
+import DocsPage from '../components/DocsPage';
 import { ItemTypeTablePage } from '@/features/catalog-command/admin/itemType/components/ItemTypeTablePage';
 import { TimePeriodTablePage } from '@/features/catalog-command/admin/timePeriod/components/TimePeriodTablePage';
 import InitialAmountPage from '@/features/catalog-command/transactions/components/initial-amount/InitialAmountPage';
@@ -64,6 +65,7 @@ export function AppRouter() {
       <Route element={<AppLayout />}>
         {/* Public */}
         <Route path="/" element={<HomePage />} />
+        <Route path="/docs" element={<DocsPage />} />
 
         {/* Authenticated */}
         <Route element={<AuthGate />}>

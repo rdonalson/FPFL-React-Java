@@ -1,80 +1,97 @@
 # Financial Planner: Forecast Ledger — API JDK
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/rdonalson/FPFL-React-Java/actions)
-[![Maven Central](https://img.shields.io/badge/maven-available-blue)](https://search.maven.org/)
+[![Java](https://img.shields.io/badge/java-25-orange)](https://openjdk.org/projects/jdk/25/)
+[![Spring Boot](https://img.shields.io/badge/spring%20boot-4.0.6-brightgreen)](https://spring.io/projects/spring-boot)
 [![License](https://img.shields.io/badge/license-MIT-lightgrey)](../LICENSE)
 
-A clean, enterprise‑grade, multi‑module Java platform built with **Java 25**, **Spring Boot 4.x**, and **Maven**. The system follows Domain‑Driven Design and is organized into bounded contexts for clarity, testability, and long‑term maintainability.
+A clean, enterprise‑grade, multi‑module Java platform built with **Java 25**, **Spring Boot 4.0.x**, and **Maven**. The system follows Domain‑Driven Design and is organized into bounded contexts for clarity, testability, and long‑term maintainability.
 
 ---
 
 ## Overview
 
-**Purpose**  
-Provide a modular backend API that stores, manages, and projects user financial planning items (recurring payments, incomes, and scheduled events). The **api** module exposes REST endpoints and is the single runnable entrypoint; domain logic and persistence live in separate bounded contexts.
+**Purpose**
+Provide a modular backend API that stores, manages, and projects user financial planning items (recurring payments, incomes, and scheduled events). The **module-api** module exposes REST endpoints and is the single runnable entrypoint; authentication, domain logic, projections, and persistence live in separate bounded contexts.
 
-**Key technologies**  
-Java 25 · Spring Boot 4.x · Spring Data JPA · Maven · PostgreSQL 16+
+**Key technologies**
+Java 25 · Spring Boot 4.0.6 · Spring Security · Spring Data JPA · springdoc‑openapi · JJWT · Lombok · Maven · PostgreSQL 16+
+
+**Deployed as**
+A multi‑stage Docker image (`fpflapijdkimg`) pushed to Azure Container Registry and rolled out to AKS by GitHub Actions. Live at <https://api-jdk.ledger-finance.com>.
 
 ---
 
 ## Quick links
 
-- **API module**: `api/` (runnable Spring Boot app)
-- **Docs**: `API-JDK/docs/` (ER diagrams, screenshots)
-- **License**: `../LICENSE` (MIT)
+- **Runnable module**: `module-api/` (Spring Boot app, the only executable JAR)
+- **Docs**: [`docs/`](docs) — architecture and ER diagrams, screenshots, [troubleshooting](docs/TROUBLESHOOTING.md), [security reports](docs/security)
+- **CI/CD workflow**: [`../.github/workflows/build-push-api.yml`](../.github/workflows/build-push-api.yml)
+- **Kubernetes manifests**: [`../k8s/API`](../k8s/API)
+- **License**: [`../LICENSE`](../LICENSE) (MIT)
 
 ---
 
 ## Project structure
 
-Each module is packaged as a **JAR** and built under a unified parent POM.
+Each module is packaged as a **JAR** and built under a unified parent POM (`com.Financial-Planner:FPFL-V2-Microservice:1.0.0`).
 
-### API-JDK/
+```
+API-JDK/
+ ├── module-api/          # REST API, controllers, DTOs, security filters, app bootstrap
+ ├── module-auth/         # Authentication and authorization domain
+ ├── module-items-bc/     # Write-side domain + persistence for financial items
+ ├── module-display-bc/   # Read models, recurrence expansion, ledger projections
+ ├── module-common-bc/    # Shared utilities, exceptions, sanitization, converters
+ ├── docs/                # Diagrams, screenshots, troubleshooting, security reports
+ ├── Dockerfile           # Multi-stage build (Maven + Temurin 25 → JRE 25)
+ ├── docker-compose.yml   # Local container run
+ └── pom.xml              # Parent POM (dependencyManagement + modules)
+```
 
-- ├── api/ # REST API, controllers, DTOs, app bootstrap
-- ├── auth/ # Authentication and authorization (module-auth)
-- ├── items/ # Domain + persistence for source data
-- ├── display/ # Read models, projections, query handlers
-- ├── common/ # Shared utilities, exceptions, config
-- └── pom.xml # Parent POM (dependencyManagement + modules)
+Reactor build order: `module-common-bc` → `module-items-bc` → `module-display-bc` → `module-auth` → `module-api`.
 
 ---
 
 ## Module responsibilities
 
-### **api**
+### **module-api**
 
-- Exposes REST endpoints and OpenAPI/Swagger contracts
-- Defines DTOs and client‑facing contracts
-- Delegates write operations to **items**
-- Delegates read operations to **display**
-- Owns Spring Boot application bootstrap, datasource, and JPA configuration
+- Exposes REST endpoints and OpenAPI/Swagger contracts (`springdoc-openapi`)
+- Defines DTOs, mappers, and the `ApiResponse` envelope for client‑facing contracts
+- Owns the Spring Security filter chain, JWT validation (`JwtAuthFilter`, `JwtServiceImpl`), and `CustomUserDetails`
+- Delegates write operations to **module-items-bc** and read operations to **module-display-bc**
+- Owns Spring Boot application bootstrap, datasource, JPA, and Actuator configuration
+- Centralizes error translation in `GlobalExceptionHandler`
 
-### **auth** (new)
+**Controllers:** `AuthController`, `UserRolesController`, `ItemController`, `ItemTypeController`, `TimePeriodController`, `InitialAmountController`, `DisplayController`, `ClientLogController`
 
-- Centralized authentication and authorization concerns
-- JWT token issuance and validation
-- Security filters, authentication providers, and role/permission mapping
-- Integrates with `api` to secure endpoints and with `items`/`display` for user-scoped data access
-- Keeps security logic separated from domain logic
+### **module-auth**
 
-### **items**
+- Centralized authentication and authorization domain
+- Users, roles, user‑role assignments, and persisted refresh tokens
+- JWT signing/parsing via **JJWT**; password hashing via `PasswordEncoderConfig` (`spring-security-crypto`)
+- Token lifetimes configured through `TokenProperties`
+- Keeps security *domain* logic out of `module-api`, which owns only the filter chain
+
+### **module-items-bc**
 
 - Owns the write‑side domain model for financial items
-- Handles CRUD operations and domain invariants
-- Implements repositories (Spring Data JPA)
-- Contains domain services and aggregates
+- Handles CRUD operations and domain invariants for `Item`, `ItemType`, and `TimePeriod`
+- Implements repositories through a ports‑and‑adapters split: domain `*Repository` interfaces, `*RepositoryImpl` adapters, and Spring Data `Jpa*Repository` interfaces (plus `JpaItemRepositoryCustom` for hand‑written queries)
 
-### **display**
+### **module-display-bc**
 
-- Provides read‑optimized models and projections
-- Query handlers and view models shaped for UI consumption
-- Keeps read concerns separate from write models for performance and simplicity
+- Provides read‑optimized models and projections shaped for UI consumption
+- Expands each item's recurrence metadata into concrete dated occurrences — one expander per pattern (one‑time, daily, weekly, bi‑weekly, monthly, bi‑monthly, quarterly, semi‑annual, annual, nth‑weekday)
+- `LedgerReadoutService` composes occurrences with the user's initial amount into a running‑balance ledger
+- Depends on `module-items-bc` for the item model; keeps read concerns separate from write models
 
-### **common**
+### **module-common-bc**
 
-- Shared utilities, custom exceptions, reusable config, and annotations
+- Shared exceptions (`DomainException`, `DomainValidationException`, `ItemNotFoundException`, `DuplicateItemException`, `RepositoryException`, `SanitizationException`, `InvalidCredentialsException`, `ForbiddenOperationException`)
+- Input sanitization (`SanitizerImpl` with `@StrictText`, `@LenientText`, `@NoSanitize` annotations)
+- `ErrorLogger` and JPA converters (`BooleanToBitConverter`)
 - Use sparingly — only for true cross‑cutting concerns
 
 ---
@@ -83,9 +100,18 @@ Each module is packaged as a **JAR** and built under a unified parent POM.
 
 - No cross‑context leakage: domain logic must remain in its owning bounded context.
 - No circular dependencies.
-- `api` is the only runnable module.
-- `items`, `display`, and `auth` may depend on `common` where appropriate.
-- `api` depends on `auth`, `items`, `display`, and `common`.
+- `module-api` is the only runnable module and the only one with the Spring Boot repackage plugin.
+- `module-auth`, `module-items-bc`, and `module-common-bc` are Spring‑agnostic apart from Spring Data JPA — no web layer.
+- Actual dependency edges:
+
+```
+module-api  ──► module-auth ──► module-common-bc
+     │                              ▲
+     ├──────► module-display-bc ────┤
+     │              │               │
+     │              ▼               │
+     └──────► module-items-bc ──────┘
+```
 
 ---
 
@@ -97,8 +123,10 @@ Each module is packaged as a **JAR** and built under a unified parent POM.
 
 # 🗄️ PostgreSQL Database Structure
 
-The API module connects to a PostgreSQL database that stores financial planning items, their types, and their recurrence periods.  
+The API module connects to a PostgreSQL database that stores financial planning items, their types, their recurrence periods, and the authentication tables backing `module-auth`.
 Below is a summary of the schema represented in the ER diagram.
+
+Schema management runs through Hibernate (`ddl-auto: update`) against the configured default schema.
 
 ---
 
@@ -106,7 +134,7 @@ Below is a summary of the schema represented in the ER diagram.
 
 ### **items**
 
-Stores all user‑defined financial items, including scheduling metadata.
+Stores all user‑defined financial items, including scheduling metadata. The recurrence columns are mutually exclusive — only the set matching the item's `fk_time_period` is populated, and `module-display-bc` reads exactly that set when expanding occurrences.
 
 | **Column**               | **Description**                                             |
 | ------------------------ | ----------------------------------------------------------- |
@@ -143,7 +171,7 @@ Stores all user‑defined financial items, including scheduling metadata.
 
 ### **item_types**
 
-Defines the type/category of an item.
+Defines the type/category of an item — the credit/debit classification applied to the ledger.
 
 | **Column** | **Description**                              |
 | ---------- | -------------------------------------------- |
@@ -154,12 +182,12 @@ Defines the type/category of an item.
 
 ### **time_periods**
 
-Defines the recurrence period for an item.
+Defines the recurrence period for an item. The chosen period determines which recurrence columns on `items` are used.
 
-| **Column** | **Description**                              |
-| ---------- | -------------------------------------------- |
-| **id**     | Primary key                                  |
-| **name**   | Type name (e.g., rent, salary, subscription) |
+| **Column** | **Description**                                                        |
+| ---------- | ---------------------------------------------------------------------- |
+| **id**     | Primary key                                                            |
+| **name**   | Period name (e.g., one‑time, daily, weekly, monthly, quarterly, annual) |
 
 ---
 
@@ -193,7 +221,7 @@ Defines named roles for authorization.
 
 ### **user_roles**
 
-Join table mapping users to roles.
+Join table mapping users to roles. Mapped in `module-auth` by `UserRoles` with the composite key `UserRolesId`.
 
 | **Column**  | **Description**                          |
 | ----------- | ---------------------------------------- |
@@ -218,28 +246,26 @@ Tracks refresh tokens for session management and revocation.
 
 ## **🔗 Relationships**
 
----
-
-## item_types (1) ────< (many) items >──── (1) time_periods
+### item_types (1) ────< (many) items >──── (1) time_periods
 
 - `items.fk_item_type` → `item_types.id`
 - `items.fk_time_period` → `time_periods.id`
 - `items.user_id` → `users.userID` (user ownership; userID is UUID)
 
-## users (1) ────< (many) user_roles >──── (1) roles
+### users (1) ────< (many) user_roles >──── (1) roles
 
 - `user_roles.user_id` → `users.id`
 - `user_roles.role_id` → `roles.id`
 
-## users (1) ────< (many) refresh_tokens
+### users (1) ────< (many) refresh_tokens
 
 - `refresh_tokens.user_id` → `users.id`
 
 ---
 
-![Modular Dependency Diagram](docs/FPFL-JDK-API-ER.png)
+![Entity Relationship Diagram](docs/FPFL-JDK-API-ER.png)
 
-The API module exposes endpoints that operate on these tables through the domain logic in the `items` bounded context.
+The API module exposes endpoints that operate on these tables through the domain logic in the `module-items-bc` and `module-auth` bounded contexts.
 
 ---
 
@@ -251,48 +277,105 @@ The API module exposes endpoints that operate on these tables through the domain
 - Maven 3.9+
 - Git
 - PostgreSQL 16+
+- Docker (optional, for containerized runs)
 
-Ensure your `application.yml` contains valid datasource credentials.
+### Configuration
+
+Runtime configuration lives in [`module-api/src/main/resources/application.yaml`](module-api/src/main/resources/application.yaml), which reads its datasource values from environment variables. **spring-dotenv** loads them from a `.env` file at the `API-JDK` root, so local setup is a matter of creating one:
+
+```dotenv
+DB_URL=jdbc:postgresql://localhost:5432/FPFL-V2
+DB_USERNAME=postgres
+DB_PASSWORD=your-password
+```
+
+| File | Used by |
+| ---- | ------- |
+| `.env` | Local development |
+| `.env.docker` | Local Docker Compose runs |
+| `.env.prod` | Production‑shaped container runs |
+
+All three are Git‑ignored. In AKS the same three values come from the `api-db-secret` Kubernetes secret instead.
+
+**Other settings** (`application.yaml`):
+
+| Setting | Value |
+| ------- | ----- |
+| `spring.jpa.hibernate.ddl-auto` | `update` |
+| Hibernate dialect | `PostgreSQLDialect` |
+| Actuator endpoints exposed | `health`, `info` (with full details and components) |
+| `security.jwt.access-token-expiration-ms` | `900000` (15 minutes) |
+| `security.jwt.refresh-token-expiration-ms` | `900000` (15 minutes) |
+
+> ⚠️ `security.jwt.secret` ships with a placeholder value. Override it with a real 256‑bit secret via environment variable before any non‑local deployment.
 
 ---
 
 ## Build the entire system
 
+From the `API-JDK` directory:
+
 ```bash
 mvn clean install
 ```
 
-This compiles, tests, and packages all modules into JAR files.
+This compiles, tests, and packages all five modules into JARs.
 
 ---
 
 ## Run the API module
 
-From the `api` directory:
+From the `API-JDK` root:
+
+```bash
+mvn -pl module-api spring-boot:run
+```
+
+Or from the `module-api` directory:
 
 ```bash
 mvn spring-boot:run
 ```
 
----
-
-Or from the project root:
-
-```bash
-mvn -pl api spring-boot:run
-```
-
----
-
 Or run the packaged JAR:
 
 ```bash
-java -jar target/api-0.0.1-SNAPSHOT.jar
+java -jar module-api/target/module-api-1.0.0.jar
 ```
+
+The API starts on port **8080** (Spring's default — no `server.port` override is set; the Docker and Kubernetes runtimes pass `SERVER_PORT=8080` explicitly).
+
+| Endpoint | URL |
+| -------- | --- |
+| Welcome page | <http://localhost:8080/> |
+| Swagger UI | <http://localhost:8080/swagger-ui.html> |
+| Actuator health | <http://localhost:8080/actuator/health> |
+
+![Swagger UI](docs/API_Swagger_Page.png)
 
 ---
 
-The API starts on port **8000** by default.
+## 🐳 Docker
+
+The [`Dockerfile`](Dockerfile) is a two‑stage build: `maven:3.9.11-eclipse-temurin-25` copies the parent and module POMs first so `dependency:go-offline` caches cleanly, builds the fat JAR, then `eclipse-temurin:25-jre` runs it. The runtime image exposes **8080**.
+
+```bash
+docker compose up --build
+```
+
+`docker-compose.yml` reads `.env.prod` and maps `8080:8080`.
+
+---
+
+## 🔄 CI/CD
+
+Pushes to `main` that touch `API-JDK/**` or `k8s/API/*.yaml` trigger [`build-push-api.yml`](../.github/workflows/build-push-api.yml):
+
+1. Build and push `fpflacr.azurecr.io/fpflapijdkimg` tagged `:${{ github.sha }}` and `:latest`, with GitHub Actions layer caching for the Maven stage
+2. Azure login → set AKS context (`fpfl-cluster`) → `kubectl apply` the service, deployment, and ingress
+3. `kubectl rollout restart deployment/api -n fpfl` and wait for `rollout status`
+
+Full pipeline details are in the [root README](../README.md#-cicd-pipeline).
 
 ---
 
@@ -302,169 +385,44 @@ The API starts on port **8000** by default.
 mvn test
 ```
 
----
-
-Each module contains its own isolated test suite.
+Each module contains its own isolated test suite. The bounded contexts test with **JUnit Jupiter** and **Mockito**; `module-api` additionally pulls Spring Boot 4's modular test starters (`spring-boot-starter-webmvc-test`, `-data-jpa-test`, `-validation-test`, `-actuator-test`).
 
 ---
 
 ## 📦 Packaging
 
-Each bounded context produces a JAR:
+Each module produces a JAR under its own `target/`:
+
+- `module-api/target/module-api-1.0.0.jar` — **the only runnable entrypoint** (Spring Boot fat JAR)
+- `module-auth/target/module-auth-1.0.0.jar`
+- `module-items-bc/target/module-items-bc-1.0.0.jar`
+- `module-display-bc/target/module-display-bc-1.0.0.jar`
+- `module-common-bc/target/module-common-bc-1.0.0.jar`
 
 ---
 
-- api/target/api-VERSION.jar
-- items/target/items-VERSION.jar
-- display/target/display-VERSION.jar
-- common/target/common-VERSION.jar
+## 🔒 Security & Dependency Management
 
----
-
-The **API module is the only runnable entrypoint**.
+- Dependency versions are pinned centrally in the parent POM's `dependencyManagement` — modules declare artifacts without versions so upgrades happen in one place.
+- CVE findings, remediations, and triaged false positives are tracked under [`docs/security/`](docs/security):
+  - [CVE-VALIDATION-REPORT.md](docs/security/CVE-VALIDATION-REPORT.md)
+  - [VULNERABILITY-FIX-SUMMARY.md](docs/security/VULNERABILITY-FIX-SUMMARY.md)
+  - [assertj-cve-remediation.md](docs/security/assertj-cve-remediation.md) — the AssertJ standardization runbook
+  - [false-positives/](docs/security/false-positives)
 
 ---
 
 ## 🧰 Development Notes
 
-- Use `application-local.yml` for local overrides (ignored by Git)
 - Keep domain logic inside the bounded context that owns it
-- Avoid placing business logic in controllers
-- Use `common` sparingly — only for true cross‑cutting concerns
+- Avoid placing business logic in controllers — they delegate to services and map through DTOs
+- Use `module-common-bc` sparingly — only for true cross‑cutting concerns
+- Sanitize user‑supplied strings with the `@StrictText` / `@LenientText` annotations rather than ad‑hoc cleanup
+- Never commit `.env` files or a real JWT secret
+- See [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) for common local setup problems
 
 ---
 
 ## 📄 License
 
 This project is licensed under the [MIT License](../LICENSE).
-
----
-
----
-
-## 🔒 Patch AssertJ CVE Across Maven Modules
-
-This document outlines the controlled process for identifying, standardizing, and remediating CVE findings related to `org.assertj:assertj-core` across the API‑JDK multi‑module Maven project.
-
-## 📌 Plan Overview
-
-The goal is to baseline current AssertJ CVE findings, align all module versions, apply a patched version centrally, and verify the fix through CVE validation and a full reactor build.
-
-## 🧭 Steps
-
-### 1. Capture Baseline CVE Findings
-
-Run:
-
-```bash
-validate_cves_for_java
-```
-
-Record all findings related to:
-
-```bash
-org.assertj:assertj-core
-```
-
-This establishes the before‑state for comparison.
-
----
-
-### 2. Locate All AssertJ Declarations
-
-Inspect the following module POMs:
-
-- `module-auth/pom.xml`
-- `module-common-bc/pom.xml`
-- `module-display-bc/pom.xml`
-- `module-items-bc/pom.xml`
-
-Identify:
-
-- Direct `assertj-core` declarations
-- Any inherited versions coming from `dependencyManagement`
-
----
-
-### 3. Confirm Effective Versions
-
-Use:
-
-```bash
-mvn help:effective-pom
-```
-
-Verify:
-
-- Which modules inherit the parent version
-- Which modules override it
-- Whether any transitive dependencies introduce older AssertJ versions
-
----
-
-### 4. Standardize the AssertJ Version
-
-Choose a single patched version and apply it consistently.
-
-**Preferred approach:**  
-✔ Add the version once in the root `dependencyManagement`  
-✔ Remove module‑level overrides
-
-This ensures:
-
-- Version consistency
-- Easier future upgrades
-- Cleaner module POMs
-
----
-
-### 5. Re‑Run CVE Validation
-
-Run:
-
-```bash
-validate_cves_for_java
-```
-
-Compare before/after results to confirm the AssertJ CVE is resolved.
-
----
-
-### 6. Verify Build & Test Stability
-
-Execute a full reactor build from the project root:
-
-```bash
-mvn clean verify
-```
-
-Confirm:
-
-- All modules compile
-- Tests pass
-- No regressions introduced by the dependency update
-
----
-
-## 🧩 Further Considerations
-
-### ✔ Which patched version should we target?
-
-Options include:
-
-- **Latest stable AssertJ release**
-- **Version aligned with Spring Boot BOM**
-- **Security‑team mandated minimum version**
-
-### ✔ Where should the version be controlled?
-
-- **Option A (recommended):** Centralize in parent `dependencyManagement`
-- **Option B:** Explicitly pin per module (only if module isolation is required)
-
-### ✔ What if the CVE persists transitively?
-
-Evaluate:
-
-- Adding exclusions
-- Upgrading the Spring BOM
-- Upgrading the parent dependency strategy
