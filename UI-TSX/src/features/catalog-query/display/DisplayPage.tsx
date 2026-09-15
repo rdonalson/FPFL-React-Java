@@ -1,6 +1,8 @@
 // src/features/catalog-query/display/DisplayPage.tsx
 import React, { useEffect, useState } from 'react';
 import * as RadixTabs from '@radix-ui/react-tabs';
+import { useNavigate } from 'react-router-dom';
+import { Button } from 'primereact/button';
 
 import { getSessionUserId } from '@/app/state/sessionHelpers';
 
@@ -13,6 +15,7 @@ import { ChartPanel } from '../chart/ChartPanel'; // <-- your new chart panel
 import { LedgerPanel } from '../ledger/LedgerPanel';
 
 export default function DisplayPage() {
+  const navigate = useNavigate();
   const [criteria, setCriteria] = useState<DisplayRequest>(() => ({
     userId: getSessionUserId() ?? null,
     ledgerStartDate: new Date(),
@@ -78,6 +81,15 @@ export default function DisplayPage() {
 
   return (
     <div className={`${themeClass} p-6`}>
+      <div className="mb-2">
+        <Button
+          label="Back to Home"
+          icon="pi pi-arrow-left"
+          className="p-button-text"
+          onClick={() => navigate('/')}
+        />
+      </div>
+
       <h2 className="text-xl font-semibold mb-2">Display</h2>
       <div className="fpfl-divider border-b mb-4" />
 

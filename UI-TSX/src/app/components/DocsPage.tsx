@@ -222,6 +222,15 @@ export default function DocsPage() {
 
   return (
     <div className="docs-page p-4 flex flex-column gap-4">
+      <div>
+        <Button
+          label="Back to Home"
+          icon="pi pi-arrow-left"
+          className="p-button-text"
+          onClick={() => navigate('/')}
+        />
+      </div>
+
       {/* ── Hero ── */}
       <Card className="shadow-2">
         <div className="flex flex-wrap align-items-start justify-content-between gap-3">

@@ -4,6 +4,10 @@ import { Checkbox } from 'primereact/checkbox';
 import { Button } from 'primereact/button';
 import type { DisplayRequest } from '../types/DisplayRequest';
 
+// Grouping is not implemented yet. Flip this to true to bring the checkbox back;
+// all of the wiring below (criteria.includeGrouping / updateGrouping) is left intact.
+const SHOW_GROUPING = false;
+
 interface Props {
   criteria: DisplayRequest;
   updateStart: (value: Date | null) => void;
@@ -51,16 +55,18 @@ export function DateRangePanel({
             />
           </div>
 
-          <div className="field mb-4 flex items-center">
-            <Checkbox
-              inputId="includeGrouping"
-              checked={criteria.includeGrouping}
-              onChange={e => updateGrouping(e.checked ?? false)}
-            />
-            <label htmlFor="includeGrouping" className="ml-2 font-bold">
-              Grouping?
-            </label>
-          </div>
+          {SHOW_GROUPING && (
+            <div className="field mb-4 flex items-center">
+              <Checkbox
+                inputId="includeGrouping"
+                checked={criteria.includeGrouping}
+                onChange={e => updateGrouping(e.checked ?? false)}
+              />
+              <label htmlFor="includeGrouping" className="ml-2 font-bold">
+                Grouping?
+              </label>
+            </div>
+          )}
 
           <Button
             label="Calculate"

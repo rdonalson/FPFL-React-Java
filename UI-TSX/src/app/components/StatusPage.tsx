@@ -1,7 +1,7 @@
 // src/app/components/StatusPage.tsx
 import { useCallback, useEffect, useState } from 'react';
 import { version as reactVersion } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Card } from 'primereact/card';
 import { Panel } from 'primereact/panel';
 import { Button } from 'primereact/button';
@@ -64,6 +64,7 @@ function formatDetails(details?: Record<string, unknown>) {
 
 export default function StatusPage() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { userId } = useSessionStore();
   const { roles } = useAuth();
 
@@ -177,6 +178,15 @@ export default function StatusPage() {
   return (
     // Width is controlled in StatusPage.css (--status-page-max-width).
     <div className="status-page p-4 flex flex-column gap-4">
+      <div>
+        <Button
+          label="Back to Home"
+          icon="pi pi-arrow-left"
+          className="p-button-text"
+          onClick={() => navigate('/')}
+        />
+      </div>
+
       <div className="flex flex-wrap align-items-center justify-content-between gap-3">
         <h1 className="text-3xl font-bold m-0">System Status</h1>
         {headerRight}

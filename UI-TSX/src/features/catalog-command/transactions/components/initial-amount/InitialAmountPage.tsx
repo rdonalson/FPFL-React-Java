@@ -3,6 +3,7 @@ import React, { JSX, useEffect, useRef, useState } from 'react';
 import { Toast } from 'primereact/toast';
 import { InputNumber } from 'primereact/inputnumber';
 import { Button } from 'primereact/button';
+import { useNavigate } from 'react-router-dom';
 
 import {
   fetchInitialAmount,
@@ -13,6 +14,7 @@ import {
 import { InitialAmountResponse } from '../../types/InitialAmount';
 
 export default function InitialAmountPage(): JSX.Element {
+  const navigate = useNavigate();
   const didLoadRef = useRef(false);
   const toast = useRef<Toast | null>(null);
 
@@ -128,6 +130,16 @@ export default function InitialAmountPage(): JSX.Element {
   return (
     <div style={{ padding: 16, maxWidth: 560 }}>
       <Toast ref={toast} />
+
+      <div style={{ marginBottom: 8 }}>
+        <Button
+          label="Back to Home"
+          icon="pi pi-arrow-left"
+          className="p-button-text"
+          onClick={() => navigate('/')}
+        />
+      </div>
+
       <h3>Initial Amount</h3>
 
       {loading ? (

@@ -26,7 +26,7 @@ const USER_ACTIONS: QuickAction[] = [
 const ADMIN_ACTIONS: QuickAction[] = [
   { label: 'Manage Item Types', icon: 'pi pi-list', route: '/command/admin/item-types' },
   { label: 'Manage Time Periods', icon: 'pi pi-calendar', route: '/command/admin/time-periods' },
-  { label: 'Check API Status', icon: 'pi pi-server', route: '/status', severity: 'secondary' },
+  { label: 'System Status', icon: 'pi pi-server', route: '/status', severity: 'secondary' },
 ];
 
 export function HomePage() {

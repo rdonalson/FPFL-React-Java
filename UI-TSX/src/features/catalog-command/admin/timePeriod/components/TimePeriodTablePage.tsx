@@ -6,6 +6,7 @@ import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { Toolbar } from 'primereact/toolbar';
 import { Toast } from 'primereact/toast';
+import { useNavigate } from 'react-router-dom';
 
 import { TimePeriod } from '../types/TimePeriod';
 import { TimePeriodCreateDialog } from './TimePeriodCreateDialog';
@@ -20,6 +21,7 @@ import {
 } from '../hooks/useTimePeriod';
 
 export function TimePeriodTablePage() {
+  const navigate = useNavigate();
   const toast = useRef<Toast>(null);
 
   const [createVisible, setCreateVisible] = useState(false);
@@ -129,6 +131,15 @@ export function TimePeriodTablePage() {
   return (
     <div className="p-4">
       <Toast ref={toast} />
+
+      <div>
+        <Button
+          label="Back to Home"
+          icon="pi pi-arrow-left"
+          className="p-button-text"
+          onClick={() => navigate('/')}
+        />
+      </div>
 
       <Toolbar left={leftToolbar} right={rightToolbar} className="mb-3" />
 

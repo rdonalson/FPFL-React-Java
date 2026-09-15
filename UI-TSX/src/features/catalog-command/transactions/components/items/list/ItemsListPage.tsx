@@ -1,5 +1,5 @@
 // src/features/catalog-command/transactions/components/items/ItemsListPage.tsx
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import { DataTable } from 'primereact/datatable';
@@ -22,26 +22,19 @@ export default function ItemsListPage({ itemType }: ItemsListPageProps) {
   const toastRef = useRef<any>(null);
 
   const { items, loading, error, loadForUserAndType, remove } = useItem();
-  const [localLoading, setLocalLoading] = useState<boolean>(false);
 
-  useEffect(() => {
-    loadItems();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [itemType]);
+  const loadItems = useCallback(async () => {
+    const userId = getSessionUserId();
+    if (!userId) {
+      toastRef.current?.show({
+        severity: 'warn',
+        summary: 'Not signed in',
+        detail: 'No user session found.',
+      });
+      return;
+    }
 
-  async function loadItems() {
-    setLocalLoading(true);
     try {
-      const userId = getSessionUserId();
-      if (!userId) {
-        toastRef.current?.show({
-          severity: 'warn',
-          summary: 'Not signed in',
-          detail: 'No user session found.',
-        });
-        setLocalLoading(false);
-        return;
-      }
       await loadForUserAndType(userId, itemType);
     } catch (err) {
       console.error('Failed to load items', err);
@@ -50,10 +43,12 @@ export default function ItemsListPage({ itemType }: ItemsListPageProps) {
         summary: 'Load failed',
         detail: 'Could not load items.',
       });
-    } finally {
-      setLocalLoading(false);
     }
-  }
+  }, [itemType, loadForUserAndType]);
+
+  useEffect(() => {
+    void loadItems();
+  }, [loadItems]);
 
   function handleAdd() {
     const base = itemType === 1 ? '/command/transactions/credits' : '/command/transactions/debits';
@@ -106,6 +101,15 @@ export default function ItemsListPage({ itemType }: ItemsListPageProps) {
       <Toast ref={toastRef} />
       <ConfirmDialog />
 
+      <div>
+        <Button
+          label="Back to Home"
+          icon="pi pi-arrow-left"
+          className="p-button-text"
+          onClick={() => navigate('/')}
+        />
+      </div>
+
       <Card>
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-semibold">{itemType === 1 ? 'Credits' : 'Debits'}</h2>
@@ -121,7 +125,7 @@ export default function ItemsListPage({ itemType }: ItemsListPageProps) {
       </Card>
 
       <Card>
-        {(loading || localLoading) && <p>Loading…</p>}
+        {loading && <p>Loading…</p>}
         {error && <p className="text-red-500">{error}</p>}
 
         <DataTable value={items} paginator rows={10} stripedRows>

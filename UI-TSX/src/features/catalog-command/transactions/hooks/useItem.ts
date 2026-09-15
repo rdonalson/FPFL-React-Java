@@ -8,7 +8,7 @@ export function useItem() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function loadForUserAndType(userId: string, itemType: number) {
+  const loadForUserAndType = useCallback(async (userId: string, itemType: number) => {
     setLoading(true);
     setError(null);
     try {
@@ -19,7 +19,7 @@ export function useItem() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
   const create = useCallback(async (payload: Item) => {
     setLoading(true);
