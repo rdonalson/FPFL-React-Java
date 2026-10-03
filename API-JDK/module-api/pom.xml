@@ -137,6 +137,13 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- JUnit 5 for the assistant draft-translation eval suite -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
 </project>
