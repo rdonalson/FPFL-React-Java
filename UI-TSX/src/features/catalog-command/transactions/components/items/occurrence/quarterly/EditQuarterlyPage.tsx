@@ -61,7 +61,7 @@ export default function EditQuarterlyPage({ itemType }: EditQuarterlyPageProps) 
     return () => {
       mounted = false;
     };
-  }, [id, itemType, loadForUserAndType]); // ✔ matches your standardized pattern
+  }, [id, items, itemType, loadForUserAndType]); // ✔ matches your standardized pattern
 
   function handleSaved() {
     const base = itemType === 1 ? '/command/transactions/credits' : '/command/transactions/debits';

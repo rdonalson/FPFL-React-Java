@@ -61,7 +61,7 @@ export default function EditSemiAnnualPage({ itemType }: EditSemiAnnualPageProps
     return () => {
       mounted = false;
     };
-  }, [id, itemType, loadForUserAndType]); // ✔ standardized deps
+  }, [id, items, itemType, loadForUserAndType]); // ✔ standardized deps
 
   function handleSaved() {
     const base = itemType === 1 ? '/command/transactions/credits' : '/command/transactions/debits';

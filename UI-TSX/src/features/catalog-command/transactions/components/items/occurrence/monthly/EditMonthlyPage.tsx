@@ -62,7 +62,7 @@ export default function EditMonthlyPage({ itemType }: EditMonthlyPageProps) {
       mounted = false;
     };
     // Depend only on id, itemType, and loader to avoid repeated calls
-  }, [id, itemType, loadForUserAndType, items]);
+  }, [id, items, itemType, loadForUserAndType]);
 
   function handleSaved() {
     const base = itemType === 1 ? '/command/transactions/credits' : '/command/transactions/debits';
