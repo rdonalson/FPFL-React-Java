@@ -1,18 +1,27 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <title>FPFL React/Java Platform</title>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>%VITE_APP_TITLE%</title>
+    <meta name="description" content="%VITE_APP_DESCRIPTION%" />
+
+    <!-- Open Graph / social previews -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="%VITE_APP_TITLE%" />
+    <meta property="og:description" content="%VITE_APP_DESCRIPTION%" />
+    <meta property="og:image" content="%VITE_APP_OG_IMAGE%" />
+    <meta name="twitter:card" content="summary_large_image" />
+
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <link id="theme-css" rel="stylesheet" href="/themes/lara-light-indigo/theme.css" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="FPFL Platform – A React + Java powered financial planning UI with modular features and clean architecture."
-    />
-    <title>FPFL React/Java Platform</title>
 
-    <!-- Server injected runtime config must appear before the app bundle -->
+    <!--
+      Runtime config overrides, merged over build-time .env values by initAppConfig().
+      Keep empty in source so .env.development / .env.production apply.
+      In production, the server may replace this object with per-environment values.
+      Must appear before the app bundle.
+    -->
     <script>
       window.__RUNTIME_CONFIG__ = {
         session: { warningBeforeMs: 300000, debug: false },
