@@ -15,12 +15,11 @@ const formatCurrency = (value: number) =>
   });
 
 const formatLedgerDate = (iso: string) => {
-  const d = new Date(iso);
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  const weekday = d.toLocaleString('en-US', { weekday: 'short' });
-  return `${yyyy}-${mm}-${dd} - ${weekday}`;
+  // Take the YYYY-MM-DD portion as-is; never let the timezone shift it
+  const [yyyy, mm, dd] = iso.slice(0, 10).split('-').map(Number);
+  const local = new Date(yyyy, mm - 1, dd); // local midnight, used only for the weekday
+  const weekday = local.toLocaleString('en-US', { weekday: 'short' });
+  return `${yyyy}-${String(mm).padStart(2, '0')}-${String(dd).padStart(2, '0')} - ${weekday}`;
 };
 
 export function LedgerPanel({ ledger }: LedgerPanelProps) {
