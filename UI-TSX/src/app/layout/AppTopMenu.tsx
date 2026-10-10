@@ -25,7 +25,10 @@ export function AppTopMenu({ onToggleSidebar }: AppTopMenuProps) {
   const navigate = useNavigate();
 
   const { dark, toggleTheme } = useThemeStore();
-  const { first, last, clearSession, isAuthenticated, setSession, id } = useSessionStore();
+  const { first, last, clearSession, isAuthenticated, setSession, id, email } = useSessionStore();
+
+  // The shared guest account must not be able to change its password
+  const isGuest = (email ?? '').toLowerCase() === DEMO_EMAIL;
 
   async function handleDemoLogin() {
     try {
@@ -113,9 +116,11 @@ export function AppTopMenu({ onToggleSidebar }: AppTopMenuProps) {
               {first} {last}
             </span>
 
-            <button className="p-button p-button-text" onClick={() => setShowChangePassword(true)}>
-              Change Password
-            </button>
+            {!isGuest && (
+              <button className="p-button p-button-text" onClick={() => setShowChangePassword(true)}>
+                Change Password
+              </button>
+            )}
 
             <button
               className="p-button p-button-text p-button-danger"
