@@ -1,5 +1,9 @@
 @use 'variables';
 
+body {
+  margin: 0;
+}
+
 a {
   color: variables.$brand-primary;
 }
@@ -10,4 +14,57 @@ a {
 }
 .p-chart canvas {
   height: 100% !important;
+}
+
+/* SM (phone portrait < 768px, or phone landscape: height <= 500px): let the main screen use the full window width.
+   The layout <main> and the page wrapper both carry PrimeFlex p-4 (2rem, !important),
+   which stacked to ~4rem of side padding on phones. */
+@media (max-width: 767px), (max-height: 500px) and (orientation: landscape) {
+  .app-main {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .app-page,
+  .app-panel {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  /* Pages without their own cards (e.g. Display) keep a small gutter so text isn't flush to the edge */
+  .app-page.app-page-gutter {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+  .app-main .p-panel {
+    border-radius: 0;
+  }
+  .app-main .p-panel .p-panel-header,
+  .app-main .p-panel .p-panel-content {
+    border-left: 0;
+    border-right: 0;
+    border-radius: 0;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+}
+
+/* SM: Display > Ledger and Chart tabs */
+@media (max-width: 767px), (max-height: 500px) and (orientation: landscape) {
+  /* Keep a wide ledger inside the screen (scroll the table, not the page) */
+  .ledger-table .p-datatable-wrapper {
+    overflow-x: auto;
+  }
+  .ledger-table .p-datatable-thead > tr > th,
+  .ledger-table .p-datatable-tbody > tr > td {
+    padding: 0.5rem 0.35rem;
+    font-size: 0.8rem;
+  }
+  .ledger-table .p-column-title {
+    white-space: normal; /* let "Credit Summary" etc. wrap to two lines */
+  }
+
+  /* Chart: give the canvas the full width */
+  .app-panel .p-chart {
+    width: 100% !important;
+    min-width: 0;
+  }
 }

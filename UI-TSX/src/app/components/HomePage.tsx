@@ -54,7 +54,7 @@ export function HomePage() {
   );
 
   return (
-    <div className="p-4 flex flex-column gap-4">
+    <div className="app-page p-4 flex flex-column gap-4">
       {/* Hero Section */}
       <Card className="shadow-2">
         <h1 className="text-3xl font-bold mb-2">Welcome to UI-TSX</h1>

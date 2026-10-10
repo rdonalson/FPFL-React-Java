@@ -48,7 +48,7 @@ export default function AppLayout() {
           <AppSidebar visible={sidebarVisible} onHide={() => setSidebarVisible(false)} />
         </aside>
 
-        <main className="flex-1 p-4">
+        <main className="app-main flex-1 p-4">
           <Outlet context={{ toastRef }} />
         </main>
 

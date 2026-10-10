@@ -10,7 +10,7 @@ interface ChartPanelProps {
 export function ChartPanel({ ledger }: ChartPanelProps) {
   if (!ledger || ledger.length === 0) {
     return (
-      <div className="p-4">
+      <div className="app-panel p-4">
         <h3 className="text-lg font-semibold mb-2">Chart Output</h3>
         <p>No data available. Run calculation first.</p>
       </div>
@@ -55,27 +55,38 @@ export function ChartPanel({ ledger }: ChartPanelProps) {
     ],
   };
 
+  // SM (phone, portrait or landscape): smaller legend/ticks so the plot area gets most of the width
+  const isSm =
+    typeof window !== 'undefined' &&
+    window.matchMedia('(max-width: 767px), (max-height: 500px) and (orientation: landscape)').matches;
+
   const options = {
     responsive: true,
     maintainAspectRatio: false,
+    layout: { padding: isSm ? 0 : 8 },
     plugins: {
-      legend: { position: 'top' },
+      legend: {
+        position: 'top',
+        labels: isSm ? { boxWidth: 12, font: { size: 10 } } : {},
+      },
       tooltip: { mode: 'index', intersect: false },
     },
     scales: {
       x: {
-        ticks: { color: '#666' },
+        ticks: isSm
+          ? { color: '#666', font: { size: 10 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 5 }
+          : { color: '#666' },
         grid: { display: false },
       },
       y: {
-        ticks: { color: '#666' },
+        ticks: isSm ? { color: '#666', font: { size: 10 }, maxTicksLimit: 6 } : { color: '#666' },
         grid: { color: '#ddd' },
       },
     },
   };
 
   return (
-    <div className="p-4">
+    <div className="app-panel p-4">
       <h3 className="text-lg font-semibold mb-4">Chart Output</h3>
 
       <div

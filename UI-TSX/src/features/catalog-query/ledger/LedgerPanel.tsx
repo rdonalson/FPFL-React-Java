@@ -45,7 +45,7 @@ export function LedgerPanel({ ledger }: LedgerPanelProps) {
 
   if (!ledger || ledger.length === 0) {
     return (
-      <div className="p-4">
+      <div className="app-panel p-4">
         <h3 className="text-lg font-semibold mb-2">Ledger Details</h3>
         <p>No ledger data available.</p>
       </div>
@@ -108,7 +108,7 @@ export function LedgerPanel({ ledger }: LedgerPanelProps) {
   );
 
   return (
-    <div className="p-4" ref={rootRef}>
+    <div className="app-panel p-4" ref={rootRef}>
       <h3 className="text-lg font-semibold mb-4">Ledger Details</h3>
 
       <DataTable

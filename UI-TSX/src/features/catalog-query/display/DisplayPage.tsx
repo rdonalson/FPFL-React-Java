@@ -80,7 +80,7 @@ export default function DisplayPage() {
   };
 
   return (
-    <div className={`${themeClass} p-6`}>
+    <div className={`${themeClass} app-page app-page-gutter p-6`}>
       <div className="mb-2">
         <Button
           label="Back to Home"
