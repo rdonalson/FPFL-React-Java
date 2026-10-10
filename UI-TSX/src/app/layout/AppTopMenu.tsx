@@ -63,11 +63,11 @@ export function AppTopMenu({ onToggleSidebar }: AppTopMenuProps) {
 
   return (
     <div
-      className="flex align-items-center justify-content-between px-3 py-2"
+      className="app-topbar flex align-items-center justify-content-between px-3 py-2"
       style={{ borderBottom: '1px solid var(--surface-border)' }}
     >
       {/* Left side */}
-      <div className="flex align-items-center gap-3">
+      <div className="app-topbar-left flex align-items-center gap-3">
         <button
           type="button"
           className="p-button p-button-text"
@@ -77,11 +77,11 @@ export function AppTopMenu({ onToggleSidebar }: AppTopMenuProps) {
           <i className="pi pi-bars text-xl" />
         </button>
 
-        <div className="text-xl font-bold">FPFL Platform</div>
+        <div className="app-topbar-title text-xl font-bold">FPFL Platform</div>
       </div>
 
       {/* Right side */}
-      <div className="flex align-items-center gap-3">
+      <div className="app-topbar-right flex align-items-center gap-3">
         {/* Theme toggle */}
         <button
           type="button"
@@ -95,16 +95,35 @@ export function AppTopMenu({ onToggleSidebar }: AppTopMenuProps) {
         {/* Not logged in */}
         {!isAuthenticated && (
           <>
-            <button className="p-button p-button-text" onClick={handleDemoLogin} disabled={loading}>
-              {loading ? 'Loading...' : 'Guest Login'}
+            <button
+              className="p-button p-button-text gap-2"
+              onClick={handleDemoLogin}
+              disabled={loading}
+              title="Guest Login"
+              aria-label="Guest Login"
+            >
+              <i className={loading ? 'pi pi-spin pi-spinner' : 'pi pi-user'} />
+              <span className="app-topbar-label">{loading ? 'Loading...' : 'Guest Login'}</span>
             </button>
 
-            <button className="p-button p-button-text" onClick={() => setShowLogin(true)}>
-              Login
+            <button
+              className="p-button p-button-text gap-2"
+              onClick={() => setShowLogin(true)}
+              title="Login"
+              aria-label="Login"
+            >
+              <i className="pi pi-sign-in" />
+              <span className="app-topbar-label">Login</span>
             </button>
 
-            <button className="p-button p-button-text" onClick={() => setShowRegister(true)}>
-              Register
+            <button
+              className="p-button p-button-text gap-2"
+              onClick={() => setShowRegister(true)}
+              title="Register"
+              aria-label="Register"
+            >
+              <i className="pi pi-user-plus" />
+              <span className="app-topbar-label">Register</span>
             </button>
           </>
         )}
@@ -112,24 +131,33 @@ export function AppTopMenu({ onToggleSidebar }: AppTopMenuProps) {
         {/* Logged in */}
         {isAuthenticated && (
           <div className="flex align-items-center gap-2">
-            <span className="font-medium">
+            <span className="app-topbar-username font-medium">
               {first} {last}
             </span>
 
             {!isGuest && (
-              <button className="p-button p-button-text" onClick={() => setShowChangePassword(true)}>
-                Change Password
+              <button
+                className="p-button p-button-text gap-2"
+                onClick={() => setShowChangePassword(true)}
+                title="Change Password"
+                aria-label="Change Password"
+              >
+                <i className="pi pi-key" />
+                <span className="app-topbar-label">Change Password</span>
               </button>
             )}
 
             <button
-              className="p-button p-button-text p-button-danger"
+              className="p-button p-button-text p-button-danger gap-2"
               onClick={() => {
                 clearSession();
                 navigate('/');
               }}
+              title="Logout"
+              aria-label="Logout"
             >
-              Logout
+              <i className="pi pi-sign-out" />
+              <span className="app-topbar-label">Logout</span>
             </button>
           </div>
         )}

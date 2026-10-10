@@ -1,7 +1,14 @@
 @use 'variables';
 
+/* Stop iOS Safari enlarging text in landscape and keeping that zoom after rotating back */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
+  overflow-x: hidden; /* nothing should push the page wider than the screen (iOS then zooms out) */
 }
 
 a {
@@ -66,5 +73,33 @@ a {
   .app-panel .p-chart {
     width: 100% !important;
     min-width: 0;
+  }
+}
+
+/* SM: top menu — compact bar */
+@media (max-width: 767px), (max-height: 500px) and (orientation: landscape) {
+  .app-topbar {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+    gap: 0.25rem;
+  }
+  .app-topbar .app-topbar-left,
+  .app-topbar .app-topbar-right {
+    gap: 0.25rem !important;
+    min-width: 0;
+  }
+  .app-topbar .app-topbar-title {
+    font-size: 1rem !important;
+    white-space: nowrap;
+  }
+  .app-topbar .p-button {
+    padding: 0.5rem;
+  }
+}
+/* Portrait phones only: icon-only buttons, hide the user's name (landscape has room for labels) */
+@media (max-width: 767px) {
+  .app-topbar .app-topbar-label,
+  .app-topbar .app-topbar-username {
+    display: none;
   }
 }

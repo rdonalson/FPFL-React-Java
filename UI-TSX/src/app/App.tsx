@@ -33,7 +33,8 @@ function App() {
   return (
     <>
       <AppRouter />
-      <BreakpointOverlay />
+      {/* Screen-size helper: dev server only, stripped from production builds */}
+      {import.meta.env.DEV && <BreakpointOverlay />}
       {/* 🔥 Session Expiring Dialog */}
       {isAuthenticated && showDialog && (
         <SessionExpireDialog visible={showDialog} onHide={() => setShowDialog(false)} />

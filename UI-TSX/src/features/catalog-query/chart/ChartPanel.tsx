@@ -2,12 +2,15 @@
 import React from 'react';
 import { Chart } from 'primereact/chart';
 import type { LedgerDto } from '../types/DispayResponse';
+import { useIsSmallScreen } from '@/shared/hooks/useIsSmallScreen';
 
 interface ChartPanelProps {
   ledger: LedgerDto[] | null;
 }
 
 export function ChartPanel({ ledger }: ChartPanelProps) {
+  const isSm = useIsSmallScreen(); // updates on rotate
+
   if (!ledger || ledger.length === 0) {
     return (
       <div className="app-panel p-4">
@@ -56,9 +59,6 @@ export function ChartPanel({ ledger }: ChartPanelProps) {
   };
 
   // SM (phone, portrait or landscape): smaller legend/ticks so the plot area gets most of the width
-  const isSm =
-    typeof window !== 'undefined' &&
-    window.matchMedia('(max-width: 767px), (max-height: 500px) and (orientation: landscape)').matches;
 
   const options = {
     responsive: true,
