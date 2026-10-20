@@ -1,16 +1,15 @@
 // src/app/layout/AppTopMenu.tsx
 import { useState } from 'react';
+import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { useSessionStore } from '@/app/state/sessionStore';
 import { useThemeStore } from '@/app/state/themeStore';
 import { LoginDialog } from '@/app/auth/components/LoginDialog';
 import { RegisterDialog } from '@/app/auth/components/RegisterDialog';
 import { ChangePasswordDialog } from '@/app/auth/components/ChangePasswordDialog';
-import { authApi } from '@/app/auth/api/authApi';
-import { unwrap } from '@/api/utils/responseHelpers';
-import { useNavigate } from 'react-router-dom';
-
-const DEMO_EMAIL = 'guest.user@gmail.com';
-const DEMO_PASSWORD = 'Password@2';
+import { DEMO_EMAIL, useGuestLogin } from '@/app/auth/hooks/useGuestLogin';
+import { menuModel } from './model/menuModel';
+import { filterMenuByRoles } from './model/filterMenu';
 
 interface AppTopMenuProps {
   onToggleSidebar: () => void;
@@ -20,74 +19,90 @@ export function AppTopMenu({ onToggleSidebar }: AppTopMenuProps) {
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const { loginAsGuest, loading } = useGuestLogin();
 
   const { dark, toggleTheme } = useThemeStore();
-  const { first, last, clearSession, isAuthenticated, setSession, id, email } = useSessionStore();
+  const { first, last, clearSession, isAuthenticated, id, email, roles } = useSessionStore();
 
   // The shared guest account must not be able to change its password
   const isGuest = (email ?? '').toLowerCase() === DEMO_EMAIL;
 
-  async function handleDemoLogin() {
-    try {
-      setLoading(true);
-
-      const raw = await authApi.login(DEMO_EMAIL, DEMO_PASSWORD);
-      const result = unwrap(raw);
-
-      if (result?.accessToken) {
-        setSession({
-          accessToken: result.accessToken,
-          refreshToken: result.refreshToken ?? null,
-          id: result.id,
-          userId: result.userId,
-          email: result.email,
-          first: result.first,
-          last: result.last,
-          roles: result.roles ?? [],
-          raw: result,
-        });
-
-        navigate('/');
-      } else {
-        console.error('Unexpected demo login response', result);
-      }
-    } catch (err) {
-      console.error('Demo login failed', err);
-    } finally {
-      setLoading(false);
-    }
-  }
+  // Same role-filtered model as the sidebar: "Actions" become inline links, "Admin" a dropdown
+  const sections = isAuthenticated ? filterMenuByRoles(menuModel, roles ?? []) : [];
+  const actions = sections.find(s => s.label === 'Actions')?.items ?? [];
+  const admin = sections.find(s => s.label === 'Admin')?.items ?? [];
+  const adminActive = admin.some(a => a.to === location.pathname);
 
   return (
-    <div
-      className="app-topbar flex align-items-center justify-content-between px-3 py-2"
-      style={{ borderBottom: '1px solid var(--surface-border)' }}
-    >
+    <div className="app-topbar fl-topbar">
       {/* Left side */}
-      <div className="app-topbar-left flex align-items-center gap-3">
-        <button
-          type="button"
-          className="p-button p-button-text"
-          onClick={onToggleSidebar}
-          title="Toggle sidebar"
-        >
-          <i className="pi pi-bars text-xl" />
-        </button>
+      <div className="app-topbar-left fl-topbar-left">
+        {isAuthenticated && (
+          <button
+            type="button"
+            className="fl-icon-btn fl-menu-toggle"
+            onClick={onToggleSidebar}
+            title="Open menu"
+            aria-label="Open menu"
+          >
+            <i className="pi pi-bars" />
+          </button>
+        )}
 
-        <div className="app-topbar-title text-xl font-bold">FPFL Platform</div>
+        <Link to="/" className="fl-brand" aria-label="FPFL Platform home">
+          <span className="app-topbar-title fl-brand-mark">FPFL</span>
+          <span className="fl-brand-sub">Platform</span>
+        </Link>
+
+        {isAuthenticated && (
+          <nav className="fl-nav" aria-label="Main">
+            {actions.map(item => (
+              <NavLink
+                key={item.to}
+                to={item.to!}
+                end={item.to === '/'}
+                className={({ isActive }) => `fl-nav-link${isActive ? ' is-active' : ''}`}
+              >
+                {item.label}
+              </NavLink>
+            ))}
+
+            {admin.length > 0 && (
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger asChild>
+                  <button type="button" className={`fl-nav-link${adminActive ? ' is-active' : ''}`}>
+                    Admin <i className="pi pi-angle-down" aria-hidden="true" />
+                  </button>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Portal>
+                  <DropdownMenu.Content className="fl-dropdown" align="start" sideOffset={6}>
+                    {admin.map(item => (
+                      <DropdownMenu.Item key={item.to} asChild>
+                        <Link to={item.to!} className="fl-dropdown-item">
+                          {item.icon && <i className={item.icon} aria-hidden="true" />}
+                          {item.label}
+                        </Link>
+                      </DropdownMenu.Item>
+                    ))}
+                  </DropdownMenu.Content>
+                </DropdownMenu.Portal>
+              </DropdownMenu.Root>
+            )}
+          </nav>
+        )}
       </div>
 
       {/* Right side */}
-      <div className="app-topbar-right flex align-items-center gap-3">
-        {/* Theme toggle */}
+      <div className="app-topbar-right fl-topbar-right">
         <button
           type="button"
-          className="p-button p-button-text"
+          className="fl-icon-btn"
           onClick={toggleTheme}
           title={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+          aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
         >
           <i className={dark ? 'pi pi-sun' : 'pi pi-moon'} />
         </button>
@@ -96,8 +111,9 @@ export function AppTopMenu({ onToggleSidebar }: AppTopMenuProps) {
         {!isAuthenticated && (
           <>
             <button
-              className="p-button p-button-text gap-2"
-              onClick={handleDemoLogin}
+              type="button"
+              className="fl-btn"
+              onClick={loginAsGuest}
               disabled={loading}
               title="Guest Login"
               aria-label="Guest Login"
@@ -107,17 +123,8 @@ export function AppTopMenu({ onToggleSidebar }: AppTopMenuProps) {
             </button>
 
             <button
-              className="p-button p-button-text gap-2"
-              onClick={() => setShowLogin(true)}
-              title="Login"
-              aria-label="Login"
-            >
-              <i className="pi pi-sign-in" />
-              <span className="app-topbar-label">Login</span>
-            </button>
-
-            <button
-              className="p-button p-button-text gap-2"
+              type="button"
+              className="fl-btn"
               onClick={() => setShowRegister(true)}
               title="Register"
               aria-label="Register"
@@ -125,19 +132,31 @@ export function AppTopMenu({ onToggleSidebar }: AppTopMenuProps) {
               <i className="pi pi-user-plus" />
               <span className="app-topbar-label">Register</span>
             </button>
+
+            <button
+              type="button"
+              className="fl-btn fl-btn--solid"
+              onClick={() => setShowLogin(true)}
+              title="Login"
+              aria-label="Login"
+            >
+              <i className="pi pi-sign-in" />
+              <span className="app-topbar-label">Login</span>
+            </button>
           </>
         )}
 
         {/* Logged in */}
         {isAuthenticated && (
-          <div className="flex align-items-center gap-2">
-            <span className="app-topbar-username font-medium">
+          <>
+            <span className="app-topbar-username fl-username">
               {first} {last}
             </span>
 
             {!isGuest && (
               <button
-                className="p-button p-button-text gap-2"
+                type="button"
+                className="fl-btn"
                 onClick={() => setShowChangePassword(true)}
                 title="Change Password"
                 aria-label="Change Password"
@@ -148,7 +167,8 @@ export function AppTopMenu({ onToggleSidebar }: AppTopMenuProps) {
             )}
 
             <button
-              className="p-button p-button-text p-button-danger gap-2"
+              type="button"
+              className="fl-btn"
               onClick={() => {
                 clearSession();
                 navigate('/');
@@ -159,7 +179,7 @@ export function AppTopMenu({ onToggleSidebar }: AppTopMenuProps) {
               <i className="pi pi-sign-out" />
               <span className="app-topbar-label">Logout</span>
             </button>
-          </div>
+          </>
         )}
       </div>
 

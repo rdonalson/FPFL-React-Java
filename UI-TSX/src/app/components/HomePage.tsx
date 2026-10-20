@@ -1,82 +1,176 @@
-import type { CSSProperties } from 'react';
-import { Card } from 'primereact/card';
-import { Button, type ButtonProps } from 'primereact/button';
-import { Panel } from 'primereact/panel';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/app/auth/hooks/useAuth';
-//import './homepage.css';
+import { useGuestLogin } from '@/app/auth/hooks/useGuestLogin';
+
+type Tone = 'brand' | 'credit' | 'debit';
 
 type QuickAction = {
   label: string;
+  description: string;
   icon: string;
   route: string;
-  severity?: ButtonProps['severity'];
+  tone: Tone;
 };
 
-// Row 1 — everyone can see
+// Everyone (once signed in)
 const USER_ACTIONS: QuickAction[] = [
-  { label: 'Display', icon: 'pi pi-chart-bar', route: '/query/display' },
-  { label: 'Initial Amount', icon: 'pi pi-dollar', route: '/command/transactions/initial-amount' },
-  { label: 'Credits', icon: 'pi pi-plus-circle', route: '/command/transactions/credits' },
-  { label: 'Debits', icon: 'pi pi-minus-circle', route: '/command/transactions/debits' },
-  { label: 'View Documentation', icon: 'pi pi-book', route: '/docs', severity: 'info' },
+  {
+    label: 'Display',
+    description: 'Chart and ledger for any date range',
+    icon: 'pi pi-chart-bar',
+    route: '/query/display',
+    tone: 'brand',
+  },
+  {
+    label: 'Initial Amount',
+    description: 'Set the balance the forecast starts from',
+    icon: 'pi pi-dollar',
+    route: '/command/transactions/initial-amount',
+    tone: 'brand',
+  },
+  {
+    label: 'Credits',
+    description: 'Income on a recurring schedule',
+    icon: 'pi pi-plus-circle',
+    route: '/command/transactions/credits',
+    tone: 'credit',
+  },
+  {
+    label: 'Debits',
+    description: 'Bills and expenses on a recurring schedule',
+    icon: 'pi pi-minus-circle',
+    route: '/command/transactions/debits',
+    tone: 'debit',
+  },
 ];
 
-// Row 2 — ROLE_ADMIN only
-const ADMIN_ACTIONS: QuickAction[] = [
-  { label: 'Manage Item Types', icon: 'pi pi-list', route: '/command/admin/item-types' },
-  { label: 'Manage Time Periods', icon: 'pi pi-calendar', route: '/command/admin/time-periods' },
-  { label: 'System Status', icon: 'pi pi-server', route: '/status', severity: 'secondary' },
+// ROLE_ADMIN only
+const ADMIN_ACTIONS = [
+  { label: 'Item Types', icon: 'pi pi-list', route: '/command/admin/item-types' },
+  { label: 'Time Periods', icon: 'pi pi-calendar', route: '/command/admin/time-periods' },
+  { label: 'System Status', icon: 'pi pi-server', route: '/status' },
 ];
+
+// Illustrative rows for the hero "receipt" — not the user's data
+const EXAMPLE_LEDGER = [
+  { date: 'Nov 01', name: 'Paycheck', amount: '+2,450.00', kind: 'credit' },
+  { date: 'Nov 03', name: 'Rent', amount: '−1,600.00', kind: 'debit' },
+  { date: 'Nov 05', name: 'Car payment', amount: '−385.20', kind: 'debit' },
+] as const;
 
 export function HomePage() {
   const navigate = useNavigate();
-  const { hasRole } = useAuth();
+  const { hasRole, isAuthenticated } = useAuth();
+  const { loginAsGuest, loading } = useGuestLogin();
 
   const isAdmin = hasRole('ROLE_ADMIN');
 
-  // Both rows share the same column count, so every button is the same width.
-  const columns = Math.max(USER_ACTIONS.length, isAdmin ? ADMIN_ACTIONS.length : 0);
-  const gridStyle = { '--qa-cols': columns } as CSSProperties;
-
-  const renderRow = (actions: QuickAction[]) => (
-    <div className="qa-grid" style={gridStyle}>
-      {actions.map((a) => (
-        <Button
-          key={a.route + a.label}
-          label={a.label}
-          icon={a.icon}
-          severity={a.severity}
-          onClick={() => navigate(a.route)}
-        />
-      ))}
-    </div>
-  );
-
   return (
-    <div className="app-page p-4 flex flex-column gap-4">
-      {/* Hero Section */}
-      <Card className="shadow-2">
-        <h1 className="text-3xl font-bold mb-2">Welcome to UI-TSX</h1>
-        <p className="text-lg text-color-secondary mb-3">
-          A modular, enterprise‑grade React + PrimeReact workspace designed for clarity,
-          scalability, and developer happiness.
-        </p>
+    <div className="fl-home">
+      {/* Hero — continues the header band */}
+      <section className="fl-band fl-hero">
+        <div className="fl-container fl-hero-inner">
+          <div className="fl-hero-copy">
+            <span className="fl-eyebrow">Financial Planner · Forecast · Ledger</span>
+            <h1 className="fl-hero-title">
+              Every credit, every debit, every day — forecast ahead.
+            </h1>
+            <p className="fl-hero-lead">
+              Model recurring income and expenses on weekly, monthly, quarterly or custom schedules
+              and watch the running balance roll forward.
+            </p>
+            <div className="fl-hero-cta">
+              {isAuthenticated ? (
+                <button type="button" className="fl-cta" onClick={() => navigate('/query/display')}>
+                  Open forecast <i className="pi pi-arrow-right" aria-hidden="true" />
+                </button>
+              ) : (
+                <button type="button" className="fl-cta" onClick={loginAsGuest} disabled={loading}>
+                  {loading ? 'Signing in…' : 'Try it as a guest'}
+                </button>
+              )}
+              <button
+                type="button"
+                className="fl-cta fl-cta--ghost"
+                onClick={() => navigate('/docs')}
+              >
+                How it works
+              </button>
+            </div>
+          </div>
 
-        <Button label="Get Started" icon="pi pi-arrow-right" onClick={() => navigate('/docs')} />
-      </Card>
+          <div className="fl-receipt" aria-label="Example ledger">
+            <div className="fl-receipt-head">
+              <span>Ledger preview</span>
+              <span>Example</span>
+            </div>
+            {EXAMPLE_LEDGER.map(row => (
+              <div key={row.date} className="fl-receipt-row">
+                <span className="fl-mono fl-muted">{row.date}</span>
+                <span>{row.name}</span>
+                <span className={`fl-mono fl-${row.kind}`}>{row.amount}</span>
+              </div>
+            ))}
+            <div className="fl-receipt-total">
+              <span>Balance</span>
+              <span className="fl-mono">7,204.75</span>
+            </div>
+          </div>
+        </div>
+      </section>
 
-      {/* Quick Actions */}
-      <Panel header="Quick Actions" className="shadow-1">
-        {renderRow(USER_ACTIONS)}
+      {/* Actions */}
+      <div className="fl-container fl-home-body">
+        <section className="fl-home-main">
+          <h2 className="fl-section-label">Get to work</h2>
+          {!isAuthenticated && (
+            <p className="fl-signin-hint">
+              <i className="pi pi-lock" aria-hidden="true" /> Log in, or try it as a guest, to open
+              these.
+            </p>
+          )}
+          <div className="fl-list">
+            {USER_ACTIONS.map(a => (
+              <Link key={a.route} to={a.route} className="fl-list-row">
+                <span className={`fl-list-icon fl-tone-${a.tone}`}>
+                  <i className={a.icon} aria-hidden="true" />
+                </span>
+                <span className="fl-list-text">
+                  <span className="fl-list-title">{a.label}</span>
+                  <span className="fl-list-desc">{a.description}</span>
+                </span>
+                <i className="pi pi-angle-right fl-list-chevron" aria-hidden="true" />
+              </Link>
+            ))}
+          </div>
+        </section>
 
-        {isAdmin && (
-          <>
-            <h3 className="qa-section-title">Admin</h3>
-            {renderRow(ADMIN_ACTIONS)}
-          </>
-        )}
-      </Panel>
+        <aside className="fl-home-aside">
+          {isAdmin && (
+            <>
+              <h2 className="fl-section-label">Admin</h2>
+              <div className="fl-list fl-list--compact">
+                {ADMIN_ACTIONS.map(a => (
+                  <Link key={a.route} to={a.route} className="fl-list-row">
+                    <i className={`${a.icon} fl-muted`} aria-hidden="true" />
+                    <span className="fl-list-title">{a.label}</span>
+                  </Link>
+                ))}
+              </div>
+            </>
+          )}
+
+          <div className="fl-note">
+            <span className="fl-note-title">New here?</span>
+            <span className="fl-note-body">
+              The documentation walks through schedules, the ledger and the chart.
+            </span>
+            <Link to="/docs" className="fl-note-link">
+              Open the docs →
+            </Link>
+          </div>
+        </aside>
+      </div>
     </div>
   );
 }

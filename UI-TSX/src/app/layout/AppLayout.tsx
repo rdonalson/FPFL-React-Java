@@ -1,6 +1,6 @@
 // src/app/layout/AppLayout.tsx
 import { useState, useRef } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { Toast } from 'primereact/toast';
 import { Helmet } from 'react-helmet-async';
 
@@ -13,6 +13,9 @@ import { AppConfig } from '@/config/appConfig';
 export default function AppLayout() {
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const toastRef = useRef<Toast | null>(null);
+
+  // The home page's hero continues the green header band edge to edge, so it skips the main padding
+  const isHome = useLocation().pathname === '/';
 
   const cfg = AppConfig.get();
   const { title, description, ogImage } = cfg.app;
@@ -40,7 +43,7 @@ export default function AppLayout() {
       <Toast ref={toastRef} position="top-right" />
 
       <div className="min-h-screen flex flex-col surface-ground">
-        <header>
+        <header className="fl-band">
           <AppTopMenu onToggleSidebar={() => setSidebarVisible(true)} />
         </header>
 
@@ -48,7 +51,7 @@ export default function AppLayout() {
           <AppSidebar visible={sidebarVisible} onHide={() => setSidebarVisible(false)} />
         </aside>
 
-        <main className="app-main flex-1 p-4">
+        <main className={isHome ? 'app-main app-main--flush flex-1' : 'app-main flex-1 p-4'}>
           <Outlet context={{ toastRef }} />
         </main>
 

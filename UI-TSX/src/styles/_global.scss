@@ -12,7 +12,7 @@ body {
 }
 
 a {
-  color: variables.$brand-primary;
+  color: var(--fl-primary, #{variables.$brand-primary});
 }
 
 .p-chart {

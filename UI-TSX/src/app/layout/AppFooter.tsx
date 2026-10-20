@@ -2,8 +2,9 @@
 
 export default function AppFooter() {
   return (
-    <div className="layout-footer flex items-center justify-center py-3 text-sm text-color-secondary">
-      © 2026 Rick Donalson
+    <div className="layout-footer fl-footer">
+      <span>© 2026 Rick Donalson</span>
+      <span className="fl-footer-stack">React + TypeScript · Spring Boot · AKS</span>
     </div>
   );
 }
