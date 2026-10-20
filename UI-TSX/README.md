@@ -207,8 +207,8 @@ The dev server runs on **<http://localhost:4000>** and opens a browser automatic
 [`Dockerfile`](Dockerfile) is a two-stage build: `node:20-alpine` writes `.env.production` from the passed build args, runs `npm run build`, and the runtime stage serves `dist/` with `vite preview` on port **80**. `vite.config.ts` allow-lists the production hostnames for that preview server.
 
 ```bash
-docker compose up --build                              # UAT settings
-docker compose -f docker-compose.prod.yml up --build   # production settings
+docker compose up --build                              # UAT settings: UI at http://localhost:9000, API at http://localhost:9100
+docker compose -f docker-compose.prod.yml up --build   # production settings, UI at http://localhost:9000
 ```
 
 ---

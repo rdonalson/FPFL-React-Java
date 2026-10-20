@@ -363,7 +363,7 @@ The [`Dockerfile`](Dockerfile) is a two‑stage build: `maven:3.9.11-eclipse-tem
 docker compose up --build
 ```
 
-`docker-compose.yml` reads `.env.prod` and maps `8080:8080`.
+`docker-compose.yml` reads `.env.prod` and maps `9100:8080` (API at <http://localhost:9100>).
 
 ---
 

@@ -86,7 +86,11 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         // Your frontend origin
-        config.setAllowedOrigins(List.of("https://ui-tsx.ledger-finance.com", "https://ledger-finance.com", "http://localhost:4000", "http://localhost"));
+        config.setAllowedOrigins(List.of(
+            "https://ui-tsx.ledger-finance.com", // production
+            "http://localhost:4000",             // Vite dev server
+            "http://localhost:9000"              // UI-TSX in Docker (9000:80)
+        ));
 
         // Allowed HTTP methods
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));

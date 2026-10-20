@@ -442,7 +442,7 @@ docker compose up --build
 
 ```bash
 cd UI-TSX
-docker compose up --build                          # UAT settings
+docker compose up --build                          # UAT settings: UI at http://localhost:9000, API at http://localhost:9100
 docker compose -f docker-compose.prod.yml up --build  # production settings
 ```
 
