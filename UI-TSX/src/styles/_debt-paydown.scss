@@ -110,6 +110,20 @@
   gap: 0.5rem;
 }
 
+/* Let PrimeReact inputs shrink to their grid cell instead of overflowing the dialog */
+.debt-editor__field,
+.debt-editor__allocation > * {
+  min-width: 0;
+}
+
+.debt-editor .p-inputnumber,
+.debt-editor .p-calendar,
+.debt-editor .p-inputnumber-input,
+.debt-editor .p-calendar .p-inputtext {
+  min-width: 0;
+  width: 100%;
+}
+
 .debt-editor__share {
   grid-column: 1 / -1;
   color: var(--fl-muted, #5c6660);

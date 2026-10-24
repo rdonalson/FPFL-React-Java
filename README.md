@@ -17,6 +17,7 @@ This repository serves as the **parent project**, containing both applications, 
 | ------- | --- |
 | UI | <https://ui-tsx.ledger-finance.com> |
 | API | <https://api-jdk.ledger-finance.com> |
+| User Guide (PDF) | [UI-TSX/public/media/fpfl-user-guide.pdf](./UI-TSX/public/media/fpfl-user-guide.pdf) · <https://ui-tsx.ledger-finance.com/media/fpfl-user-guide.pdf> |
 
 ---
 

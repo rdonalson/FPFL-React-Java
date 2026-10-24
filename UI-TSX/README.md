@@ -151,7 +151,7 @@ Domain modules **never** call Axios directly — they go through the typed clien
 
 | Path | Access | Page |
 | ---- | ------ | ---- |
-| `/` | Public | Home |
+| `/` | Public | Home (links the [User Guide](public/media/fpfl-user-guide.pdf) PDF) |
 | `/command/transactions/initial-amount` | Authenticated | Initial amount |
 | `/command/transactions/credits` | Authenticated | Credit items list (`itemType=1`) |
 | `/command/transactions/credits/new` | Authenticated | Choose a recurrence period |
@@ -169,6 +169,8 @@ Period ids map to a dedicated add/edit page each: `1` one-time · `2` daily · `
 ---
 
 ## 📦 Features
+
+An illustrated, 14-page **[User Guide](public/media/fpfl-user-guide.pdf)** (PDF, served at `/media/fpfl-user-guide.pdf`) walks through every page; the home page hero, its "New here?" card and the Docs page all link to it.
 
 Each domain module under `src/features` encapsulates:
 
