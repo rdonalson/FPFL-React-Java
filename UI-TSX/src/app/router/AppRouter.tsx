@@ -56,6 +56,9 @@ import EditAnnualPage from '@/features/catalog-command/transactions/components/i
 import EditNthWeekdayPage from '@/features/catalog-command/transactions/components/items/occurrence/nth-weekday/EditNthWeekdayPage';
 import AddNthWeekdayPage from '@/features/catalog-command/transactions/components/items/occurrence/nth-weekday/AddNthWeekdayPage';
 
+// Debt Paydown
+import DebtPaydownPage from '@/features/debt-paydown/components/DebtPaydownPage';
+
 // Display Page (Query)
 import DisplayPage from '@/features/catalog-query/display/DisplayPage';
 
@@ -78,6 +81,7 @@ export function AppRouter() {
 
           {/* Shared authenticated */}
           <Route path="/command/transactions/initial-amount" element={<InitialAmountPage />} />
+          <Route path="/command/transactions/debt-paydown" element={<DebtPaydownPage />} />
 
           {/* ====================================================== */}
           {/*                     CREDIT FLOWS (1)                   */}

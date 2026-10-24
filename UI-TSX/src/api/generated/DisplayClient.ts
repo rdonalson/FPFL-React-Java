@@ -10,4 +10,14 @@ export class DisplayClient {
   }) {
     return apiClient.post('/display/ledger', payload);
   }
+
+  /** Debt Paydown over the same window (same body as the ledger). */
+  static async fetchPaydown(payload: {
+    userId: string;
+    ledgerStartDate: string;
+    ledgerEndDate: string;
+    includeGrouping: boolean;
+  }) {
+    return apiClient.post('/display/paydown', payload);
+  }
 }

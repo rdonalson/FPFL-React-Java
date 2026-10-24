@@ -22,6 +22,11 @@ export const menuModel: MenuItem[] = [
       { label: 'Initial Amount', icon: 'pi pi-dollar', to: '/command/transactions/initial-amount' },
       { label: 'Credits', icon: 'pi pi-dollar', to: '/command/transactions/credits' },
       { label: 'Debits', icon: 'pi pi-dollar', to: '/command/transactions/debits' },
+      {
+        label: 'Debt Paydown',
+        icon: 'pi pi-credit-card',
+        to: '/command/transactions/debt-paydown',
+      },
       { label: 'Docs', icon: 'pi pi-book', to: '/docs' },
     ],
   },

@@ -3,7 +3,13 @@ package com.financialplanner.moduledisplaybc.service;
 import com.financialplanner.moduledisplaybc.model.ItemDto;
 import com.financialplanner.moduledisplaybc.model.LedgerDto;
 import com.financialplanner.moduledisplaybc.model.LedgerRequest;
+import com.financialplanner.moduledisplaybc.paydown.PaydownCalculator;
+import com.financialplanner.moduledisplaybc.paydown.PaydownModels.DebtPaydown;
+import com.financialplanner.moduledisplaybc.paydown.PaydownModels.LedgerAdjustment;
+import com.financialplanner.moduledisplaybc.paydown.PaydownModels.PaydownResult;
 import com.financialplanner.moduledisplaybc.recurrence.*;
+import com.financialplanner.modulecommonbc.exception.DomainValidationException;
+import com.financialplanner.moduleitemsbc.domain.service.DebtService;
 import com.financialplanner.moduleitemsbc.domain.service.ItemService;
 import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.Item;
 import org.springframework.stereotype.Service;
@@ -24,6 +30,8 @@ import java.util.stream.Collectors;
 public class LedgerReadoutServiceImpl implements LedgerReadoutService {
 
     private final ItemService itemService;
+    private final DebtService debtService;
+    private final PaydownCalculator paydownCalculator;
     private final OneTimeOccurrenceExpander oneTimeExpander;
     private final DailyRecurrenceExpander dailyExpander;
     private final WeeklyRecurrenceExpander weeklyExpander;
@@ -35,8 +43,10 @@ public class LedgerReadoutServiceImpl implements LedgerReadoutService {
     private final AnnualRecurrenceExpander annualExpander;
     private final NthWeekdayRecurrenceExpander nthWeekdayExpander;
 
-    public LedgerReadoutServiceImpl(ItemService itemService) {
+    public LedgerReadoutServiceImpl(ItemService itemService, DebtService debtService) {
         this.itemService = itemService;
+        this.debtService = debtService;
+        this.paydownCalculator = new PaydownCalculator(new RecurrenceOccurrences());
         this.oneTimeExpander = new OneTimeOccurrenceExpander(this::mapItemToDto);
         this.dailyExpander = new DailyRecurrenceExpander(this::mapItemToDto);
         this.weeklyExpander = new WeeklyRecurrenceExpander(this::mapItemToDto);
@@ -95,6 +105,12 @@ public class LedgerReadoutServiceImpl implements LedgerReadoutService {
         itemDtos.addAll(semiAnnualDtos);
         itemDtos.addAll(annualDtos);
         itemDtos.addAll(nthWeekdayDtos);
+
+        // Debt Paydown: money credits send to tracked debts, as extra debits after the day's own items
+        PaydownResult paydown = paydownCalculator.calculate(userItems, debtService.list(request.userId()), start, end);
+        for (LedgerAdjustment adjustment : paydown.adjustments()) {
+            itemDtos.add(mapAdjustmentToDto(adjustment));
+        }
         // Build ledger table (DTO)
         List<LedgerDto> ledger = buildLedgerTable(start, end);
 
@@ -105,6 +121,47 @@ public class LedgerReadoutServiceImpl implements LedgerReadoutService {
         applyDailyEnrichment(ledger, itemDtos);
 
         return ledger;
+    }
+
+    /**
+     * Debt Paydown over the same window as the ledger: each tracked debt's balance per day, its payments,
+     * allocations and interest, and the projected payoff date.
+     *
+     * @param request the user and date range
+     * @return one entry per tracked debt whose debit still exists, by debit name
+     */
+    @Override
+    public List<DebtPaydown> buildPaydown(LedgerRequest request) {
+        if (request == null || request.userId() == null) {
+            throw new DomainValidationException("UserId cannot be null");
+        }
+        LocalDate start = request.ledgerStartDate();
+        LocalDate end = request.ledgerEndDate();
+        if (start == null || end == null) {
+            throw new DomainValidationException("Ledger start and end dates are required");
+        }
+        if (end.isBefore(start)) {
+            throw new DomainValidationException("Ledger end date must be on or after the start date");
+        }
+
+        List<Item> userItems = itemService.findByUserId(request.userId());
+        return paydownCalculator.calculate(userItems, debtService.list(request.userId()), start, end).debts();
+    }
+
+    /**
+     * Maps a Debt Paydown allocation to a ledger entry: a debit named after the debt, with the share
+     * ("25% of Paycheck") as its period.
+     */
+    private ItemDto mapAdjustmentToDto(LedgerAdjustment adjustment) {
+        ItemDto dto = new ItemDto();
+        dto.setItemKey(Math.toIntExact(adjustment.itemId()));
+        dto.setFkItemType(2);
+        dto.setItemType(PAYDOWN_TYPE_NAME);
+        dto.setName(adjustment.name());
+        dto.setPeriod(adjustment.detail());
+        dto.setAmount(-adjustment.amount().abs().doubleValue());
+        dto.setOccurrenceDate(adjustment.date().toString());
+        return dto;
     }
 
     /**

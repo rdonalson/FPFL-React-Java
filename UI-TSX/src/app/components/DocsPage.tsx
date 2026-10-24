@@ -139,6 +139,16 @@ const ENTITIES: EntityRow[] = [
     group: 'Domain',
     description: 'Recurrence period; selects which recurrence columns an item uses',
   },
+  {
+    entity: 'Debt',
+    group: 'Domain',
+    description: 'Debt Paydown — a debit being paid down, with balance owed, APR and as-of date',
+  },
+  {
+    entity: 'DebtAllocation',
+    group: 'Domain',
+    description: 'Debt Paydown — a percentage of a credit sent to a debt each time it occurs',
+  },
   { entity: 'User', group: 'Auth', description: 'Application account' },
   {
     entity: 'Role / UserRoles',
@@ -422,8 +432,8 @@ export default function DocsPage() {
                   <li>Passwords hashed with BCrypt</li>
                   <li>
                     Roles drive both API authorization and UI route guards — admin-only areas are
-                    also filtered out of the sidebar, so the guard is a backstop rather than the only
-                    defense
+                    also filtered out of the sidebar, so the guard is a backstop rather than the
+                    only defense
                   </li>
                 </ul>
               </RadixTabs.Content>
@@ -457,6 +467,38 @@ export default function DocsPage() {
                   />
                   <Column field="pattern" header="Pattern" />
                 </DataTable>
+
+                <Divider />
+
+                <SectionHeading
+                  title="Debt Paydown"
+                  blurb="Send part of your credits to paying down a debit, and see when it is paid off."
+                />
+
+                <p>
+                  On the Debt Paydown page you pick a debit (for example a credit card payment),
+                  enter what you owe on it, as of which date, and an optional APR, then choose a
+                  percentage of any of your credits to send to it each time that credit comes in. A
+                  credit can be allocated at most 100% across all of your debts.
+                </p>
+                <ul className="mt-0">
+                  <li>
+                    The debit&apos;s own scheduled payment pays the debt down too; it is already a
+                    debit on the ledger.
+                  </li>
+                  <li>
+                    Each allocation is deducted from the main forecast as an extra{' '}
+                    {codeText('Debt Paydown')} debit (for example &quot;25% of Paycheck&quot;), and
+                    stops once the debt is paid off — the last payment is cut to what is left.
+                  </li>
+                  <li>
+                    Interest is charged monthly (APR ÷ 12) at each month end on what is still owed.
+                  </li>
+                  <li>
+                    The Display page adds Paydown chart and Paydown ledger tabs when you track a
+                    debt; the payoff date is projected up to 30 years ahead.
+                  </li>
+                </ul>
               </RadixTabs.Content>
 
               {/* ---------------------------------------------------- */}
@@ -495,6 +537,11 @@ export default function DocsPage() {
                   </li>
                   <li>
                     {codeText('refresh_tokens.user_id')} → {codeText('users.id')}
+                  </li>
+                  <li>
+                    {codeText('debts.fk_item')} → {codeText('items.id')} (the debit; one debt per
+                    debit) and {codeText('debt_allocations.fk_credit_item')} →{' '}
+                    {codeText('items.id')} (deleting either item removes the debt or allocation)
                   </li>
                 </ul>
               </RadixTabs.Content>

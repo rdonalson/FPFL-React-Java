@@ -8,11 +8,16 @@ import { getSessionUserId } from '@/app/state/sessionHelpers';
 
 import { DateRangePanel } from '../range/DateRangePanel';
 import type { DisplayRequest } from '../types/DisplayRequest';
-import { fetchDisplayLedger } from '../api/displayApi';
+import { fetchDisplayLedger, fetchDisplayPaydown } from '../api/displayApi';
 
 import type { LedgerDto } from '../types/DispayResponse';
 import { ChartPanel } from '../chart/ChartPanel'; // <-- your new chart panel
 import { LedgerPanel } from '../ledger/LedgerPanel';
+import { PaydownChartPanel } from '../paydown/PaydownChartPanel';
+import { PaydownLedgerPanel } from '../paydown/PaydownLedgerPanel';
+import type { DebtPaydown } from '../paydown/paydown';
+
+type DisplayTab = 'date' | 'chart' | 'ledger' | 'paydown-chart' | 'paydown-ledger';
 
 export default function DisplayPage() {
   const navigate = useNavigate();
@@ -24,7 +29,8 @@ export default function DisplayPage() {
   }));
 
   const [ledgerRows, setLedgerRows] = useState<LedgerDto[] | null>(null);
-  const [activeTab, setActiveTab] = useState<'date' | 'chart' | 'ledger'>('date');
+  const [paydown, setPaydown] = useState<DebtPaydown[]>([]);
+  const [activeTab, setActiveTab] = useState<DisplayTab>('date');
 
   // theme detection (unchanged)
   const [themeClass, setThemeClass] = useState<'theme-light' | 'theme-dark'>(() => {
@@ -71,8 +77,16 @@ export default function DisplayPage() {
 
   const handleCalculate = async () => {
     try {
-      const result = await fetchDisplayLedger(criteria);
+      // Debt Paydown is extra: if it fails, the forecast still shows
+      const [result, debts] = await Promise.all([
+        fetchDisplayLedger(criteria),
+        fetchDisplayPaydown(criteria).catch(err => {
+          console.error('Paydown API error:', err);
+          return [] as DebtPaydown[];
+        }),
+      ]);
       setLedgerRows(result);
+      setPaydown(debts);
       setActiveTab('chart');
     } catch (err) {
       console.error('Display API error:', err);
@@ -97,13 +111,11 @@ export default function DisplayPage() {
         <RadixTabs.Root
           defaultValue={activeTab}
           value={activeTab}
-          onValueChange={(val: string) =>
-            setActiveTab((val as 'date' | 'chart' | 'ledger') ?? 'date')
-          }
+          onValueChange={(val: string) => setActiveTab((val as DisplayTab) ?? 'date')}
           className="max-w-full"
         >
           <RadixTabs.List
-            className="fpfl-tabs-list flex gap-4 border-b pb-2"
+            className="fpfl-tabs-list flex flex-wrap gap-4 border-b pb-2"
             aria-label="Display tabs"
           >
             <RadixTabs.Trigger
@@ -132,6 +144,28 @@ export default function DisplayPage() {
             >
               Ledger
             </RadixTabs.Trigger>
+
+            {paydown.length > 0 && (
+              <>
+                <RadixTabs.Trigger
+                  value="paydown-chart"
+                  className="fpfl-tab flex items-center gap-2 px-3 py-2 rounded-md font-medium
+                             data-[state=active]:text-sky-700 data-[state=active]:font-semibold
+                             data-[state=inactive]:text-gray-500"
+                >
+                  Paydown Chart
+                </RadixTabs.Trigger>
+
+                <RadixTabs.Trigger
+                  value="paydown-ledger"
+                  className="fpfl-tab flex items-center gap-2 px-3 py-2 rounded-md font-medium
+                             data-[state=active]:text-sky-700 data-[state=active]:font-semibold
+                             data-[state=inactive]:text-gray-500"
+                >
+                  Paydown Ledger
+                </RadixTabs.Trigger>
+              </>
+            )}
           </RadixTabs.List>
 
           <div className="pt-4">
@@ -159,6 +193,19 @@ export default function DisplayPage() {
             <RadixTabs.Content value="ledger" className="outline-none">
               <LedgerPanel ledger={ledgerRows} />
             </RadixTabs.Content>
+
+            {/* DEBT PAYDOWN PANELS (only when a debt is tracked) */}
+            {paydown.length > 0 && (
+              <>
+                <RadixTabs.Content value="paydown-chart" className="outline-none">
+                  <PaydownChartPanel debts={paydown} ledger={ledgerRows} />
+                </RadixTabs.Content>
+
+                <RadixTabs.Content value="paydown-ledger" className="outline-none">
+                  <PaydownLedgerPanel debts={paydown} />
+                </RadixTabs.Content>
+              </>
+            )}
           </div>
         </RadixTabs.Root>
       </div>

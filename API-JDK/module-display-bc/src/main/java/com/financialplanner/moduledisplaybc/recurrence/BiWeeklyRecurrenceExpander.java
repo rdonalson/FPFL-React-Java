@@ -58,7 +58,7 @@ public class BiWeeklyRecurrenceExpander {
 
             LocalDate begin = item.getBeginDate();
             // Default effective range = ledger range
-            LocalDate effStart = begin.isAfter(ledgerStart) ? begin : ledgerStart;
+            LocalDate effStart = begin != null && begin.isAfter(ledgerStart) ? begin : ledgerStart;
             LocalDate effEnd   = ledgerEnd;
 
             // Only call resolveRange() when DateRangeReq == true
@@ -85,7 +85,8 @@ public class BiWeeklyRecurrenceExpander {
             DayOfWeek targetDow = DayOfWeek.of(dowValue);
 
             // Compute bi-weekly dates using the effective range
-            List<LocalDate> biWeeklyDates = computeBiWeeklyDates(effStart, effEnd, targetDow);
+            // Anchor on the begin date so the paydays don't shift with the ledger's start date
+            List<LocalDate> biWeeklyDates = computeBiWeeklyDates(begin != null ? begin : effStart, effStart, effEnd, targetDow);
 
             for (LocalDate date : biWeeklyDates) {
                 ItemDto dto = mapper.apply(item);
@@ -115,32 +116,34 @@ public class BiWeeklyRecurrenceExpander {
     }
 
     /**
-     * Computes a list of bi-weekly dates within a specified range that match a given day of the week.
-     * The method determines all dates falling on the specified {@code targetDay} within the
-     * inclusive range defined by {@code start} and {@code end}, occurring at bi-weekly intervals.
+     * Computes every-other-week dates on {@code targetDay} within [start, end]. The two-week rhythm is
+     * anchored on the first {@code targetDay} on or after {@code anchor} (the item's begin date), so the same
+     * item lands on the same days whatever range is asked for.
      *
-     * @param start the start date of the range; must not be null.
-     *              The computation begins from this date to find the first occurrence of the {@code targetDay}.
-     * @param end the end date of the range; must not be null and must not be before the {@code start} date.
-     *            No dates beyond this date will be included in the result.
-     * @param targetDay the day of the week to match (e.g., MONDAY, TUESDAY); must not be null.
-     * @return a list of {@code LocalDate} objects representing bi-weekly occurrences of the {@code targetDay}
-     *         within the specified range. If no matching dates are found, the returned list will be empty.
+     * @param anchor    the date the rhythm counts from (usually the item's begin date)
+     * @param start     the first date that may be returned
+     * @param end       the last date that may be returned
+     * @param targetDay the weekday of every occurrence
+     * @return the occurrences in date order
      */
-    private static List<LocalDate> computeBiWeeklyDates(LocalDate start, LocalDate end, DayOfWeek targetDay) {
+    static List<LocalDate> computeBiWeeklyDates(LocalDate anchor, LocalDate start, LocalDate end, DayOfWeek targetDay) {
         List<LocalDate> dates = new ArrayList<>();
-
-        LocalDate cursor = start;
-
-        // Snap forward to first matching weekday
-        while (cursor.getDayOfWeek() != targetDay) {
-            cursor = cursor.plusDays(1);
-            if (cursor.isAfter(end)) {
-                return dates; // no occurrences in range
-            }
+        if (start == null || end == null || end.isBefore(start)) {
+            return dates;
         }
 
-        // Add bi-weekly occurrences
+        // First occurrence: the target weekday on or after the anchor
+        LocalDate cursor = anchor;
+        while (cursor.getDayOfWeek() != targetDay) {
+            cursor = cursor.plusDays(1);
+        }
+
+        // Jump straight to the first occurrence inside the range
+        if (cursor.isBefore(start)) {
+            long days = java.time.temporal.ChronoUnit.DAYS.between(cursor, start);
+            cursor = cursor.plusWeeks(2 * ((days + 13) / 14));
+        }
+
         while (!cursor.isAfter(end)) {
             dates.add(cursor);
             cursor = cursor.plusWeeks(2);

@@ -79,12 +79,14 @@ Reactor build order: `module-common-bc` → `module-items-bc` → `module-displa
 - Owns the write‑side domain model for financial items
 - Handles CRUD operations and domain invariants for `Item`, `ItemType`, and `TimePeriod`
 - Implements repositories through a ports‑and‑adapters split: domain `*Repository` interfaces, `*RepositoryImpl` adapters, and Spring Data `Jpa*Repository` interfaces (plus `JpaItemRepositoryCustom` for hand‑written queries)
+- Debt Paydown: `Debt` / `DebtAllocation` entities, `DebtService` and `DebtRules` (only your own debits and credits; a credit can be at most 100% allocated across all of your debts)
 
 ### **module-display-bc**
 
 - Provides read‑optimized models and projections shaped for UI consumption
 - Expands each item's recurrence metadata into concrete dated occurrences — one expander per pattern (one‑time, daily, weekly, bi‑weekly, monthly, bi‑monthly, quarterly, semi‑annual, annual, nth‑weekday)
 - `LedgerReadoutService` composes occurrences with the user's initial amount into a running‑balance ledger
+- `PaydownCalculator` (pure, unit‑tested) projects each tracked debt day by day — the debit's own payment, the allocated share of each credit, monthly interest (APR ÷ 12 at month end) — up to 30 years out for the payoff date. Allocations appear on the main ledger as extra `Debt Paydown` debits
 - Depends on `module-items-bc` for the item model; keeps read concerns separate from write models
 
 ### **module-common-bc**
@@ -261,6 +263,36 @@ Tracks refresh tokens for session management and revocation.
 
 - `refresh_tokens.user_id` → `users.id`
 
+### items (1) ──── (0..1) debts ────< (many) debt_allocations >──── (1) items
+
+- `debts.fk_item` → `items.id` (the debit being paid down; unique, `ON DELETE CASCADE`)
+- `debt_allocations.fk_debt` → `debts.id` (`ON DELETE CASCADE`)
+- `debt_allocations.fk_credit_item` → `items.id` (the credit; `ON DELETE CASCADE`)
+
+---
+
+## 💳 Debt Paydown
+
+Track paying down a debit (e.g. a credit card payment) by sending a percentage of individual credits to it.
+
+| Table | Columns |
+| ----- | ------- |
+| **debts** | `id`, `user_id` (owner), `fk_item` (the debit), `balance` numeric(14,2), `apr` numeric(6,3), `balance_date`, `created_at` |
+| **debt_allocations** | `id`, `fk_debt`, `fk_credit_item`, `percent` numeric(5,2); unique (`fk_debt`, `fk_credit_item`) |
+
+Hibernate (`ddl-auto: update`) creates both tables; they match API-NET's `db/001_debt_paydown.sql`, so the two APIs share them.
+
+| Method | Path | Notes |
+| ------ | ---- | ----- |
+| `GET` | `/debts` | The caller's tracked debts with allocations |
+| `GET` | `/debts/{id}` | One debt (someone else's answers 404 unless admin) |
+| `POST` | `/debts` | `{ itemId, balance, apr?, balanceDate?, allocations: [{ creditItemId, percent }] }` |
+| `PUT` | `/debts/{id}` | Same body; the debit can't change |
+| `DELETE` | `/debts/{id}` | Stops tracking (the debit stays) |
+| `POST` | `/display/paydown` | Same body as `/display/ledger`: per‑debt daily balances, events, totals, payoff date |
+
+All require a JWT; the owner always comes from the token. `/display/ledger` now includes allocations as `Debt Paydown` debits (period shows e.g. `25% of Paycheck`).
+
 ---
 
 ![Entity Relationship Diagram](docs/FPFL-JDK-API-ER.png)
@@ -386,6 +418,26 @@ mvn test
 ```
 
 Each module contains its own isolated test suite. The bounded contexts test with **JUnit Jupiter** and **Mockito**; `module-api` additionally pulls Spring Boot 4's modular test starters (`spring-boot-starter-webmvc-test`, `-data-jpa-test`, `-validation-test`, `-actuator-test`).
+
+```bash
+mvn test -pl module-display-bc -am          # one module (plus what it depends on)
+mvn test -Dtest=PaydownCalculatorTest -Dsurefire.failIfNoSpecifiedTests=false
+```
+
+Current suites (plain JUnit, no database or Spring context — they run in under a second):
+
+| Module | Test class | Covers |
+| ------ | ---------- | ------ |
+| module-items-bc | `DebtRulesTest` | Debt Paydown rules: rounding, defaults, limits, credit-only allocations, the 100%-per-credit cap |
+| module-items-bc | `DebtServiceImplTest` | Track / update / delete debts against in-memory repositories; ownership (404 unless admin); allocations updated in place |
+| module-display-bc | `PaydownCalculatorTest` | Payoff projection: allocations, the debit's own payment, last payment cut to what's left, monthly interest, same-day order, windows before/after the balance date |
+| module-display-bc | `LedgerReadoutServiceImplTest` | The ledger deducts allocations as `Debt Paydown` debits and stops after payoff; paydown request checks |
+| module-display-bc | `BiWeeklyRecurrenceExpanderTest` | Every-two-weeks dates anchored on the begin date, whatever the ledger range |
+| module-api | `DebtMapperTest` | Request → draft, entity → response (sorted allocations, per-occurrence share), paydown → JSON shape |
+| module-api | `DisplayControllerPaydownTest` | `/display/paydown` ownership (caller by default, admin for others) and the real sanitizer passing "25% of Paycheck" |
+| module-api | `ItemDraftTranslatorTest` | Assistant item drafts → item requests |
+
+The Docker build packages with `-DskipTests`, so run `mvn test` before pushing.
 
 ---
 
