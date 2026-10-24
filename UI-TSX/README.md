@@ -155,7 +155,8 @@ Domain modules **never** call Axios directly — they go through the typed clien
 | `/command/transactions/credits/new/:periodId` | Authenticated | Add credit item for that period |
 | `/command/transactions/credits/:periodId/:id/edit` | Authenticated | Edit credit item |
 | `/command/transactions/debits/…` | Authenticated | Same shape, `itemType=2` |
-| `/query/display` | Authenticated | Forecasted ledger + chart |
+| `/command/transactions/debt-paydown` | Authenticated | Debt Paydown: track debts and allocate credits to them |
+| `/query/display` | Authenticated | Forecasted ledger + chart (plus Paydown Chart / Paydown Ledger tabs when a debt is tracked) |
 | `/command/admin/item-types` | **Admin** | Item type maintenance |
 | `/command/admin/time-periods` | **Admin** | Time period maintenance |
 | `/status` | **Admin** | UI + API health, 30s auto-refresh |
@@ -176,7 +177,8 @@ Each domain module under `src/features` encapsulates:
 The split mirrors the backend's write/read separation:
 
 - **`catalog-command`** — the write side. `transactions/` covers items and initial amount; `admin/` covers item type and time period maintenance.
-- **`catalog-query`** — the read side. `display/` is the ledger page, composed of `range/` (date selection), `ledger/` (table), and `chart/` (Chart.js panel).
+- **`catalog-query`** — the read side. `display/` is the ledger page, composed of `range/` (date selection), `ledger/` (table), `chart/` (Chart.js panel) and `paydown/` (per‑debt payoff chart and paydown ledger).
+- **`debt-paydown`** — the Debt Paydown setup page: pick a debit, enter what's owed (as of a date, optional APR) and send a percentage of any credits to it. The forecast deducts those shares and charts the payoff.
 
 ---
 
@@ -199,6 +201,12 @@ The dev server runs on **<http://localhost:4000>** and opens a browser automatic
 | `npm run preview` | Serve the built output on port 80 |
 | `npm run lint` / `npm run lint:fix` | ESLint |
 | `npm run format` | Prettier |
+| `npm test` | Run the unit and component tests once (Vitest + Testing Library, jsdom) |
+| `npm run test:watch` | Vitest in watch mode |
+| `npm run test:coverage` | Tests with a V8 coverage report (`coverage/`) |
+| `npm run test:types` | Type-check the tests (`tsconfig.test.json`; the app build skips test files) |
+
+Tests live next to the code as `*.test.ts` / `*.test.tsx`; shared setup is in `src/test/setup.ts`.
 
 ---
 

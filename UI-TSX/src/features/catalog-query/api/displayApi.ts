@@ -2,14 +2,26 @@ import { DisplayClient } from '@/api/generated/DisplayClient';
 import { unwrap } from '@/api/utils/responseHelpers';
 import type { DisplayRequest } from '@/features/catalog-query/types/DisplayRequest';
 import type { LedgerDto, ItemDto } from '../types/DispayResponse';
+import type { DebtPaydown } from '../paydown/paydown';
 
-export async function fetchDisplayLedger(criteria: DisplayRequest): Promise<LedgerDto[] | null> {
-  const payload = {
+function toPayload(criteria: DisplayRequest) {
+  return {
     userId: criteria.userId!,
     ledgerStartDate: criteria.ledgerStartDate?.toISOString().slice(0, 10) ?? '',
     ledgerEndDate: criteria.ledgerEndDate?.toISOString().slice(0, 10) ?? '',
     includeGrouping: criteria.includeGrouping,
   };
+}
+
+/** Each tracked debt over the same window as the ledger; empty when nothing is tracked. */
+export async function fetchDisplayPaydown(criteria: DisplayRequest): Promise<DebtPaydown[]> {
+  const res = await DisplayClient.fetchPaydown(toPayload(criteria));
+  const raw = unwrap<any>(res, null);
+  return (raw?.data as DebtPaydown[] | undefined) ?? [];
+}
+
+export async function fetchDisplayLedger(criteria: DisplayRequest): Promise<LedgerDto[] | null> {
+  const payload = toPayload(criteria);
 
   const res = await DisplayClient.fetchLedger(payload);
 

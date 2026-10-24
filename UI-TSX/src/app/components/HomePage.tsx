@@ -42,6 +42,13 @@ const USER_ACTIONS: QuickAction[] = [
     route: '/command/transactions/debits',
     tone: 'debit',
   },
+  {
+    label: 'Debt Paydown',
+    description: 'Put part of your credits toward a debt and see the payoff date',
+    icon: 'pi pi-credit-card',
+    route: '/command/transactions/debt-paydown',
+    tone: 'brand',
+  },
 ];
 
 // ROLE_ADMIN only
