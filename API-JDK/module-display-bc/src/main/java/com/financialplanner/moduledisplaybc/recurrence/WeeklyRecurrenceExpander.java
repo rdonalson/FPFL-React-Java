@@ -72,7 +72,10 @@ public class WeeklyRecurrenceExpander {
                 continue;
             }
 
-            DayOfWeek dow = DayOfWeek.of(weeklyDow);
+            DayOfWeek dow = Weekdays.of(weeklyDow);
+            if (dow == null) {
+                continue; // not a weekday
+            }
 
             // Compute weekly dates using the effective range
             List<LocalDate> weeklyDates = computeWeeklyDates(effStart, effEnd, dow);

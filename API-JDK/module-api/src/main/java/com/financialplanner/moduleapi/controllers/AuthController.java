@@ -1,5 +1,10 @@
 package com.financialplanner.moduleapi.controllers;
 
+import com.financialplanner.moduleapi.security.CallerAccess;
+import com.financialplanner.moduleapi.security.CustomUserDetails;
+import com.financialplanner.modulecommonbc.exception.ForbiddenOperationException;
+import com.financialplanner.modulecommonbc.exception.InvalidCredentialsException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import com.financialplanner.moduleapi.dtos.auth.*;
 import com.financialplanner.moduleapi.response.ApiResponse;
 import com.financialplanner.moduleapi.response.ApiResponseFactory;
@@ -114,7 +119,16 @@ public class AuthController {
 
     @PostMapping("/change-password")
     public ResponseEntity<ApiResponse<AuthResponse>> changePassword(
-        @Valid @RequestBody ChangePasswordRequest request) {
+        @Valid @RequestBody ChangePasswordRequest request,
+        @AuthenticationPrincipal CustomUserDetails principal) {
+
+        // Only your own password (an admin may change anyone's)
+        if (principal == null || principal.getUser() == null) {
+            throw new InvalidCredentialsException("Sign in to continue");
+        }
+        if (!request.id().equals(principal.getUser().getId()) && !CallerAccess.isAdmin(principal)) {
+            throw new ForbiddenOperationException("You can only change your own password");
+        }
 
         User user = authService.changePassword(
             request.id(),

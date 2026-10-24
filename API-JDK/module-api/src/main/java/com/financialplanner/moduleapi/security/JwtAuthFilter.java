@@ -3,6 +3,7 @@ package com.financialplanner.moduleapi.security;
 import com.financialplanner.moduleauth.domain.service.UserRolesService;
 import com.financialplanner.moduleauth.domain.service.UserService;
 import com.financialplanner.moduleauth.infrastructure.persistence.entity.User;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -45,7 +46,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         final String jwt = authHeader.substring(7);
-        final String email = jwtService.extractUsername(jwt);
+        final String email;
+        try {
+            email = jwtService.extractUsername(jwt);
+        } catch (JwtException | IllegalArgumentException ex) {
+            // Expired, forged or malformed token: carry on unauthenticated so the request gets a clean
+            // 401/403 from Spring Security instead of an exception (500) out of the filter.
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 

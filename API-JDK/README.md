@@ -329,6 +329,14 @@ DB_PASSWORD=your-password
 
 All three are Git‑ignored. In AKS the same three values come from the `api-db-secret` Kubernetes secret instead.
 
+The token signing key is read from `JWT_SECRET` (Base64, at least 256 bits). Locally you can leave it unset and a development-only default is used (the API logs a warning); in AKS it comes from the `api-jwt-secret` Kubernetes secret, which must exist before the deployment will start:
+
+```bash
+kubectl create secret generic api-jwt-secret -n fpfl --from-literal=JWT_SECRET="$(openssl rand -base64 48)"
+```
+
+A missing or too-short secret stops the API at startup rather than signing weak tokens. Changing the secret signs everyone out.
+
 **Other settings** (`application.yaml`):
 
 | Setting | Value |
@@ -339,7 +347,7 @@ All three are Git‑ignored. In AKS the same three values come from the `api-db-
 | `security.jwt.access-token-expiration-ms` | `900000` (15 minutes) |
 | `security.jwt.refresh-token-expiration-ms` | `900000` (15 minutes) |
 
-> ⚠️ `security.jwt.secret` ships with a placeholder value. Override it with a real 256‑bit secret via environment variable before any non‑local deployment.
+| `security.jwt.secret` | `${JWT_SECRET}` (dev-only default when unset) |
 
 ---
 
@@ -424,18 +432,15 @@ mvn test -pl module-display-bc -am          # one module (plus what it depends o
 mvn test -Dtest=PaydownCalculatorTest -Dsurefire.failIfNoSpecifiedTests=false
 ```
 
-Current suites (plain JUnit, no database or Spring context — they run in under a second):
+Current suites (JUnit 5 + Mockito, no database; the web tests use MockMvc and the security test boots only `SecurityConfig` — the whole run takes a few seconds). About 250 tests:
 
-| Module | Test class | Covers |
-| ------ | ---------- | ------ |
-| module-items-bc | `DebtRulesTest` | Debt Paydown rules: rounding, defaults, limits, credit-only allocations, the 100%-per-credit cap |
-| module-items-bc | `DebtServiceImplTest` | Track / update / delete debts against in-memory repositories; ownership (404 unless admin); allocations updated in place |
-| module-display-bc | `PaydownCalculatorTest` | Payoff projection: allocations, the debit's own payment, last payment cut to what's left, monthly interest, same-day order, windows before/after the balance date |
-| module-display-bc | `LedgerReadoutServiceImplTest` | The ledger deducts allocations as `Debt Paydown` debits and stops after payoff; paydown request checks |
-| module-display-bc | `BiWeeklyRecurrenceExpanderTest` | Every-two-weeks dates anchored on the begin date, whatever the ledger range |
-| module-api | `DebtMapperTest` | Request → draft, entity → response (sorted allocations, per-occurrence share), paydown → JSON shape |
-| module-api | `DisplayControllerPaydownTest` | `/display/paydown` ownership (caller by default, admin for others) and the real sanitizer passing "25% of Paycheck" |
-| module-api | `ItemDraftTranslatorTest` | Assistant item drafts → item requests |
+| Module | What's covered |
+| ------ | -------------- |
+| module-common-bc | `SanitizerImpl` (strict / lenient / URI rules through POJOs, records, collections, maps, arrays, cycles), `BooleanToBitConverter`, `ErrorLogger`, the domain exceptions |
+| module-auth | `AuthServiceImpl` (register, login, change password with BCrypt), `UserServiceImpl`, `RoleServiceImpl`, `UserRolesServiceImpl`, `RefreshTokenServiceImpl` (expiry, uniqueness), the repository adapters and the batched role replacement, `PasswordEncoderConfig`, `TokenProperties` |
+| module-items-bc | `ItemServiceImpl`, `ItemTypeServiceImpl`, `TimePeriodServiceImpl`, the repository adapters' error translation (409 / 404 / 500), `ItemEntityMapper`, the criteria queries; Debt Paydown's `DebtRules` and `DebtServiceImpl` |
+| module-display-bc | Every recurrence pattern (`RecurrenceExpandersTest`, month-end and leap-day clamping, time frames, Sunday as 0 or 7), `RecurrenceRange`, the ledger build (initial amount, credits, debits, running total), every-two-weeks anchoring; Debt Paydown's `PaydownCalculator` and ledger deductions |
+| module-api | Every controller over HTTP (status codes, JSON, `Location` headers, validation errors), `GlobalExceptionHandler`, `ApiResponseFactory`, request-record and Bean Validation rules, the mappers, `JwtServiceImpl`, `JwtAuthFilter`, `SecurityConfig` (public vs. protected vs. admin-only paths, CORS), each user limited to their own items, initial amount, forecast and password, `ItemDraftTranslator` |
 
 The Docker build packages with `-DskipTests`, so run `mvn test` before pushing.
 
@@ -454,6 +459,18 @@ Each module produces a JAR under its own `target/`:
 ---
 
 ## 🔒 Security & Dependency Management
+
+**Who can do what**
+
+| Paths | Access |
+| ----- | ------ |
+| `/auth/login`, `/auth/register`, `/auth/refresh`, `/actuator/health`, `/client-logs`, Swagger | Public |
+| `GET /item-types/**`, `GET /time-periods/**` | Public |
+| Changing `/item-types/**`, `/time-periods/**`; all of `/users/**` (roles) | `ROLE_ADMIN` |
+| `/auth/change-password`, `/items/**`, `/initial-amount/**`, `/display/**`, `/debts/**` | Signed in |
+
+Signed-in users only reach their own data; `CallerAccess` makes the check in each controller and admins may act on anyone's. Another user's item answers 404 (so ids can't be probed), another user's initial amount, forecast or password answers 403, and `GET /items` (every user's items) is admin-only.
+
 
 - Dependency versions are pinned centrally in the parent POM's `dependencyManagement` — modules declare artifacts without versions so upgrades happen in one place.
 - CVE findings, remediations, and triaged false positives are tracked under [`docs/security/`](docs/security):

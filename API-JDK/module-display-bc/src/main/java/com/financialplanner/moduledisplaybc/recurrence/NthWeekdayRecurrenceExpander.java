@@ -45,7 +45,8 @@ public class NthWeekdayRecurrenceExpander {
 
             if (dowVal == null || indexVal == null) continue;
 
-            DayOfWeek dow = DayOfWeek.of(dowVal);
+            DayOfWeek dow = Weekdays.of(dowVal);
+            if (dow == null) continue; // not a weekday
 
             List<LocalDate> dates = computeNthWeekdayDates(effStart, effEnd, dow, indexVal);
 

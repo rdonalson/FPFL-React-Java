@@ -49,7 +49,9 @@ management:
 
 security:
     jwt:
-        secret: "your-very-long-256-bit-secret-key-here"
+        # Base64, at least 256 bits. Set JWT_SECRET in every deployed environment
+        # (e.g. openssl rand -base64 48); the default below is for local development only.
+        secret: ${JWT_SECRET:ZnBmbC1sb2NhbC1kZXYtb25seS1qd3Qtc2VjcmV0LW5vdC1mb3ItcHJvZHVjdGlvbiEh}
         # 15 seconds
         #access-token-expiration-ms: 30000
         #refresh-token-expiration-ms: 30000

@@ -1,6 +1,11 @@
 package com.financialplanner.moduleapi.exception;
 
 
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import com.financialplanner.moduleapi.response.ApiResponse;
 import com.financialplanner.modulecommonbc.exception.*;
 import com.financialplanner.modulecommonbc.logging.ErrorLogger;
@@ -74,6 +79,67 @@ public class GlobalExceptionHandler {
         String correlationId = ErrorLogger.logException(ex);
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                              .body(new ApiResponse<>(403, ex.getMessage(), correlationId));
+    }
+
+    /**
+     * A request body that fails its {@code @Valid} constraints (e.g. a malformed email or a short password)
+     * is the client's mistake: 400 with the field messages, not a 500 with Spring's internal description.
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResponse<Void>> handleInvalidBody(MethodArgumentNotValidException ex) {
+        String correlationId = ErrorLogger.logException(ex);
+        String message = ex.getBindingResult()
+                           .getFieldErrors()
+                           .stream()
+                           .map(e -> e.getDefaultMessage() != null ? e.getDefaultMessage() : e.getField() + " is invalid")
+                           .sorted()
+                           .distinct()
+                           .reduce((a, b) -> a + "; " + b)
+                           .orElse("Request is invalid");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                             .body(new ApiResponse<>(400, message, correlationId));
+    }
+
+    /**
+     * A body that can't be read: bad JSON, a wrong type, or a request record whose constructor rejected it
+     * (those throw {@link DomainValidationException}, which arrives wrapped). 400 with the real reason.
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiResponse<Void>> handleUnreadableBody(HttpMessageNotReadableException ex) {
+        String correlationId = ErrorLogger.logException(ex);
+        String message = "Request body is missing or malformed";
+        for (Throwable t = ex; t != null; t = t.getCause()) {
+            if (t instanceof DomainValidationException || t instanceof SanitizationException) {
+                message = t.getMessage();
+                break;
+            }
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                             .body(new ApiResponse<>(400, message, correlationId));
+    }
+
+    /** A path or query value of the wrong type, e.g. {@code /items/abc}. */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ApiResponse<Void>> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        String correlationId = ErrorLogger.logException(ex);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                             .body(new ApiResponse<>(400, "Invalid value for " + ex.getName(), correlationId));
+    }
+
+    /** No such endpoint: 404 rather than 500. */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleNoResource(NoResourceFoundException ex) {
+        String correlationId = ErrorLogger.logException(ex);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                             .body(new ApiResponse<>(404, "Not found", correlationId));
+    }
+
+    /** The endpoint exists but not for this HTTP method: 405. */
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMethodNotAllowed(HttpRequestMethodNotSupportedException ex) {
+        String correlationId = ErrorLogger.logException(ex);
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
+                             .body(new ApiResponse<>(405, ex.getMessage(), correlationId));
     }
 
     @ExceptionHandler(Exception.class)

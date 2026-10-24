@@ -5,9 +5,14 @@ import com.financialplanner.moduleapi.dtos.item.ItemResponse;
 import com.financialplanner.moduleapi.mappers.ItemMapper;
 import com.financialplanner.moduleapi.response.ApiResponse;
 import com.financialplanner.moduleapi.response.ApiResponseFactory;
+import com.financialplanner.moduleapi.security.CallerAccess;
+import com.financialplanner.moduleapi.security.CustomUserDetails;
 import com.financialplanner.moduleitemsbc.domain.service.ItemService;
 import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.Item;
+import com.financialplanner.modulecommonbc.exception.ForbiddenOperationException;
+import com.financialplanner.modulecommonbc.exception.ItemNotFoundException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -19,6 +24,9 @@ import java.util.UUID;
  * creating, updating, and deleting items.
  * This controller interacts with the service layer for business logic and utilizes
  * a mapper for converting between entities and DTOs.
+ * <p>
+ * Every endpoint is limited to the signed-in user's own items (admins may see and change anyone's). Someone
+ * else's item answers 404, so ids cannot be probed.
  */
 @RestController
 @RequestMapping("/items")
@@ -47,7 +55,9 @@ public class ItemController {
      * @return a ResponseEntity containing an ApiResponse with a list of ItemResponse objects.
      */
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ItemResponse>>> list() {
+    public ResponseEntity<ApiResponse<List<ItemResponse>>> list(@AuthenticationPrincipal CustomUserDetails principal) {
+        // Every user's items: administrators only
+        CallerAccess.requireAdmin(principal);
         // Retrieve all time period entities from the repository
         List<Item> items = service.list();
         // Map each entity to its corresponding response object
@@ -69,9 +79,9 @@ public class ItemController {
      * that wraps the item's details if retrieval is successful
      */
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<ItemResponse>> get(@PathVariable("id") Long id) {
-        // Retrieve time period entity from the repository
-        ItemResponse item = mapper.toResponse(service.get(id));
+    public ResponseEntity<ApiResponse<ItemResponse>> get(@PathVariable("id") Long id, @AuthenticationPrincipal CustomUserDetails principal) {
+        // Retrieve the caller's item
+        ItemResponse item = mapper.toResponse(owned(id, principal));
         // Build sanitized ApiResponse using ResponseFactory
         ApiResponse<ItemResponse> body = responseFactory.success(item, "Item " + id + " retrieved successfully");
         // Return 200 Success + sanitized body
@@ -86,7 +96,9 @@ public class ItemController {
      * @return ResponseEntity containing an ApiResponse with a list of ItemResponse objects
      */
     @GetMapping("/{userId}/{itemType}")
-    public ResponseEntity<ApiResponse<List<ItemResponse>>> get(@PathVariable("userId") UUID userId, @PathVariable("itemType") Long itemType) {
+    public ResponseEntity<ApiResponse<List<ItemResponse>>> get(@PathVariable("userId") UUID userId, @PathVariable("itemType") Long itemType,
+                                                            @AuthenticationPrincipal CustomUserDetails principal) {
+        CallerAccess.requireSelfOrAdmin(userId, principal);
         // Retrieve time period entity from the repository
         List<Item> items = service.findByUserIdAndItemTypeId(userId, itemType);
         // Map each entity to its corresponding response object
@@ -111,7 +123,9 @@ public class ItemController {
      */
     @SuppressWarnings({"QodanaXss", "JvmTaintAnalysis", "XSS"})
     @PostMapping
-    public ResponseEntity<ApiResponse<ItemResponse>> create(@RequestBody ItemRequest request) {
+    public ResponseEntity<ApiResponse<ItemResponse>> create(@RequestBody ItemRequest request, @AuthenticationPrincipal CustomUserDetails principal) {
+        // Items can only be created for yourself (or by an admin)
+        CallerAccess.requireSelfOrAdmin(request.userId(), principal);
         // Convert request → entity & sanitize input
         Item entity = mapper.toEntity(request);
         // Persist entity and then convert & sanitize the response
@@ -137,7 +151,13 @@ public class ItemController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<ItemResponse>> update(@PathVariable("id") Long id,
-                                                            @RequestBody ItemRequest request) {
+                                                            @RequestBody ItemRequest request,
+                                                            @AuthenticationPrincipal CustomUserDetails principal) {
+        // The item must be the caller's, and must stay with its owner
+        Item existing = owned(id, principal);
+        if (!existing.getUserId().equals(request.userId())) {
+            throw new ForbiddenOperationException("An item cannot be moved to another user");
+        }
         // Convert request → entity & sanitize input
         Item entity = mapper.toEntity(request);
         // Persist entity and then convert & sanitize the response
@@ -157,7 +177,8 @@ public class ItemController {
      * @return a ResponseEntity containing an ApiResponse with a success message and no data payload
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable("id") Long id) {
+    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable("id") Long id, @AuthenticationPrincipal CustomUserDetails principal) {
+        owned(id, principal);
         // Build ApiResponse using ResponseFactory
         service.delete(id);
         // Build sanitized ApiResponse using ResponseFactory
@@ -165,6 +186,13 @@ public class ItemController {
         // Return 200 Deleted
         return ResponseEntity.ok(body);
     }
+
+    /** The item with this id if the caller may see it; otherwise 404, the same as an id that does not exist. */
+    private Item owned(Long id, CustomUserDetails principal) {
+        Item item = service.get(id);
+        if (item == null || !CallerAccess.canAccess(item.getUserId(), principal)) {
+            throw new ItemNotFoundException("Item " + id + " not found");
+        }
+        return item;
+    }
 }
-
-

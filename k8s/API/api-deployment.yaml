@@ -36,6 +36,13 @@ spec:
                             secretKeyRef:
                                 name: api-db-secret
                                 key: DB_PASSWORD
+                      # Signing key for access tokens (Base64, 256+ bits). Create it once with:
+                      #   kubectl create secret generic api-jwt-secret -n fpfl --from-literal=JWT_SECRET="$(openssl rand -base64 48)"
+                      - name: JWT_SECRET
+                        valueFrom:
+                            secretKeyRef:
+                                name: api-jwt-secret
+                                key: JWT_SECRET
                       - name: SPRING_JPA_HIBERNATE_DDL_AUTO
                         value: "update"
                       - name: SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA
