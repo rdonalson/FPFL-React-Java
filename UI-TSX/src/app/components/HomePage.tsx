@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/app/auth/hooks/useAuth';
 import { useGuestLogin } from '@/app/auth/hooks/useGuestLogin';
+import { USER_GUIDE_URL } from '@/config/userGuide';
 
 type Tone = 'brand' | 'credit' | 'debit';
 
@@ -103,6 +104,14 @@ export function HomePage() {
               >
                 How it works
               </button>
+              <a
+                className="fl-cta fl-cta--ghost"
+                href={USER_GUIDE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <i className="pi pi-file-pdf" aria-hidden="true" /> User Guide
+              </a>
             </div>
           </div>
 
@@ -170,8 +179,17 @@ export function HomePage() {
           <div className="fl-note">
             <span className="fl-note-title">New here?</span>
             <span className="fl-note-body">
-              The documentation walks through schedules, the ledger and the chart.
+              The user guide walks through every page with screenshots. The documentation covers
+              schedules, the ledger engine and how the system is built.
             </span>
+            <a
+              href={USER_GUIDE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="fl-note-link"
+            >
+              Read the user guide (PDF) →
+            </a>
             <Link to="/docs" className="fl-note-link">
               Open the docs →
             </Link>

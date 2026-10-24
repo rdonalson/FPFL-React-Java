@@ -11,6 +11,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Divider } from 'primereact/divider';
 import { AppConfig } from '@/config/appConfig';
+import { USER_GUIDE_URL } from '@/config/userGuide';
 
 /* ------------------------------------------------------------------ */
 /*  Static reference data                                              */
@@ -253,13 +254,20 @@ export default function DocsPage() {
             </p>
           </div>
 
-          <Button
-            label="View on GitHub"
-            icon="pi pi-github"
-            severity="secondary"
-            outlined
-            onClick={() => window.open(REPO_URL, '_blank', 'noopener')}
-          />
+          <div className="flex flex-wrap gap-2">
+            <Button
+              label="User Guide"
+              icon="pi pi-file-pdf"
+              onClick={() => window.open(USER_GUIDE_URL, '_blank', 'noopener')}
+            />
+            <Button
+              label="View on GitHub"
+              icon="pi pi-github"
+              severity="secondary"
+              outlined
+              onClick={() => window.open(REPO_URL, '_blank', 'noopener')}
+            />
+          </div>
         </div>
 
         <Divider />

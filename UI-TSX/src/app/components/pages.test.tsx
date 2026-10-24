@@ -89,6 +89,27 @@ describe('HomePage', () => {
   });
 });
 
+describe('User Guide links', () => {
+  it('the home page links the PDF guide from the hero and the New here? card', () => {
+    inRouter(<HomePage />);
+    expect(screen.getByRole('link', { name: /User Guide/ })).toHaveAttribute(
+      'href',
+      '/media/fpfl-user-guide.pdf',
+    );
+    const cardLink = screen.getByRole('link', { name: /Read the user guide/ });
+    expect(cardLink).toHaveAttribute('href', '/media/fpfl-user-guide.pdf');
+    expect(cardLink).toHaveAttribute('target', '_blank');
+  });
+
+  it('the docs page opens the guide in a new tab', () => {
+    const open = vi.spyOn(window, 'open').mockImplementation(() => null);
+    inRouter(<DocsPage />);
+    fireEvent.click(screen.getByRole('button', { name: /User Guide/ }));
+    expect(open).toHaveBeenCalledWith('/media/fpfl-user-guide.pdf', '_blank', 'noopener');
+    open.mockRestore();
+  });
+});
+
 describe('DocsPage', () => {
   it('opens on the overview and switches sections', async () => {
     inRouter(<DocsPage />);
