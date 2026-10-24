@@ -140,7 +140,9 @@ Domain modules **never** call Axios directly — they go through the typed clien
 - [`sessionStore`](src/app/state/sessionStore.ts) (Zustand) holds the access token, user id, and roles
 - [`useTokenWatcher`](src/app/auth/hooks/useTokenWatcher.ts) decodes the token's expiry and raises `SessionExpireDialog` ahead of it, driven by `VITE_SESSION_WARNING_MS`
 - [`AuthGate`](src/app/router/AuthGate.tsx) protects authenticated routes; [`AdminRouteGuard`](src/app/router/AdminRouteGuard.tsx) protects admin-only ones
-- [`filterMenu`](src/app/layout/model/filterMenu.ts) hides admin entries from the sidebar for non-admin users, so the guard is a backstop rather than the only defense
+- [`filterMenu`](src/app/layout/model/filterMenu.ts) hides admin entries from the sidebar for non-admin users, so a non-admin never sees links they can't use
+- The API enforces the same rules on its side: admin-only endpoints answer 403 for other users, and every call is limited to the signed-in user's own data, so the UI's guards are a convenience rather than the security boundary
+- Access tokens last 15 minutes (set by the API); the expiry dialog appears `VITE_SESSION_WARNING_MS` before that and refreshes the session if the user stays
 
 ---
 
