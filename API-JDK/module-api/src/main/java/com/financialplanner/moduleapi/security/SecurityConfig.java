@@ -39,28 +39,34 @@ public class SecurityConfig {
             // Authorization rules
             .authorizeHttpRequests(auth -> auth
 
+                // Allow preflight OPTIONS requests
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
                 // Static + frontend assets
                 .requestMatchers("/", "/home", "/index.html", "/favicon.ico", "/static/**", "/assets/**", "/images/**", "/icon.svg").permitAll()
 
                 // Actuator health
                 .requestMatchers("/actuator/health").permitAll()
 
-                // Authentication endpoints
+                // Authentication endpoints (changing a password needs the signed-in user)
+                .requestMatchers("/auth/change-password").authenticated()
                 .requestMatchers("/auth/**").permitAll()
 
                 // Client log endpoint
                 .requestMatchers("/client-logs").permitAll()
 
-                // Public catalog endpoints
-                .requestMatchers("/item-types/**", "/time-periods/**", "/items/**").permitAll()
+                // Catalogs: anyone may read them, only admins may change them
+                .requestMatchers(HttpMethod.GET, "/item-types/**", "/time-periods/**").permitAll()
+                .requestMatchers("/item-types/**", "/time-periods/**").hasAuthority("ROLE_ADMIN")
+
+                // Role management is admin-only
+                .requestMatchers("/users/**").hasAuthority("ROLE_ADMIN")
 
                 // Swagger / OpenAPI
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
 
-                // Allow preflight OPTIONS requests
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-                // Everything else requires JWT
+                // Everything else (items, initial amount, display, debts) requires a JWT;
+                // the controllers then limit each user to their own data
                 .anyRequest().authenticated())
 
             // Stateless JWT sessions

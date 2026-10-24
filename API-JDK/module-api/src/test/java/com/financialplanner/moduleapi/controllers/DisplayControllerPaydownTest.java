@@ -80,7 +80,7 @@ class DisplayControllerPaydownTest {
 
     @Test
     void theLedgersPaydownEntriesSurviveSanitizing() {
-        ApiResponse<List<LedgerDto>> body = controller.buildLedger(new LedgerRequest(ME, START, END, false)).getBody();
+        ApiResponse<List<LedgerDto>> body = controller.buildLedger(new LedgerRequest(ME, START, END, false), principal(ME, "ROLE_USER")).getBody();
 
         assertNotNull(body);
         ItemDto entry = body.getData().getFirst().getItems().getFirst();

@@ -82,7 +82,10 @@ public class BiWeeklyRecurrenceExpander {
                 continue;
             }
 
-            DayOfWeek targetDow = DayOfWeek.of(dowValue);
+            DayOfWeek targetDow = Weekdays.of(dowValue);
+            if (targetDow == null) {
+                continue; // not a weekday
+            }
 
             // Compute bi-weekly dates using the effective range
             // Anchor on the begin date so the paydays don't shift with the ledger's start date

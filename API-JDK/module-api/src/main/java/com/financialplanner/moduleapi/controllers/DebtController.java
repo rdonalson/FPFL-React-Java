@@ -5,8 +5,8 @@ import com.financialplanner.moduleapi.dtos.debt.DebtResponse;
 import com.financialplanner.moduleapi.mappers.DebtMapper;
 import com.financialplanner.moduleapi.response.ApiResponse;
 import com.financialplanner.moduleapi.response.ApiResponseFactory;
+import com.financialplanner.moduleapi.security.CallerAccess;
 import com.financialplanner.moduleapi.security.CustomUserDetails;
-import com.financialplanner.modulecommonbc.exception.InvalidCredentialsException;
 import com.financialplanner.moduleitemsbc.domain.service.DebtService;
 import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.Debt;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +26,7 @@ import java.util.UUID;
 @RequestMapping("/debts")
 public class DebtController {
 
-    public static final String ADMIN_ROLE = "ROLE_ADMIN";
+    public static final String ADMIN_ROLE = CallerAccess.ADMIN_ROLE;
 
     private final DebtService service;
     private final DebtMapper mapper;
@@ -81,13 +81,10 @@ public class DebtController {
     }
 
     static UUID userId(CustomUserDetails principal) {
-        if (principal == null || principal.getUser() == null) {
-            throw new InvalidCredentialsException("Sign in to use Debt Paydown");
-        }
-        return principal.getUser().getUserId();
+        return CallerAccess.userId(principal);
     }
 
     static boolean isAdmin(CustomUserDetails principal) {
-        return principal != null && principal.getRoleNames() != null && principal.getRoleNames().contains(ADMIN_ROLE);
+        return CallerAccess.isAdmin(principal);
     }
 }

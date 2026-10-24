@@ -5,6 +5,8 @@ import com.financialplanner.moduleapi.dtos.initialamount.InitialAmountResponse;
 import com.financialplanner.moduleapi.mappers.InitialAmountMapper;
 import com.financialplanner.moduleapi.response.ApiResponse;
 import com.financialplanner.moduleapi.response.ApiResponseFactory;
+import com.financialplanner.moduleapi.security.CallerAccess;
+import com.financialplanner.moduleapi.security.CustomUserDetails;
 import com.financialplanner.modulecommonbc.exception.DuplicateItemException;
 import com.financialplanner.modulecommonbc.exception.ItemNotFoundException;
 import com.financialplanner.modulecommonbc.exception.RepositoryException;
@@ -12,6 +14,7 @@ import com.financialplanner.moduleitemsbc.domain.service.ItemService;
 import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.Item;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -23,6 +26,7 @@ import java.util.UUID;
  * REST controller for InitialAmount operations.
  * Uses the Item domain/entity for persistence (mapped from InitialAmountRequest).
  * Supports Get (by id and by userId+itemType), Create and Update. Delete is intentionally omitted.
+ * Users can only read and change their own initial amount (admins may act on anyone's).
  */
 @RestController
 @RequestMapping("/initial-amount")
@@ -43,7 +47,9 @@ public class InitialAmountController {
      * Retrieve InitialAmounts for a given user and item type.
      */
     @GetMapping("/{userId}")
-    public ResponseEntity<ApiResponse<InitialAmountResponse>> getByUserAndType(@PathVariable("userId") UUID userId) {
+    public ResponseEntity<ApiResponse<InitialAmountResponse>> getByUserAndType(@PathVariable("userId") UUID userId,
+                                                                                    @AuthenticationPrincipal CustomUserDetails principal) {
+        CallerAccess.requireSelfOrAdmin(userId, principal);
         final long INITIAL_AMOUNT_ITEM_TYPE_ID = 3L;
         try {
             List<Item> items = service.findByUserIdAndItemTypeId(userId, INITIAL_AMOUNT_ITEM_TYPE_ID);
@@ -68,7 +74,9 @@ public class InitialAmountController {
      */
     @SuppressWarnings({"QodanaXss", "JvmTaintAnalysis", "XSS"})
     @PostMapping
-    public ResponseEntity<ApiResponse<InitialAmountResponse>> create(@RequestBody InitialAmountRequest request) {
+    public ResponseEntity<ApiResponse<InitialAmountResponse>> create(@RequestBody InitialAmountRequest request,
+                                                                     @AuthenticationPrincipal CustomUserDetails principal) {
+        CallerAccess.requireSelfOrAdmin(request.userId(), principal);
         Item entity = mapper.toEntity(request);
         final long INITIAL_AMOUNT_ITEM_TYPE_ID = 3L;
 
@@ -95,7 +103,9 @@ public class InitialAmountController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<InitialAmountResponse>> update(@PathVariable("id") Long id,
-                                                                     @RequestBody InitialAmountRequest request) {
+                                                                     @RequestBody InitialAmountRequest request,
+                                                                     @AuthenticationPrincipal CustomUserDetails principal) {
+        CallerAccess.requireSelfOrAdmin(request.userId(), principal);
         final long INITIAL_AMOUNT_ITEM_TYPE_ID = 3L;
         try {
             List<Item> items = service.findByUserIdAndItemTypeId(request.userId(), INITIAL_AMOUNT_ITEM_TYPE_ID);
