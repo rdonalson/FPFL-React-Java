@@ -59,19 +59,19 @@ Reactor build order: `module-common-bc` → `module-items-bc` → `module-displa
 
 - Exposes REST endpoints and OpenAPI/Swagger contracts (`springdoc-openapi`)
 - Defines DTOs, mappers, and the `ApiResponse` envelope for client‑facing contracts
-- Owns the Spring Security filter chain, JWT validation (`JwtAuthFilter`, `JwtServiceImpl`), and `CustomUserDetails`
+- Owns the Spring Security filter chain, JWT issue and validation (`JwtAuthFilter`, `JwtServiceImpl`), `CustomUserDetails`, and `CallerAccess` (limits each signed‑in user to their own data; admins may act on anyone's)
 - Delegates write operations to **module-items-bc** and read operations to **module-display-bc**
 - Owns Spring Boot application bootstrap, datasource, JPA, and Actuator configuration
-- Centralizes error translation in `GlobalExceptionHandler`
+- Centralizes error translation in `GlobalExceptionHandler`: domain exceptions, validation failures, malformed JSON, bad path values, unknown routes and wrong methods all answer 4xx in the `ApiResponse` envelope, never 500
 
-**Controllers:** `AuthController`, `UserRolesController`, `ItemController`, `ItemTypeController`, `TimePeriodController`, `InitialAmountController`, `DisplayController`, `ClientLogController`
+**Controllers:** `AuthController`, `UserRolesController`, `ItemController`, `ItemTypeController`, `TimePeriodController`, `InitialAmountController`, `DisplayController`, `DebtController`, `ClientLogController`
 
 ### **module-auth**
 
 - Centralized authentication and authorization domain
 - Users, roles, user‑role assignments, and persisted refresh tokens
 - JWT signing/parsing via **JJWT**; password hashing via `PasswordEncoderConfig` (`spring-security-crypto`)
-- Token lifetimes configured through `TokenProperties`
+- Token signing key and lifetimes configured through `TokenProperties` (`security.jwt.*`)
 - Keeps security *domain* logic out of `module-api`, which owns only the filter chain
 
 ### **module-items-bc**
@@ -84,7 +84,7 @@ Reactor build order: `module-common-bc` → `module-items-bc` → `module-displa
 ### **module-display-bc**
 
 - Provides read‑optimized models and projections shaped for UI consumption
-- Expands each item's recurrence metadata into concrete dated occurrences — one expander per pattern (one‑time, daily, weekly, bi‑weekly, monthly, bi‑monthly, quarterly, semi‑annual, annual, nth‑weekday)
+- Expands each item's recurrence metadata into concrete dated occurrences — one expander per pattern (one‑time, daily, weekly, bi‑weekly, monthly, bi‑monthly, quarterly, semi‑annual, annual, nth‑weekday). `Weekdays` accepts Sunday as 0 (what the UI saves) or 7 and skips out‑of‑range values instead of failing the whole forecast
 - `LedgerReadoutService` composes occurrences with the user's initial amount into a running‑balance ledger
 - `PaydownCalculator` (pure, unit‑tested) projects each tracked debt day by day — the debit's own payment, the allocated share of each credit, monthly interest (APR ÷ 12 at month end) — up to 30 years out for the payoff date. Allocations appear on the main ledger as extra `Debt Paydown` debits
 - Depends on `module-items-bc` for the item model; keeps read concerns separate from write models
@@ -291,7 +291,7 @@ Hibernate (`ddl-auto: update`) creates both tables; they match API-NET's `db/001
 | `DELETE` | `/debts/{id}` | Stops tracking (the debit stays) |
 | `POST` | `/display/paydown` | Same body as `/display/ledger`: per‑debt daily balances, events, totals, payoff date |
 
-All require a JWT; the owner always comes from the token. `/display/ledger` now includes allocations as `Debt Paydown` debits (period shows e.g. `25% of Paycheck`).
+All require a JWT; the owner always comes from the token, and only an admin may ask for another user's paydown or ledger. `/display/ledger` now includes allocations as `Debt Paydown` debits (period shows e.g. `25% of Paycheck`).
 
 ---
 
