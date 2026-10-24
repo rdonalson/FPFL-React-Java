@@ -15,6 +15,8 @@ export default function EditNthWeekdayPage({ itemType }: { itemType: number }) {
   const toastRef = React.useRef<Toast | null>(null);
 
   const { items, loadForUserAndType, update } = useItem();
+  // Load the user's items at most once: if the id isn't among them, it doesn't exist
+  const fetchedRef = React.useRef(false);
   const [item, setItem] = useState<Item | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -29,6 +31,14 @@ export default function EditNthWeekdayPage({ itemType }: { itemType: number }) {
           if (mounted) setItem(found);
           return;
         }
+
+        if (fetchedRef.current) {
+          if (mounted) setItem(null);
+
+          return;
+        }
+
+        fetchedRef.current = true;
 
         const userId = getSessionUserId();
         if (!userId) throw new Error('No user session');

@@ -206,7 +206,7 @@ The dev server runs on **<http://localhost:4000>** and opens a browser automatic
 | `npm run test:coverage` | Tests with a V8 coverage report (`coverage/`) |
 | `npm run test:types` | Type-check the tests (`tsconfig.test.json`; the app build skips test files) |
 
-Tests live next to the code as `*.test.ts` / `*.test.tsx`; shared setup is in `src/test/setup.ts`.
+Tests live next to the code as `*.test.ts` / `*.test.tsx` (about 345 across the app: API layer, session and auth, layout and routing, admin tables, every credit/debit period form and page, the Display page and Debt Paydown). Shared helpers are in `src/test/`: `setup.ts` (jsdom polyfills), `render.tsx` (`renderWithProviders` with router + React Query, `typeNumber` for PrimeReact `InputNumber`) and `session.ts` (`signIn` / `signOut`). Tests mock the API modules, never the network; Chart.js is replaced by a stub that records the datasets.
 
 ---
 
