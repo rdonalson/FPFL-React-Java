@@ -57,11 +57,11 @@ The FPFL system is designed as a **modular, maintainable, enterprise‑grade ful
 - **React 19** + **TypeScript** built with **Vite 7** (React Compiler enabled)
 - **PrimeReact** component library with **Tailwind CSS** and SCSS overrides
 - **TanStack Query** for server state, **TanStack Table** for data grids, **Zustand** for session/theme state
-- **React Hook Form + Zod** for form handling and validation, **Axios** for transport, **Chart.js** for ledger charting
+- **React Hook Form + Zod** for form handling and validation, **Axios** for transport, **Chart.js** for ledger charting, **ExcelJS** (loaded on demand) for Excel export
 - JWT session handling with refresh‑token rotation, expiry warning dialog, and role‑aware routing
 - Organized by feature with a command/query split:
   - `features/catalog-command` — items, initial amount, and admin maintenance (item types, time periods)
-  - `features/catalog-query` — forecasted ledger, date range selection, charting, Debt Paydown chart and ledger tabs
+  - `features/catalog-query` — forecasted ledger, date range selection, charting, Debt Paydown chart and ledger tabs, Excel export
   - `features/debt-paydown` — track a debt and send a percentage of income items to it
   - `app/` — layout (Sakai‑style sidebar/top menu), routing and guards, auth, providers, state
 
@@ -147,7 +147,7 @@ The `module-display-bc` context turns stored items into a date‑ranged, running
 | `AnnualRecurrenceExpander` | Yearly |
 | `NthWeekdayRecurrenceExpander` | "Nth weekday of the month" patterns |
 
-`LedgerReadoutService` composes the expanded occurrences with the user's initial amount and returns the ledger the UI renders as both a table and a chart.
+`LedgerReadoutService` composes the expanded occurrences with the user's initial amount and returns the ledger the UI renders as both a table and a chart, and can export to a formatted Excel workbook (Ledger and Debt Paydown sheets).
 
 ### **💳 Debt Paydown**
 
@@ -159,10 +159,10 @@ A user picks a debit (say, a credit card payment), enters what's owed (as of a d
 
 | App | Tests | Stack | Run |
 | --- | ----- | ----- | --- |
-| UI-TSX | ≈345 | Vitest, Testing Library, jsdom | `cd UI-TSX && npm test` |
+| UI-TSX | ≈360 | Vitest, Testing Library, jsdom | `cd UI-TSX && npm test` |
 | API-JDK | ≈250 | JUnit 6, Mockito, MockMvc | `cd API-JDK && mvn clean test` |
 
-- **UI** — the API layer, session and auth, layout and routing guards, admin tables, every credit/debit period form and page, the Display page and Debt Paydown. Tests mock the API modules (never the network) through shared helpers in `src/test/`.
+- **UI** — the API layer, session and auth, layout and routing guards, admin tables, every credit/debit period form and page, the Display page, Excel export and Debt Paydown. Tests mock the API modules (never the network) through shared helpers in `src/test/`.
 - **API** — every module: the sanitizer and exceptions; auth services and refresh tokens; item and debt services, rules and repository adapters; every recurrence pattern (month‑end and leap‑day clamping), the ledger build and payoff math; and every controller over HTTP, including the security rules (public vs. signed‑in vs. admin, and that no one can reach another user's data).
 - Neither suite needs a database, and each runs in seconds. The Docker builds skip tests, so run both before pushing.
 
@@ -210,7 +210,8 @@ A guided tour of the codebase. All links are relative to the repository root. Th
 | [useTokenWatcher](UI-TSX/src/app/auth/hooks/useTokenWatcher.ts) · [SessionExpireDialog](UI-TSX/src/app/auth/components/SessionExpireDialog.tsx) | Reads the token's expiry and offers to extend the session before it lapses |
 | [AdminRouteGuard](UI-TSX/src/app/router/AdminRouteGuard.tsx) · [filterMenu](UI-TSX/src/app/layout/model/filterMenu.ts) | Role-aware routing and menus (the API enforces the same rules) |
 | [DebtPaydownPage](UI-TSX/src/features/debt-paydown/components/DebtPaydownPage.tsx) · [paydown.ts](UI-TSX/src/features/catalog-query/paydown/paydown.ts) · [PaydownChartPanel](UI-TSX/src/features/catalog-query/paydown/PaydownChartPanel.tsx) | A full feature end to end: form with validation, server state with TanStack Query, payoff chart |
-| [render.tsx](UI-TSX/src/test/render.tsx) · [DebtPaydownPage.test.tsx](UI-TSX/src/features/debt-paydown/components/DebtPaydownPage.test.tsx) | Test harness (router + React Query) and a component test that drives the page like a user (≈345 tests, Vitest + Testing Library) |
+| [ledgerExport.ts](UI-TSX/src/features/catalog-query/export/ledgerExport.ts) | Export to Excel: a styled workbook built in the browser (summary, frozen headers, accounting formats, collapsible day groups, a Debt Paydown sheet), with the 1 MB library loaded only on demand |
+| [render.tsx](UI-TSX/src/test/render.tsx) · [DebtPaydownPage.test.tsx](UI-TSX/src/features/debt-paydown/components/DebtPaydownPage.test.tsx) | Test harness (router + React Query) and a component test that drives the page like a user (≈360 tests, Vitest + Testing Library) |
 
 ### DevOps
 
@@ -255,6 +256,7 @@ A guided tour of the codebase. All links are relative to the repository root. Th
 ### Feature — Forecasted Ledger (query side)
 
 - [DisplayPage](UI-TSX/src/features/catalog-query/display/DisplayPage.tsx) · [LedgerPanel](UI-TSX/src/features/catalog-query/ledger/LedgerPanel.tsx) · [ChartPanel](UI-TSX/src/features/catalog-query/chart/ChartPanel.tsx) · [DateRangePanel](UI-TSX/src/features/catalog-query/range/DateRangePanel.tsx)
+- **Excel export** — [ledgerExport.ts](UI-TSX/src/features/catalog-query/export/ledgerExport.ts) · [ledgerExport.test.ts](UI-TSX/src/features/catalog-query/export/ledgerExport.test.ts)
 - **Paydown tabs** — [PaydownChartPanel](UI-TSX/src/features/catalog-query/paydown/PaydownChartPanel.tsx) · [PaydownLedgerPanel](UI-TSX/src/features/catalog-query/paydown/PaydownLedgerPanel.tsx) · [paydown.ts](UI-TSX/src/features/catalog-query/paydown/paydown.ts)
 
 ### Feature — Debt Paydown

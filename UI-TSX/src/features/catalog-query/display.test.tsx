@@ -20,6 +20,8 @@ const displayApi = vi.hoisted(() => ({
   fetchDisplayPaydown: vi.fn(),
 }));
 vi.mock('./api/displayApi', () => displayApi);
+const ledgerExport = vi.hoisted(() => ({ exportLedgerToExcel: vi.fn() }));
+vi.mock('./export/ledgerExport', () => ledgerExport);
 vi.mock('@/app/state/sessionHelpers', () => ({ getSessionUserId: () => 'user-1' }));
 
 import { ChartPanel } from './chart/ChartPanel';
@@ -166,6 +168,45 @@ describe('DisplayPage', () => {
 
     await waitFor(() => expect(tab('Chart')).toHaveAttribute('aria-selected', 'true'));
     expect(tab('Paydown Chart')).not.toBeInTheDocument();
+  });
+
+  it('exports what is on screen to Excel once calculated', async () => {
+    displayApi.fetchDisplayLedger.mockResolvedValue(LEDGER);
+    displayApi.fetchDisplayPaydown.mockResolvedValue(PAYDOWN);
+    ledgerExport.exportLedgerToExcel.mockResolvedValue(undefined);
+    renderWithProviders(<DisplayPage />);
+
+    const exportButton = () => screen.getByRole('button', { name: /Export to Excel/ });
+    expect(exportButton()).toBeDisabled();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Calculate' }));
+    await waitFor(() => expect(exportButton()).toBeEnabled());
+    fireEvent.click(exportButton());
+
+    await waitFor(() => expect(ledgerExport.exportLedgerToExcel).toHaveBeenCalledTimes(1));
+    const [days, options] = ledgerExport.exportLedgerToExcel.mock.calls[0];
+    expect(days).toBe(LEDGER);
+    expect(options.paydown).toBe(PAYDOWN);
+    expect(options.start).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(options.end).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+
+  it('keeps the page working when the export fails', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    displayApi.fetchDisplayLedger.mockResolvedValue(LEDGER);
+    displayApi.fetchDisplayPaydown.mockResolvedValue([]);
+    ledgerExport.exportLedgerToExcel.mockRejectedValue(new Error('disk full'));
+    renderWithProviders(<DisplayPage />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Calculate' }));
+    const exportButton = () => screen.getByRole('button', { name: /Export to Excel/ });
+    await waitFor(() => expect(exportButton()).toBeEnabled());
+    fireEvent.click(exportButton());
+
+    await waitFor(() =>
+      expect(console.error).toHaveBeenCalledWith('Excel export error:', expect.any(Error)),
+    );
+    await waitFor(() => expect(exportButton()).toBeEnabled());
   });
 
   it('starts on a 90-day range from today', () => {

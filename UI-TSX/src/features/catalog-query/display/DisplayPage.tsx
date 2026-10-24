@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from 'primereact/button';
 
 import { getSessionUserId } from '@/app/state/sessionHelpers';
+import { useToast } from '@/shared/hooks/useToast';
+import { toDateOnlyString } from '@/shared/utils/dateUtils';
 
 import { DateRangePanel } from '../range/DateRangePanel';
 import type { DisplayRequest } from '../types/DisplayRequest';
@@ -16,6 +18,7 @@ import { LedgerPanel } from '../ledger/LedgerPanel';
 import { PaydownChartPanel } from '../paydown/PaydownChartPanel';
 import { PaydownLedgerPanel } from '../paydown/PaydownLedgerPanel';
 import type { DebtPaydown } from '../paydown/paydown';
+import { exportLedgerToExcel } from '../export/ledgerExport';
 
 type DisplayTab = 'date' | 'chart' | 'ledger' | 'paydown-chart' | 'paydown-ledger';
 
@@ -31,6 +34,10 @@ export default function DisplayPage() {
   const [ledgerRows, setLedgerRows] = useState<LedgerDto[] | null>(null);
   const [paydown, setPaydown] = useState<DebtPaydown[]>([]);
   const [activeTab, setActiveTab] = useState<DisplayTab>('date');
+  /** The range the results on screen were calculated for ('yyyy-MM-dd'), used to title the export. */
+  const [shownRange, setShownRange] = useState<{ start: string; end: string } | null>(null);
+  const [exporting, setExporting] = useState(false);
+  const toast = useToast();
 
   // theme detection (unchanged)
   const [themeClass, setThemeClass] = useState<'theme-light' | 'theme-dark'>(() => {
@@ -87,9 +94,31 @@ export default function DisplayPage() {
       ]);
       setLedgerRows(result);
       setPaydown(debts);
+      const start = toDateOnlyString(criteria.ledgerStartDate);
+      const end = toDateOnlyString(criteria.ledgerEndDate);
+      setShownRange(start && end ? { start, end } : null);
       setActiveTab('chart');
     } catch (err) {
       console.error('Display API error:', err);
+    }
+  };
+
+  /** Downloads what's on screen as an Excel workbook laid out like the Ledger tab. */
+  const handleExport = async () => {
+    if (!ledgerRows?.length || !shownRange) return;
+    setExporting(true);
+    try {
+      await exportLedgerToExcel(ledgerRows, { ...shownRange, paydown });
+    } catch (err) {
+      console.error('Excel export error:', err);
+      toast?.current?.show({
+        severity: 'error',
+        summary: 'Export failed',
+        detail: 'The Excel file could not be created. Please try again.',
+        life: 5000,
+      });
+    } finally {
+      setExporting(false);
     }
   };
 
@@ -104,7 +133,17 @@ export default function DisplayPage() {
         />
       </div>
 
-      <h2 className="text-xl font-semibold mb-2">Display</h2>
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+        <h2 className="text-xl font-semibold">Display</h2>
+        <Button
+          label="Export to Excel"
+          icon="pi pi-file-excel"
+          outlined
+          loading={exporting}
+          disabled={!ledgerRows?.length || !shownRange || exporting}
+          onClick={handleExport}
+        />
+      </div>
       <div className="fpfl-divider border-b mb-4" />
 
       <div className="pr-tabs mb-2">

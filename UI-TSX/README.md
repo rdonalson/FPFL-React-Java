@@ -22,6 +22,7 @@ Live at <https://ui-tsx.ledger-finance.com> · API at <https://api-jdk.ledger-fi
 | **Forms** | React Hook Form + Zod (via `@hookform/resolvers`) |
 | **HTTP** | Axios with centralized interceptors |
 | **Charting** | Chart.js |
+| **Excel export** | ExcelJS, loaded on demand (`import('exceljs')`) so it stays out of the main bundle |
 | **Auth** | JWT with `jwt-decode`, refresh-token rotation, idle/expiry watcher |
 | **Misc** | `react-helmet-async` (SEO/meta) · `react-hot-toast` (notifications) |
 | **Tooling** | ESLint 9 (flat config) + Prettier — strict formatting + linting |
@@ -158,7 +159,7 @@ Domain modules **never** call Axios directly — they go through the typed clien
 | `/command/transactions/credits/:periodId/:id/edit` | Authenticated | Edit credit item |
 | `/command/transactions/debits/…` | Authenticated | Same shape, `itemType=2` |
 | `/command/transactions/debt-paydown` | Authenticated | Debt Paydown: track debts and allocate credits to them |
-| `/query/display` | Authenticated | Forecasted ledger + chart (plus Paydown Chart / Paydown Ledger tabs when a debt is tracked) |
+| `/query/display` | Authenticated | Forecasted ledger + chart (plus Paydown Chart / Paydown Ledger tabs when a debt is tracked), with Export to Excel |
 | `/command/admin/item-types` | **Admin** | Item type maintenance |
 | `/command/admin/time-periods` | **Admin** | Time period maintenance |
 | `/status` | **Admin** | UI + API health, 30s auto-refresh |
@@ -179,7 +180,7 @@ Each domain module under `src/features` encapsulates:
 The split mirrors the backend's write/read separation:
 
 - **`catalog-command`** — the write side. `transactions/` covers items and initial amount; `admin/` covers item type and time period maintenance.
-- **`catalog-query`** — the read side. `display/` is the ledger page, composed of `range/` (date selection), `ledger/` (table), `chart/` (Chart.js panel) and `paydown/` (per‑debt payoff chart and paydown ledger).
+- **`catalog-query`** — the read side. `display/` is the ledger page, composed of `range/` (date selection), `ledger/` (table), `chart/` (Chart.js panel), `paydown/` (per‑debt payoff chart and paydown ledger) and `export/` (**Export to Excel**: a "Ledger" sheet laid out like the Ledger tab, with a summary and each day's credits and debits in collapsible Excel outline groups, plus a "Debt Paydown" sheet when a debt is tracked. ExcelJS is loaded only when someone exports, so it stays out of the main bundle).
 - **`debt-paydown`** — the Debt Paydown setup page: pick a debit, enter what's owed (as of a date, optional APR) and send a percentage of any credits to it. The forecast deducts those shares and charts the payoff.
 
 ---
@@ -208,7 +209,7 @@ The dev server runs on **<http://localhost:4000>** and opens a browser automatic
 | `npm run test:coverage` | Tests with a V8 coverage report (`coverage/`) |
 | `npm run test:types` | Type-check the tests (`tsconfig.test.json`; the app build skips test files) |
 
-Tests live next to the code as `*.test.ts` / `*.test.tsx` (about 345 across the app: API layer, session and auth, layout and routing, admin tables, every credit/debit period form and page, the Display page and Debt Paydown). Shared helpers are in `src/test/`: `setup.ts` (jsdom polyfills), `render.tsx` (`renderWithProviders` with router + React Query, `typeNumber` for PrimeReact `InputNumber`) and `session.ts` (`signIn` / `signOut`). Tests mock the API modules, never the network; Chart.js is replaced by a stub that records the datasets.
+Tests live next to the code as `*.test.ts` / `*.test.tsx` (about 360 across the app: API layer, session and auth, layout and routing, admin tables, every credit/debit period form and page, the Display page, Excel export and Debt Paydown). Shared helpers are in `src/test/`: `setup.ts` (jsdom polyfills), `render.tsx` (`renderWithProviders` with router + React Query, `typeNumber` for PrimeReact `InputNumber`) and `session.ts` (`signIn` / `signOut`). Tests mock the API modules, never the network; Chart.js is replaced by a stub that records the datasets.
 
 ---
 
