@@ -91,6 +91,27 @@ export default function WeeklyForm({
         return;
       }
 
+      if (dateRangeReq) {
+        if (!beginDate || !endDate) {
+          toastRef.current?.show({
+            severity: 'warn',
+            summary: 'Validation',
+            detail: 'Please select both begin and end dates for the date range.',
+          });
+          setSaving(false);
+          return;
+        }
+        if (beginDate > endDate) {
+          toastRef.current?.show({
+            severity: 'warn',
+            summary: 'Validation',
+            detail: 'Begin date must be before or equal to end date.',
+          });
+          setSaving(false);
+          return;
+        }
+      }
+
       const payload: Item = {
         id: initial?.id,
         userId,

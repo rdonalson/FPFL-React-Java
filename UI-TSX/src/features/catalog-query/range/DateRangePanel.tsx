@@ -32,7 +32,7 @@ export function DateRangePanel({
               Start Date
             </label>
             <Calendar
-              id="ledgerStartDate"
+              inputId="ledgerStartDate"
               value={criteria.ledgerStartDate}
               onChange={e => updateStart(e.value as Date)}
               dateFormat="mm/dd/yy"
@@ -46,7 +46,7 @@ export function DateRangePanel({
               End Date
             </label>
             <Calendar
-              id="ledgerEndDate"
+              inputId="ledgerEndDate"
               value={criteria.ledgerEndDate}
               onChange={e => updateEnd(e.value as Date)}
               dateFormat="mm/dd/yy"
