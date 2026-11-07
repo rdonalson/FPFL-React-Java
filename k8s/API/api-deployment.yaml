@@ -44,7 +44,7 @@ spec:
                                 name: api-jwt-secret
                                 key: JWT_SECRET
                       - name: SPRING_JPA_HIBERNATE_DDL_AUTO
-                        value: "update"
+                        value: "validate"
                       - name: SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA
                         value: "fpfl"
                   resources:
