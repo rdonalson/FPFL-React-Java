@@ -35,6 +35,11 @@ spring:
 #
 #server:
 #    port: 8080
+springdoc:
+    swagger-ui:
+        # Must match the org.webjars:swagger-ui version pinned in the parent pom.xml
+        version: 5.34.0
+
 management:
     endpoints:
         web:

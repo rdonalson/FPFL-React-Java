@@ -47,6 +47,14 @@
                 <version>2.8.9</version>
             </dependency>
 
+            <!-- Newer Swagger UI than springdoc 2.8.9 bundles: 5.31+ has the light/dark switch API-NET's
+                 Swagger page shows. Must match springdoc.swagger-ui.version in application.yaml. -->
+            <dependency>
+                <groupId>org.webjars</groupId>
+                <artifactId>swagger-ui</artifactId>
+                <version>5.34.0</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
