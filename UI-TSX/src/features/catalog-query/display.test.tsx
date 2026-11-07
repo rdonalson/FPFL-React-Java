@@ -18,6 +18,7 @@ vi.mock('primereact/chart', () => ({
 const displayApi = vi.hoisted(() => ({
   fetchDisplayLedger: vi.fn(),
   fetchDisplayPaydown: vi.fn(),
+  fetchDisplayAccounts: vi.fn(),
 }));
 vi.mock('./api/displayApi', () => displayApi);
 const ledgerExport = vi.hoisted(() => ({ exportLedgerToExcel: vi.fn() }));
@@ -31,6 +32,68 @@ import { PaydownChartPanel } from './paydown/PaydownChartPanel';
 import DisplayPage from './display/DisplayPage';
 import { LEDGER, PAYDOWN } from './test-ledger';
 import { renderWithProviders } from '@/test/render';
+import { AccountsChartPanel } from './accounts/AccountsChartPanel';
+import { AccountsLedgerPanel } from './accounts/AccountsLedgerPanel';
+import type { AccountLedger } from './accounts/accountLedger';
+
+const VISA: AccountLedger = {
+  accountId: 1,
+  name: 'Visa',
+  kind: 'creditCard',
+  apr: 12,
+  creditLimit: 4000,
+  openingBalance: 1000,
+  balanceDate: '2026-10-29',
+  startingBalance: 1000,
+  endingBalance: 550,
+  totalPurchases: 50,
+  totalPaid: 500,
+  totalInterest: 0,
+  payoffDate: '2027-01-15',
+  balances: [1050, 550],
+  events: [
+    {
+      date: '2026-10-30',
+      kind: 'purchase',
+      sourceId: 5,
+      sourceName: 'Groceries',
+      percent: null,
+      amount: 50,
+      balanceAfter: 1050,
+    },
+    {
+      date: '2026-10-31',
+      kind: 'payment',
+      sourceId: 20,
+      sourceName: 'Paycheck',
+      percent: 25,
+      amount: -500,
+      balanceAfter: 550,
+    },
+  ],
+};
+
+describe('Cards & Loans panels', () => {
+  it('shows a card per account with its figures and payoff', () => {
+    render(<AccountsChartPanel accounts={[VISA]} ledger={LEDGER} />);
+    const card = screen.getByRole('article', { name: 'Visa' });
+    expect(within(card).getByText('$50.00')).toBeInTheDocument(); // purchases
+    expect(within(card).getByText('$500.00')).toBeInTheDocument(); // paid
+    expect(within(card).getByText('14%')).toBeInTheDocument(); // limit used
+    expect(
+      within(card).getByText(/Paid off Jan 15, 2027 \(after this range\)/),
+    ).toBeInTheDocument();
+  });
+
+  it('lists every purchase and payment with the balance after it', () => {
+    render(<AccountsLedgerPanel accounts={[VISA]} />);
+    expect(screen.getByText('Groceries')).toBeInTheDocument();
+    expect(screen.getByText('25% of Paycheck')).toBeInTheDocument();
+    expect(screen.getByText('+$50.00')).toBeInTheDocument();
+    expect(screen.getByText('−$500.00')).toBeInTheDocument();
+    expect(screen.getByText('2 entries')).toBeInTheDocument();
+  });
+});
 
 const chartData = () => {
   const el = screen.getByTestId('chart');
@@ -143,6 +206,44 @@ describe('PaydownChartPanel', () => {
 
 describe('DisplayPage', () => {
   const tab = (name: string) => screen.queryByRole('tab', { name });
+
+  beforeEach(() => {
+    displayApi.fetchDisplayAccounts.mockReset();
+    displayApi.fetchDisplayAccounts.mockResolvedValue([]);
+  });
+
+  it('adds the Cards & Loans tabs when there are cards or loans, and exports them', async () => {
+    displayApi.fetchDisplayLedger.mockResolvedValue(LEDGER);
+    displayApi.fetchDisplayPaydown.mockResolvedValue([]);
+    displayApi.fetchDisplayAccounts.mockResolvedValue([VISA]);
+    ledgerExport.exportLedgerToExcel.mockResolvedValue(undefined);
+    renderWithProviders(<DisplayPage />);
+
+    expect(tab('Cards & Loans Chart')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Calculate' }));
+
+    await waitFor(() => expect(tab('Cards & Loans Chart')).toBeInTheDocument());
+    expect(tab('Cards & Loans Ledger')).toBeInTheDocument();
+    expect(tab('Paydown Chart')).not.toBeInTheDocument();
+    expect(displayApi.fetchDisplayAccounts.mock.calls[0][0]).toMatchObject({ userId: 'user-1' });
+
+    fireEvent.click(screen.getByRole('button', { name: /Export to Excel/ }));
+    await waitFor(() => expect(ledgerExport.exportLedgerToExcel).toHaveBeenCalled());
+    expect(ledgerExport.exportLedgerToExcel.mock.calls.at(-1)![1].accounts).toEqual([VISA]);
+  });
+
+  it('still shows the forecast when the accounts call fails', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    displayApi.fetchDisplayLedger.mockResolvedValue(LEDGER);
+    displayApi.fetchDisplayPaydown.mockResolvedValue([]);
+    displayApi.fetchDisplayAccounts.mockRejectedValue(new Error('down'));
+    renderWithProviders(<DisplayPage />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Calculate' }));
+
+    await waitFor(() => expect(tab('Chart')).toHaveAttribute('aria-selected', 'true'));
+    expect(tab('Cards & Loans Chart')).not.toBeInTheDocument();
+  });
 
   it('calculates and shows the chart, adding the paydown tabs when a debt is tracked', async () => {
     displayApi.fetchDisplayLedger.mockResolvedValue(LEDGER);

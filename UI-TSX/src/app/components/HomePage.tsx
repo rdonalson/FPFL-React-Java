@@ -44,6 +44,13 @@ const USER_ACTIONS: QuickAction[] = [
     tone: 'debit',
   },
   {
+    label: 'Cards & Loans',
+    description: 'Track credit cards and loans with their own purchases and payoff date',
+    icon: 'pi pi-wallet',
+    route: '/command/transactions/accounts',
+    tone: 'brand',
+  },
+  {
     label: 'Debt Paydown',
     description: 'Put part of your credits toward a debt and see the payoff date',
     icon: 'pi pi-credit-card',

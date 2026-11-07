@@ -11,6 +11,7 @@ import com.financialplanner.moduleapi.security.CustomUserDetails;
 import com.financialplanner.moduleitemsbc.domain.service.CreditAccountService;
 import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.AccountPurchase;
 import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.CreditAccount;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +27,7 @@ import java.util.UUID;
  */
 @RestController
 @RequestMapping("/accounts")
+@Tag(name = "Credit Cards / Loans", description = "Cards & Loans: credit cards and loans, their purchases and payments")
 public class AccountController {
 
     private final CreditAccountService service;

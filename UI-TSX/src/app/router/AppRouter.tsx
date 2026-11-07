@@ -58,6 +58,8 @@ import AddNthWeekdayPage from '@/features/catalog-command/transactions/component
 
 // Debt Paydown
 import DebtPaydownPage from '@/features/debt-paydown/components/DebtPaydownPage';
+import AccountsPage from '@/features/accounts/components/AccountsPage';
+import AccountDetailPage from '@/features/accounts/components/AccountDetailPage';
 
 // Display Page (Query)
 import DisplayPage from '@/features/catalog-query/display/DisplayPage';
@@ -82,6 +84,8 @@ export function AppRouter() {
           {/* Shared authenticated */}
           <Route path="/command/transactions/initial-amount" element={<InitialAmountPage />} />
           <Route path="/command/transactions/debt-paydown" element={<DebtPaydownPage />} />
+          <Route path="/command/transactions/accounts" element={<AccountsPage />} />
+          <Route path="/command/transactions/accounts/:id" element={<AccountDetailPage />} />
 
           {/* ====================================================== */}
           {/*                     CREDIT FLOWS (1)                   */}
