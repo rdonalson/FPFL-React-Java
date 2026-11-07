@@ -16,7 +16,7 @@ services:
         env_file:
             - .env.docker
         environment:
-            SPRING_JPA_HIBERNATE_DDL_AUTO: update
+            SPRING_JPA_HIBERNATE_DDL_AUTO: validate
             SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA: fpfl
 
             # Must match your Dockerfile + Kubernetes containerPort

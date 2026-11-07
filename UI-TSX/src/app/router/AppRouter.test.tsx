@@ -23,6 +23,16 @@ vi.mock('@/features/debt-paydown/api/debtApi', () => ({
   updateDebt: vi.fn(),
   deleteDebt: vi.fn(),
 }));
+vi.mock('@/features/accounts/api/accountApi', () => ({
+  listAccounts: vi.fn().mockResolvedValue([]),
+  getAccount: vi.fn(),
+  createAccount: vi.fn(),
+  updateAccount: vi.fn(),
+  deleteAccount: vi.fn(),
+  addPurchase: vi.fn(),
+  updatePurchase: vi.fn(),
+  deletePurchase: vi.fn(),
+}));
 vi.mock('@/features/catalog-command/admin/timePeriod/api/timePeriodApi', () => ({
   timePeriodApi: { fetchAll: vi.fn().mockResolvedValue([{ id: 6, name: 'Monthly' }]) },
 }));
@@ -67,6 +77,7 @@ describe('AppRouter', () => {
     ['/command/transactions/credits', 'Credits'],
     ['/command/transactions/debits', 'Debits'],
     ['/command/transactions/debt-paydown', 'Debt Paydown'],
+    ['/command/transactions/accounts', 'Cards & Loans'],
     ['/command/transactions/credits/new', 'New Credit'],
   ])('opens %s for signed-in users', async (path, heading) => {
     signIn();

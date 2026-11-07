@@ -4,6 +4,7 @@ import type { Row, Worksheet } from 'exceljs';
 
 import { LEDGER, PAYDOWN } from '../test-ledger';
 import type { LedgerDto } from '../types/DispayResponse';
+import type { AccountLedger } from '../accounts/accountLedger';
 import {
   buildLedgerWorkbook,
   excelDate,
@@ -149,6 +150,81 @@ describe('Ledger sheet', () => {
     const ws = sheet([]);
     expect(ws.getCell('A2').value).toBe('Oct 30, 2026 – Oct 31, 2026 · 0 days');
     expect(dayRows(ws)).toHaveLength(0);
+  });
+});
+
+describe('Cards & Loans sheet', () => {
+  const VISA: AccountLedger = {
+    accountId: 1,
+    name: 'Visa',
+    kind: 'creditCard',
+    apr: 0,
+    creditLimit: null,
+    openingBalance: 1000,
+    balanceDate: '2026-10-29',
+    startingBalance: 1000,
+    endingBalance: 550,
+    totalPurchases: 50,
+    totalPaid: 500,
+    totalInterest: 0,
+    payoffDate: '2026-11-13',
+    balances: [1050, 550],
+    events: [
+      {
+        date: '2026-10-30',
+        kind: 'purchase',
+        sourceId: 5,
+        sourceName: 'Groceries',
+        percent: null,
+        amount: 50,
+        balanceAfter: 1050,
+      },
+      {
+        date: '2026-10-31',
+        kind: 'payment',
+        sourceId: 20,
+        sourceName: 'Paycheck',
+        percent: 25,
+        amount: -500,
+        balanceAfter: 550,
+      },
+    ],
+  };
+
+  it('lists each card or loan with its activity grouped underneath', () => {
+    const ws = buildLedgerWorkbook(excel, LEDGER, { ...options, accounts: [VISA] }).getWorksheet(
+      'Cards & Loans',
+    )!;
+    expect(ws.getCell('A1').value).toBe('Cards & Loans');
+
+    let summary: Row | undefined;
+    ws.eachRow(row => {
+      if (row.getCell(1).value === 'Visa') summary = row;
+    });
+    expect(cells(summary!, 7)).toEqual([
+      'Visa',
+      1000,
+      50,
+      500,
+      0,
+      550,
+      'Nov 13, 2026 (after range)',
+    ]);
+
+    const purchase = ws.getRow(summary!.number + 2);
+    const payment = ws.getRow(summary!.number + 3);
+    expect(cells(purchase)).toEqual([null, excelDate('2026-10-30'), 'Groceries', 50, 1050]);
+    expect(cells(payment)).toEqual([null, excelDate('2026-10-31'), '25% of Paycheck', -500, 550]);
+    expect(payment.outlineLevel).toBe(1);
+    expect(payment.hidden).toBe(true);
+  });
+
+  it('is left out when there are no cards or loans', () => {
+    expect(
+      buildLedgerWorkbook(excel, LEDGER, { ...options, accounts: [] }).getWorksheet(
+        'Cards & Loans',
+      ),
+    ).toBeUndefined();
   });
 });
 

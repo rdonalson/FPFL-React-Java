@@ -3,6 +3,7 @@ import { unwrap } from '@/api/utils/responseHelpers';
 import type { DisplayRequest } from '@/features/catalog-query/types/DisplayRequest';
 import type { LedgerDto, ItemDto } from '../types/DispayResponse';
 import type { DebtPaydown } from '../paydown/paydown';
+import type { AccountLedger } from '../accounts/accountLedger';
 
 function toPayload(criteria: DisplayRequest) {
   return {
@@ -18,6 +19,13 @@ export async function fetchDisplayPaydown(criteria: DisplayRequest): Promise<Deb
   const res = await DisplayClient.fetchPaydown(toPayload(criteria));
   const raw = unwrap<any>(res, null);
   return (raw?.data as DebtPaydown[] | undefined) ?? [];
+}
+
+/** Each card or loan over the same window as the ledger; empty when there are none. */
+export async function fetchDisplayAccounts(criteria: DisplayRequest): Promise<AccountLedger[]> {
+  const res = await DisplayClient.fetchAccounts(toPayload(criteria));
+  const raw = unwrap<any>(res, null);
+  return (raw?.data as AccountLedger[] | undefined) ?? [];
 }
 
 export async function fetchDisplayLedger(criteria: DisplayRequest): Promise<LedgerDto[] | null> {

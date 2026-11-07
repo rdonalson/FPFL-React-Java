@@ -20,4 +20,14 @@ export class DisplayClient {
   }) {
     return apiClient.post('/display/paydown', payload);
   }
+
+  /** Cards & Loans over the same window (same body as the ledger). */
+  static async fetchAccounts(payload: {
+    userId: string;
+    ledgerStartDate: string;
+    ledgerEndDate: string;
+    includeGrouping: boolean;
+  }) {
+    return apiClient.post('/display/accounts', payload);
+  }
 }

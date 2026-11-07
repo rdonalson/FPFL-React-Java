@@ -1,0 +1,72 @@
+/* src/styles/_accounts.scss — Cards & Loans pages. They reuse Debt Paydown's card, editor and
+   Display panel styles (_debt-paydown.scss); this adds only what differs. */
+
+/* A payment row: item | %/$ switch with its value | remove */
+.debt-editor__allocation.accounts__payment {
+  grid-template-columns: minmax(0, 1fr) 13rem auto;
+
+  .p-selectbutton .p-button {
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+.accounts__whole {
+  color: var(--fl-muted, #5c6660);
+}
+
+.accounts__purchases-link {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 600;
+  color: var(--fl-primary, #166534);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+/* Purchases on the account page */
+.accounts__purchases {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.accounts__purchase {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--surface-border, #e5e7eb);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.accounts__purchase-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.accounts__purchase-amount {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 575.98px) {
+  .debt-editor__allocation.accounts__payment {
+    grid-template-columns: minmax(0, 1fr) auto;
+
+    > :nth-child(2) {
+      grid-column: 1 / -1;
+      grid-row: 2;
+    }
+  }
+}

@@ -10,7 +10,7 @@ import { toDateOnlyString } from '@/shared/utils/dateUtils';
 
 import { DateRangePanel } from '../range/DateRangePanel';
 import type { DisplayRequest } from '../types/DisplayRequest';
-import { fetchDisplayLedger, fetchDisplayPaydown } from '../api/displayApi';
+import { fetchDisplayAccounts, fetchDisplayLedger, fetchDisplayPaydown } from '../api/displayApi';
 
 import type { LedgerDto } from '../types/DispayResponse';
 import { ChartPanel } from '../chart/ChartPanel'; // <-- your new chart panel
@@ -18,9 +18,19 @@ import { LedgerPanel } from '../ledger/LedgerPanel';
 import { PaydownChartPanel } from '../paydown/PaydownChartPanel';
 import { PaydownLedgerPanel } from '../paydown/PaydownLedgerPanel';
 import type { DebtPaydown } from '../paydown/paydown';
+import { AccountsChartPanel } from '../accounts/AccountsChartPanel';
+import { AccountsLedgerPanel } from '../accounts/AccountsLedgerPanel';
+import type { AccountLedger } from '../accounts/accountLedger';
 import { exportLedgerToExcel } from '../export/ledgerExport';
 
-type DisplayTab = 'date' | 'chart' | 'ledger' | 'paydown-chart' | 'paydown-ledger';
+type DisplayTab =
+  | 'date'
+  | 'chart'
+  | 'ledger'
+  | 'accounts-chart'
+  | 'accounts-ledger'
+  | 'paydown-chart'
+  | 'paydown-ledger';
 
 export default function DisplayPage() {
   const navigate = useNavigate();
@@ -33,6 +43,7 @@ export default function DisplayPage() {
 
   const [ledgerRows, setLedgerRows] = useState<LedgerDto[] | null>(null);
   const [paydown, setPaydown] = useState<DebtPaydown[]>([]);
+  const [accounts, setAccounts] = useState<AccountLedger[]>([]);
   const [activeTab, setActiveTab] = useState<DisplayTab>('date');
   /** The range the results on screen were calculated for ('yyyy-MM-dd'), used to title the export. */
   const [shownRange, setShownRange] = useState<{ start: string; end: string } | null>(null);
@@ -84,16 +95,21 @@ export default function DisplayPage() {
 
   const handleCalculate = async () => {
     try {
-      // Debt Paydown is extra: if it fails, the forecast still shows
-      const [result, debts] = await Promise.all([
+      // Debt Paydown and Cards & Loans are extra: if either fails, the forecast still shows
+      const [result, debts, cards] = await Promise.all([
         fetchDisplayLedger(criteria),
         fetchDisplayPaydown(criteria).catch(err => {
           console.error('Paydown API error:', err);
           return [] as DebtPaydown[];
         }),
+        fetchDisplayAccounts(criteria).catch(err => {
+          console.error('Accounts API error:', err);
+          return [] as AccountLedger[];
+        }),
       ]);
       setLedgerRows(result);
       setPaydown(debts);
+      setAccounts(cards);
       const start = toDateOnlyString(criteria.ledgerStartDate);
       const end = toDateOnlyString(criteria.ledgerEndDate);
       setShownRange(start && end ? { start, end } : null);
@@ -108,7 +124,7 @@ export default function DisplayPage() {
     if (!ledgerRows?.length || !shownRange) return;
     setExporting(true);
     try {
-      await exportLedgerToExcel(ledgerRows, { ...shownRange, paydown });
+      await exportLedgerToExcel(ledgerRows, { ...shownRange, paydown, accounts });
     } catch (err) {
       console.error('Excel export error:', err);
       toast?.current?.show({
@@ -184,6 +200,28 @@ export default function DisplayPage() {
               Ledger
             </RadixTabs.Trigger>
 
+            {accounts.length > 0 && (
+              <>
+                <RadixTabs.Trigger
+                  value="accounts-chart"
+                  className="fpfl-tab flex items-center gap-2 px-3 py-2 rounded-md font-medium
+                             data-[state=active]:text-sky-700 data-[state=active]:font-semibold
+                             data-[state=inactive]:text-gray-500"
+                >
+                  Cards &amp; Loans Chart
+                </RadixTabs.Trigger>
+
+                <RadixTabs.Trigger
+                  value="accounts-ledger"
+                  className="fpfl-tab flex items-center gap-2 px-3 py-2 rounded-md font-medium
+                             data-[state=active]:text-sky-700 data-[state=active]:font-semibold
+                             data-[state=inactive]:text-gray-500"
+                >
+                  Cards &amp; Loans Ledger
+                </RadixTabs.Trigger>
+              </>
+            )}
+
             {paydown.length > 0 && (
               <>
                 <RadixTabs.Trigger
@@ -232,6 +270,19 @@ export default function DisplayPage() {
             <RadixTabs.Content value="ledger" className="outline-none">
               <LedgerPanel ledger={ledgerRows} />
             </RadixTabs.Content>
+
+            {/* CARDS & LOANS PANELS (only when there are any) */}
+            {accounts.length > 0 && (
+              <>
+                <RadixTabs.Content value="accounts-chart" className="outline-none">
+                  <AccountsChartPanel accounts={accounts} ledger={ledgerRows} />
+                </RadixTabs.Content>
+
+                <RadixTabs.Content value="accounts-ledger" className="outline-none">
+                  <AccountsLedgerPanel accounts={accounts} />
+                </RadixTabs.Content>
+              </>
+            )}
 
             {/* DEBT PAYDOWN PANELS (only when a debt is tracked) */}
             {paydown.length > 0 && (
