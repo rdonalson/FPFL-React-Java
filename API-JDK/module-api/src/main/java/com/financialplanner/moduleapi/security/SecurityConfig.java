@@ -65,7 +65,7 @@ public class SecurityConfig {
                 // Swagger / OpenAPI
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
 
-                // Everything else (items, initial amount, display, debts) requires a JWT;
+                // Everything else (items, initial amount, display, debts, accounts) requires a JWT;
                 // the controllers then limit each user to their own data
                 .anyRequest().authenticated())
 

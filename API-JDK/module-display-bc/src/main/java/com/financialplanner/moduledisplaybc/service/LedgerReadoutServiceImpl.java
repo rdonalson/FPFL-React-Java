@@ -1,5 +1,8 @@
 package com.financialplanner.moduledisplaybc.service;
 
+import com.financialplanner.moduledisplaybc.accounts.AccountLedgerCalculator;
+import com.financialplanner.moduledisplaybc.accounts.AccountLedgerModels.AccountLedger;
+import com.financialplanner.moduledisplaybc.accounts.AccountLedgerModels.AccountLedgerResult;
 import com.financialplanner.moduledisplaybc.model.ItemDto;
 import com.financialplanner.moduledisplaybc.model.LedgerDto;
 import com.financialplanner.moduledisplaybc.model.LedgerRequest;
@@ -9,9 +12,12 @@ import com.financialplanner.moduledisplaybc.paydown.PaydownModels.LedgerAdjustme
 import com.financialplanner.moduledisplaybc.paydown.PaydownModels.PaydownResult;
 import com.financialplanner.moduledisplaybc.recurrence.*;
 import com.financialplanner.modulecommonbc.exception.DomainValidationException;
+import com.financialplanner.moduleitemsbc.domain.service.CreditAccountService;
 import com.financialplanner.moduleitemsbc.domain.service.DebtService;
+import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.CreditAccount;
 import com.financialplanner.moduleitemsbc.domain.service.ItemService;
 import com.financialplanner.moduleitemsbc.infrastructure.persistence.entity.Item;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -31,7 +37,10 @@ public class LedgerReadoutServiceImpl implements LedgerReadoutService {
 
     private final ItemService itemService;
     private final DebtService debtService;
+    /** Null in tests that predate Cards &amp; Loans: then there are no accounts. */
+    private final CreditAccountService accountService;
     private final PaydownCalculator paydownCalculator;
+    private final AccountLedgerCalculator accountCalculator;
     private final OneTimeOccurrenceExpander oneTimeExpander;
     private final DailyRecurrenceExpander dailyExpander;
     private final WeeklyRecurrenceExpander weeklyExpander;
@@ -44,9 +53,17 @@ public class LedgerReadoutServiceImpl implements LedgerReadoutService {
     private final NthWeekdayRecurrenceExpander nthWeekdayExpander;
 
     public LedgerReadoutServiceImpl(ItemService itemService, DebtService debtService) {
+        this(itemService, debtService, null);
+    }
+
+    @Autowired
+    public LedgerReadoutServiceImpl(ItemService itemService, DebtService debtService,
+                                    CreditAccountService accountService) {
         this.itemService = itemService;
         this.debtService = debtService;
+        this.accountService = accountService;
         this.paydownCalculator = new PaydownCalculator(new RecurrenceOccurrences());
+        this.accountCalculator = new AccountLedgerCalculator(new RecurrenceOccurrences());
         this.oneTimeExpander = new OneTimeOccurrenceExpander(this::mapItemToDto);
         this.dailyExpander = new DailyRecurrenceExpander(this::mapItemToDto);
         this.weeklyExpander = new WeeklyRecurrenceExpander(this::mapItemToDto);
@@ -109,7 +126,11 @@ public class LedgerReadoutServiceImpl implements LedgerReadoutService {
         // Debt Paydown: money credits send to tracked debts, as extra debits after the day's own items
         PaydownResult paydown = paydownCalculator.calculate(userItems, debtService.list(request.userId()), start, end);
         for (LedgerAdjustment adjustment : paydown.adjustments()) {
-            itemDtos.add(mapAdjustmentToDto(adjustment));
+            itemDtos.add(mapAdjustmentToDto(adjustment, PAYDOWN_TYPE_NAME));
+        }
+        // Cards & Loans: money credits send to cards and loans, as extra debits too
+        for (LedgerAdjustment adjustment : accountLedgers(userItems, request.userId(), start, end).adjustments()) {
+            itemDtos.add(mapAdjustmentToDto(adjustment, AccountLedgerCalculator.PAYMENT_TYPE_NAME));
         }
         // Build ledger table (DTO)
         List<LedgerDto> ledger = buildLedgerTable(start, end);
@@ -149,14 +170,45 @@ public class LedgerReadoutServiceImpl implements LedgerReadoutService {
     }
 
     /**
-     * Maps a Debt Paydown allocation to a ledger entry: a debit named after the debt, with the share
-     * ("25% of Paycheck") as its period.
+     * Cards &amp; Loans over the same window as the ledger: each card or loan's balance per day, its purchases,
+     * payments and interest, and the projected payoff date.
+     *
+     * @param request the user and date range
+     * @return one entry per card or loan, by name
      */
-    private ItemDto mapAdjustmentToDto(LedgerAdjustment adjustment) {
+    @Override
+    public List<AccountLedger> buildAccounts(LedgerRequest request) {
+        if (request == null || request.userId() == null) {
+            throw new DomainValidationException("UserId cannot be null");
+        }
+        LocalDate start = request.ledgerStartDate();
+        LocalDate end = request.ledgerEndDate();
+        if (start == null || end == null) {
+            throw new DomainValidationException("Ledger start and end dates are required");
+        }
+        if (end.isBefore(start)) {
+            throw new DomainValidationException("Ledger end date must be on or after the start date");
+        }
+
+        List<Item> userItems = itemService.findByUserId(request.userId());
+        return accountLedgers(userItems, request.userId(), start, end).accounts();
+    }
+
+    private AccountLedgerResult accountLedgers(List<Item> userItems, java.util.UUID userId, LocalDate start,
+                                               LocalDate end) {
+        List<CreditAccount> accounts = accountService == null ? List.of() : accountService.list(userId);
+        return accountCalculator.calculate(userItems, accounts, start, end);
+    }
+
+    /**
+     * Maps a Debt Paydown allocation or a Cards &amp; Loans payment to a ledger entry: a debit named after the
+     * debt or account, with the share ("25% of Paycheck") as its period.
+     */
+    private ItemDto mapAdjustmentToDto(LedgerAdjustment adjustment, String typeName) {
         ItemDto dto = new ItemDto();
         dto.setItemKey(Math.toIntExact(adjustment.itemId()));
         dto.setFkItemType(2);
-        dto.setItemType(PAYDOWN_TYPE_NAME);
+        dto.setItemType(typeName);
         dto.setName(adjustment.name());
         dto.setPeriod(adjustment.detail());
         dto.setAmount(-adjustment.amount().abs().doubleValue());

@@ -8,7 +8,10 @@ spring:
         password: ${DB_PASSWORD}
     jpa:
         hibernate:
-            ddl-auto: update
+            # The fpfl schema is shared with API-NET and its extra tables come from API-NET's db/ scripts, so
+            # Hibernate only checks that the entities match the tables; it never changes them. Set
+            # HIBERNATE_DDL_AUTO=none to skip the check.
+            ddl-auto: ${HIBERNATE_DDL_AUTO:validate}
         show-sql: false
         properties:
             hibernate:

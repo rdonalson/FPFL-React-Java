@@ -10,10 +10,13 @@ import com.financialplanner.moduledisplaybc.service.LedgerReadoutService;
 import com.financialplanner.moduleapi.response.ApiResponse;
 import com.financialplanner.moduleapi.response.ApiResponseFactory;
 import com.financialplanner.moduleapi.dtos.paydown.DebtPaydownResponse;
+import com.financialplanner.moduleapi.dtos.account.AccountLedgerResponse;
+import com.financialplanner.moduleapi.mappers.AccountMapper;
 import com.financialplanner.moduleapi.mappers.DebtMapper;
 import com.financialplanner.moduleapi.security.CallerAccess;
 import com.financialplanner.moduleapi.security.CustomUserDetails;
 import com.financialplanner.modulecommonbc.exception.ForbiddenOperationException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,12 +32,21 @@ public class DisplayController {
     private final LedgerReadoutService ledgerReadoutService;
     private final ApiResponseFactory responseFactory;
     private final DebtMapper debtMapper;
+    /** Null only in tests that predate Cards &amp; Loans. */
+    private final AccountMapper accountMapper;
 
     public DisplayController(LedgerReadoutService ledgerReadoutService, ApiResponseFactory responseFactory,
                              DebtMapper debtMapper) {
+        this(ledgerReadoutService, responseFactory, debtMapper, null);
+    }
+
+    @Autowired
+    public DisplayController(LedgerReadoutService ledgerReadoutService, ApiResponseFactory responseFactory,
+                             DebtMapper debtMapper, AccountMapper accountMapper) {
         this.ledgerReadoutService = ledgerReadoutService;
         this.responseFactory = responseFactory;
         this.debtMapper = debtMapper;
+        this.accountMapper = accountMapper;
     }
 
     @PostMapping("/ledger")
@@ -59,6 +71,20 @@ public class DisplayController {
         List<DebtPaydownResponse> debts =
             debtMapper.toPaydownResponse(ledgerReadoutService.buildPaydown(scoped(request, principal)));
         return ResponseEntity.ok(responseFactory.success(debts, "Paydown retrieved successfully"));
+    }
+
+    /**
+     * Cards &amp; Loans: each card or loan's balance per day, its purchases, payments and interest, and the
+     * projected payoff date, over the same window as the ledger (same request body). {@code userId} defaults to
+     * the caller; only an admin may ask for someone else's.
+     */
+    @PostMapping("/accounts")
+    public ResponseEntity<ApiResponse<List<AccountLedgerResponse>>> buildAccounts(
+        @RequestBody LedgerRequest request, @AuthenticationPrincipal CustomUserDetails principal) {
+
+        List<AccountLedgerResponse> accounts =
+            accountMapper.toLedgerResponse(ledgerReadoutService.buildAccounts(scoped(request, principal)));
+        return ResponseEntity.ok(responseFactory.success(accounts, "Accounts ledger retrieved successfully"));
     }
 
     /**

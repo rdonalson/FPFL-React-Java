@@ -117,5 +117,12 @@ class DisplayControllerPaydownTest {
                                            List.of(new BigDecimal("500")), new BigDecimal("500"), BigDecimal.ZERO,
                                            LocalDate.of(2026, 11, 13), List.of(event)));
         }
+
+        @Override
+        public List<com.financialplanner.moduledisplaybc.accounts.AccountLedgerModels.AccountLedger> buildAccounts(
+            LedgerRequest request) {
+            lastRequest = request;
+            return List.of();
+        }
     }
 }
