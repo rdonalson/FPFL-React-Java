@@ -10,11 +10,11 @@ import { InputNumber } from 'primereact/inputnumber';
 import { InputText } from 'primereact/inputtext';
 import { Calendar } from 'primereact/calendar';
 import { Message } from 'primereact/message';
-import { SelectButton } from 'primereact/selectbutton';
 
 import { useToast } from '@/shared/hooks/useToast';
 import { formatDate, formatMoney, formatPercent } from '@/features/debt-paydown/types/Debt';
 
+import { Segmented } from './Segmented';
 import { addPurchase, deletePurchase, getAccount, updatePurchase } from '../api/accountApi';
 import {
   ONE_TIME,
@@ -263,7 +263,7 @@ export default function AccountDetailPage() {
         onHide={closeEditor}
         modal
         draggable={false}
-        style={{ width: '34rem' }}
+        style={{ width: '38rem' }}
         breakpoints={{ '640px': '95vw' }}
       >
         {editing !== null && (
@@ -275,7 +275,7 @@ export default function AccountDetailPage() {
               void save();
             }}
           >
-            <div className="debt-editor__grid">
+            <div className="debt-editor__grid accounts__grid">
               <div className="debt-editor__field debt-editor__field--wide">
                 <label htmlFor="purchase-name">What for</label>
                 <InputText
@@ -303,18 +303,15 @@ export default function AccountDetailPage() {
               </div>
 
               <div className="debt-editor__field">
-                <span id="purchase-period-label">How often</span>
-                <SelectButton
-                  aria-labelledby="purchase-period-label"
-                  options={[...PURCHASE_PERIODS]}
-                  optionLabel="label"
-                  optionValue="value"
+                <span className="accounts__label">How often</span>
+                <Segmented
+                  ariaLabel="How often"
+                  options={PURCHASE_PERIODS}
                   value={form.fkPeriod}
-                  allowEmpty={false}
-                  onChange={e =>
+                  onChange={fkPeriod =>
                     patch({
-                      fkPeriod: e.value,
-                      dateRangeReq: e.value === ONE_TIME ? false : form.dateRangeReq,
+                      fkPeriod,
+                      dateRangeReq: fkPeriod === ONE_TIME ? false : form.dateRangeReq,
                     })
                   }
                 />
@@ -359,25 +356,29 @@ export default function AccountDetailPage() {
                     <label htmlFor="purchase-ranged">Only between two dates</label>
                   </div>
                   {form.dateRangeReq && (
-                    <div className="flex flex-wrap gap-2">
-                      <Calendar
-                        inputId="purchase-begin"
-                        aria-label="First date"
-                        placeholder="First date"
-                        value={form.beginDate}
-                        onChange={e => patch({ beginDate: (e.value as Date | null) ?? null })}
-                        dateFormat="M d, yy"
-                        showIcon
-                      />
-                      <Calendar
-                        inputId="purchase-end"
-                        aria-label="Last date"
-                        placeholder="Last date"
-                        value={form.endDate}
-                        onChange={e => patch({ endDate: (e.value as Date | null) ?? null })}
-                        dateFormat="M d, yy"
-                        showIcon
-                      />
+                    <div className="accounts__range">
+                      <div className="debt-editor__field">
+                        <label htmlFor="purchase-begin">From</label>
+                        <Calendar
+                          inputId="purchase-begin"
+                          value={form.beginDate}
+                          onChange={e => patch({ beginDate: (e.value as Date | null) ?? null })}
+                          dateFormat="M d, yy"
+                          showIcon
+                          className="w-full"
+                        />
+                      </div>
+                      <div className="debt-editor__field">
+                        <label htmlFor="purchase-end">To</label>
+                        <Calendar
+                          inputId="purchase-end"
+                          value={form.endDate}
+                          onChange={e => patch({ endDate: (e.value as Date | null) ?? null })}
+                          dateFormat="M d, yy"
+                          showIcon
+                          className="w-full"
+                        />
+                      </div>
                     </div>
                   )}
                 </div>

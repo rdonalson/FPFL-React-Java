@@ -9,7 +9,6 @@ import { InputNumber } from 'primereact/inputnumber';
 import { InputText } from 'primereact/inputtext';
 import { Calendar } from 'primereact/calendar';
 import { Message } from 'primereact/message';
-import { SelectButton } from 'primereact/selectbutton';
 
 import { getSessionUserId } from '@/app/state/sessionHelpers';
 import { useToast } from '@/shared/hooks/useToast';
@@ -18,6 +17,7 @@ import type { Item } from '@/features/catalog-command/transactions/types/Item';
 import { formatDate, formatMoney, formatPercent } from '@/features/debt-paydown/types/Debt';
 
 import { createAccount, deleteAccount, listAccounts, updateAccount } from '../api/accountApi';
+import { Segmented } from './Segmented';
 import {
   CREDIT,
   DEBIT,
@@ -392,7 +392,7 @@ export default function AccountsPage() {
               void save();
             }}
           >
-            <div className="debt-editor__grid">
+            <div className="debt-editor__grid accounts__grid">
               <div className="debt-editor__field debt-editor__field--wide">
                 <label htmlFor="account-name">Name</label>
                 <InputText
@@ -406,19 +406,13 @@ export default function AccountsPage() {
               </div>
 
               <div className="debt-editor__field debt-editor__field--wide">
-                <span id="account-kind-label">Kind</span>
-                <SelectButton
-                  aria-labelledby="account-kind-label"
-                  options={[...KIND_OPTIONS]}
-                  optionLabel="label"
-                  optionValue="value"
+                <span className="accounts__label">Kind</span>
+                <Segmented
+                  ariaLabel="Kind"
+                  options={KIND_OPTIONS}
                   value={form.kind}
-                  allowEmpty={false}
-                  onChange={e =>
-                    patch({
-                      kind: e.value,
-                      creditLimit: e.value === 'loan' ? null : form.creditLimit,
-                    })
+                  onChange={kind =>
+                    patch({ kind, creditLimit: kind === 'loan' ? null : form.creditLimit })
                   }
                 />
               </div>
@@ -514,15 +508,13 @@ export default function AccountsPage() {
                     {p.mode === 'whole' ? (
                       <span className="text-sm accounts__whole">Whole amount</span>
                     ) : (
-                      <div className="flex gap-2 items-center">
-                        <SelectButton
+                      <div className="accounts__share">
+                        <Segmented
+                          size="small"
+                          ariaLabel={`Percentage or amount for payment ${i + 1}`}
                           options={MODE_OPTIONS}
-                          optionLabel="label"
-                          optionValue="value"
                           value={p.mode}
-                          allowEmpty={false}
-                          aria-label={`Amount or percentage for payment ${i + 1}`}
-                          onChange={e => patchPayment(p.key, { mode: e.value })}
+                          onChange={mode => patchPayment(p.key, { mode })}
                         />
                         {p.mode === 'percent' ? (
                           <InputNumber
