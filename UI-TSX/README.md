@@ -158,8 +158,10 @@ Domain modules **never** call Axios directly — they go through the typed clien
 | `/command/transactions/credits/new/:periodId` | Authenticated | Add credit item for that period |
 | `/command/transactions/credits/:periodId/:id/edit` | Authenticated | Edit credit item |
 | `/command/transactions/debits/…` | Authenticated | Same shape, `itemType=2` |
+| `/command/transactions/accounts` | Authenticated | Cards & Loans: credit cards and loans, and who pays them |
+| `/command/transactions/accounts/:id` | Authenticated | One card or loan and its purchases |
 | `/command/transactions/debt-paydown` | Authenticated | Debt Paydown: track debts and allocate credits to them |
-| `/query/display` | Authenticated | Forecasted ledger + chart (plus Paydown Chart / Paydown Ledger tabs when a debt is tracked), with Export to Excel |
+| `/query/display` | Authenticated | Forecasted ledger + chart (plus Cards & Loans Chart / Ledger tabs when there's a card or loan, and Paydown Chart / Ledger tabs when a debt is tracked), with Export to Excel |
 | `/command/admin/item-types` | **Admin** | Item type maintenance |
 | `/command/admin/time-periods` | **Admin** | Time period maintenance |
 | `/status` | **Admin** | UI + API health, 30s auto-refresh |
@@ -170,7 +172,7 @@ Period ids map to a dedicated add/edit page each: `1` one-time · `2` daily · `
 
 ## 📦 Features
 
-An illustrated, 14-page **[User Guide](public/media/fpfl-user-guide.pdf)** (PDF, served at `/media/fpfl-user-guide.pdf`) walks through every page; the home page hero, its "New here?" card and the Docs page all link to it.
+An illustrated, 17-page **[User Guide](public/media/fpfl-user-guide.pdf)** (PDF, served at `/media/fpfl-user-guide.pdf`) walks through every page; the home page hero, its "New here?" card and the Docs page all link to it.
 
 Each domain module under `src/features` encapsulates:
 
@@ -182,7 +184,8 @@ Each domain module under `src/features` encapsulates:
 The split mirrors the backend's write/read separation:
 
 - **`catalog-command`** — the write side. `transactions/` covers items and initial amount; `admin/` covers item type and time period maintenance.
-- **`catalog-query`** — the read side. `display/` is the ledger page, composed of `range/` (date selection), `ledger/` (table), `chart/` (Chart.js panel), `paydown/` (per‑debt payoff chart and paydown ledger) and `export/` (**Export to Excel**: a "Ledger" sheet laid out like the Ledger tab, with a summary and each day's credits and debits in collapsible Excel outline groups, plus a "Debt Paydown" sheet when a debt is tracked. ExcelJS is loaded only when someone exports, so it stays out of the main bundle).
+- **`catalog-query`** — the read side. `display/` is the ledger page, composed of `range/` (date selection), `ledger/` (table), `chart/` (Chart.js panel), `accounts/` (Cards & Loans chart and ledger tabs), `paydown/` (per‑debt payoff chart and paydown ledger) and `export/` (**Export to Excel**: a "Ledger" sheet laid out like the Ledger tab, with a summary and each day's credits and debits in collapsible Excel outline groups, plus a "Cards & Loans" sheet when there are cards or loans and a "Debt Paydown" sheet when a debt is tracked. ExcelJS is loaded only when someone exports, so it stays out of the main bundle).
+- **`accounts`** — Cards & Loans. `AccountsPage` lists each credit card or loan (what's owed, as of when, APR, credit limit, who pays it) and edits it in a dialog: kind, balance, APR, optional limit, and payments from your credits (a percentage or a fixed amount each time) or debits (the whole amount). `AccountDetailPage` holds the card's purchases (one time, daily or weekly, optionally between two dates). The rules in `types/Account.ts` mirror the API's, so mistakes show in the dialog before anything is sent; `Segmented` is the small toggle used for kind, %/$ and how often.
 - **`debt-paydown`** — the Debt Paydown setup page: pick a debit, enter what's owed (as of a date, optional APR) and send a percentage of any credits to it. The forecast deducts those shares and charts the payoff.
 
 ---
@@ -211,7 +214,7 @@ The dev server runs on **<http://localhost:4000>** and opens a browser automatic
 | `npm run test:coverage` | Tests with a V8 coverage report (`coverage/`) |
 | `npm run test:types` | Type-check the tests (`tsconfig.test.json`; the app build skips test files) |
 
-Tests live next to the code as `*.test.ts` / `*.test.tsx` (about 360 across the app: API layer, session and auth, layout and routing, admin tables, every credit/debit period form and page, the Display page, Excel export and Debt Paydown). Shared helpers are in `src/test/`: `setup.ts` (jsdom polyfills), `render.tsx` (`renderWithProviders` with router + React Query, `typeNumber` for PrimeReact `InputNumber`) and `session.ts` (`signIn` / `signOut`). Tests mock the API modules, never the network; Chart.js is replaced by a stub that records the datasets.
+Tests live next to the code as `*.test.ts` / `*.test.tsx` (about 385 across the app: API layer, session and auth, layout and routing, admin tables, every credit/debit period form and page, the Display page, Excel export, Cards & Loans and Debt Paydown). Shared helpers are in `src/test/`: `setup.ts` (jsdom polyfills), `render.tsx` (`renderWithProviders` with router + React Query, `typeNumber` for PrimeReact `InputNumber`) and `session.ts` (`signIn` / `signOut`). Tests mock the API modules, never the network; Chart.js is replaced by a stub that records the datasets.
 
 ---
 

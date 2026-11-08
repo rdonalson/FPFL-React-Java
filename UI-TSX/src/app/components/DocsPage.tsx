@@ -90,11 +90,11 @@ const API_MODULES: ModuleRow[] = [
   },
   {
     module: 'module-items-bc',
-    role: 'Write-side domain logic and persistence for items, item types, time periods',
+    role: 'Write-side domain logic and persistence for items, item types, time periods, credit cards and loans (purchases, payments), debts',
   },
   {
     module: 'module-display-bc',
-    role: 'Read-side projections — recurrence expansion into the forecasted ledger',
+    role: 'Read-side projections — the forecasted ledger, card and loan balances, debt payoff',
   },
   { module: 'module-auth', role: 'Users, roles, authentication, refresh tokens' },
   {
@@ -139,6 +139,23 @@ const ENTITIES: EntityRow[] = [
     entity: 'TimePeriod',
     group: 'Domain',
     description: 'Recurrence period; selects which recurrence columns an item uses',
+  },
+  {
+    entity: 'CreditAccount',
+    group: 'Domain',
+    description:
+      'Cards & Loans — a credit card or loan: balance owed as of a date, APR, optional credit limit',
+  },
+  {
+    entity: 'AccountPurchase',
+    group: 'Domain',
+    description: 'Cards & Loans — a purchase on a card: one time, daily or weekly',
+  },
+  {
+    entity: 'AccountPayment',
+    group: 'Domain',
+    description:
+      "Cards & Loans — one of your items paying an account: a credit's amount or percentage, or a debit's whole amount",
   },
   {
     entity: 'Debt',
@@ -323,6 +340,11 @@ export default function DocsPage() {
                   composes them with your starting balance, producing a forecasted ledger you can
                   read as a table or a chart over any date range you choose.
                 </p>
+                <p>
+                  Credit cards and loans live alongside: each is its own account with purchases on
+                  it, paid down by your credits and debits. The forecast deducts those payments and
+                  shows each balance falling to its payoff date.
+                </p>
 
                 <Divider />
 
@@ -368,6 +390,12 @@ export default function DocsPage() {
                     size="small"
                     onClick={() => navigate('/command/transactions/debits')}
                   />
+                  <Button
+                    label="Cards & Loans"
+                    icon="pi pi-credit-card"
+                    size="small"
+                    onClick={() => navigate('/command/transactions/accounts')}
+                  />
                 </div>
               </RadixTabs.Content>
 
@@ -385,7 +413,12 @@ export default function DocsPage() {
                   </li>
                   <li>
                     {codeText('features/catalog-query')} — the read side: the forecasted ledger,
-                    date range selection, and charting
+                    date range selection, charting, the Cards &amp; Loans and Debt Paydown tabs, and
+                    Excel export
+                  </li>
+                  <li>
+                    {codeText('features/accounts')} — Cards &amp; Loans: credit cards and loans,
+                    their purchases, and the credits and debits that pay them
                   </li>
                   <li>
                     {codeText('app/')} — layout, routing and guards, authentication, providers, and
@@ -479,8 +512,44 @@ export default function DocsPage() {
                 <Divider />
 
                 <SectionHeading
+                  title="Cards & Loans"
+                  blurb="Each credit card or loan is its own account, with purchases and payments, projected to its payoff date."
+                />
+
+                <p>
+                  On the Cards &amp; Loans page you add a card or loan with what you owe on it, as
+                  of which date, its APR and (for a card) an optional credit limit, then choose who
+                  pays it: a percentage or a fixed amount of any of your credits each time it comes
+                  in, or a debit&apos;s whole amount (the card&apos;s own monthly payment, say).
+                  Purchases on the card — one time, daily or weekly — go on its own page.
+                </p>
+                <ul className="mt-0">
+                  <li>
+                    {codeText('AccountLedgerCalculator')} walks each account day by day: purchases
+                    raise the balance, payments lower it, and interest (APR ÷ 12) is charged at each
+                    month end on what is owed.
+                  </li>
+                  <li>
+                    Payments are deducted from the main forecast as {codeText('Card/Loan Payment')}{' '}
+                    debits (for example &quot;50% of Paycheck&quot;); a payment never exceeds what
+                    is owed.
+                  </li>
+                  <li>
+                    A credit can be shared at most 100% across all of your cards and loans; the
+                    dialog says how much is left.
+                  </li>
+                  <li>
+                    The Display page adds Cards &amp; Loans chart and ledger tabs and the Excel
+                    export a Cards &amp; Loans sheet; the payoff date is projected up to 30 years
+                    ahead.
+                  </li>
+                </ul>
+
+                <Divider />
+
+                <SectionHeading
                   title="Debt Paydown"
-                  blurb="Send part of your credits to paying down a debit, and see when it is paid off."
+                  blurb="The older, simpler tracker: send part of your credits to paying down a debit, and see when it is paid off."
                 />
 
                 <p>
@@ -513,7 +582,7 @@ export default function DocsPage() {
               <RadixTabs.Content value="data" className="outline-none">
                 <SectionHeading
                   title="PostgreSQL entities"
-                  blurb="Schema management runs through Hibernate; a full breakdown lives in the API README."
+                  blurb="The FPFL-V3 database is shared with the Angular/.NET version: SQL scripts create the tables and Hibernate validates against them. A full breakdown lives in the API README."
                 />
 
                 <DataTable value={ENTITIES} size="small" stripedRows dataKey="entity">
@@ -550,6 +619,13 @@ export default function DocsPage() {
                     {codeText('debts.fk_item')} → {codeText('items.id')} (the debit; one debt per
                     debit) and {codeText('debt_allocations.fk_credit_item')} →{' '}
                     {codeText('items.id')} (deleting either item removes the debt or allocation)
+                  </li>
+                  <li>
+                    {codeText('account_purchases.fk_account')} and{' '}
+                    {codeText('account_payments.fk_account')} → {codeText('credit_accounts.id')}{' '}
+                    (deleting an account removes them);{' '}
+                    {codeText('account_payments.fk_credit_item')} → {codeText('items.id')} (the
+                    paying credit or debit)
                   </li>
                 </ul>
               </RadixTabs.Content>

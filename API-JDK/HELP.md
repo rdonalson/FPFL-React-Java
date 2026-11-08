@@ -5,13 +5,13 @@
 For further reference, please consider the following sections:
 
 - [Official Apache Maven documentation](https://maven.apache.org/guides/index.html)
-- [Spring Boot Maven Plugin Reference Guide](https://docs.spring.io/spring-boot/4.0.1/maven-plugin)
-- [Create an OCI image](https://docs.spring.io/spring-boot/4.0.1/maven-plugin/build-image.html)
-- [Spring Boot Actuator](https://docs.spring.io/spring-boot/4.0.1/reference/actuator/index.html)
-- [Spring Data JPA](https://docs.spring.io/spring-boot/4.0.1/reference/data/sql.html#data.sql.jpa-and-spring-data)
-- [Spring Boot DevTools](https://docs.spring.io/spring-boot/4.0.1/reference/using/devtools.html)
-- [Validation](https://docs.spring.io/spring-boot/4.0.1/reference/io/validation.html)
-- [Spring Web](https://docs.spring.io/spring-boot/4.0.1/reference/web/servlet.html)
+- [Spring Boot Maven Plugin Reference Guide](https://docs.spring.io/spring-boot/4.0.6/maven-plugin)
+- [Create an OCI image](https://docs.spring.io/spring-boot/4.0.6/maven-plugin/build-image.html)
+- [Spring Boot Actuator](https://docs.spring.io/spring-boot/4.0.6/reference/actuator/index.html)
+- [Spring Data JPA](https://docs.spring.io/spring-boot/4.0.6/reference/data/sql.html#data.sql.jpa-and-spring-data)
+- [Spring Boot DevTools](https://docs.spring.io/spring-boot/4.0.6/reference/using/devtools.html)
+- [Validation](https://docs.spring.io/spring-boot/4.0.6/reference/io/validation.html)
+- [Spring Web](https://docs.spring.io/spring-boot/4.0.6/reference/web/servlet.html)
 
 ### Guides
 

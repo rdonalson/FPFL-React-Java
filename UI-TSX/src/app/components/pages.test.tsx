@@ -121,6 +121,7 @@ describe('DocsPage', () => {
     fireEvent.click(within(tabs).getByRole('tab', { name: /Ledger Engine/ }));
     expect(await screen.findByText('How a forecast is built')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Debt Paydown' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Cards & Loans' })).toBeInTheDocument();
 
     fireEvent.mouseDown(within(tabs).getByRole('tab', { name: /Data Model/ }));
     fireEvent.click(within(tabs).getByRole('tab', { name: /Data Model/ }));
