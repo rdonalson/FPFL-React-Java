@@ -1,12 +1,88 @@
 /* src/styles/_accounts.scss — Cards & Loans pages. They reuse Debt Paydown's card, editor and
    Display panel styles (_debt-paydown.scss); this adds only what differs. */
 
+/* ---- segmented toggle (Kind, %/$, How often) ----------------------------------------------- */
+.fl-segmented {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  align-self: flex-start;
+  border: 1px solid var(--fl-primary, #166534);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.fl-segmented__option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.9rem;
+  border: 0;
+  border-left: 1px solid var(--fl-primary, #166534);
+  background: transparent;
+  color: var(--fl-primary, #166534);
+  font: inherit;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+
+  &:first-child {
+    border-left: 0;
+  }
+
+  &:hover:not(.fl-segmented__option--chosen) {
+    background: color-mix(in srgb, var(--fl-primary, #166534) 10%, transparent);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--fl-primary, #166534);
+    outline-offset: -3px;
+  }
+}
+
+/* Card color on primary: white on deep green (light), near-black on mint (dark) */
+.fl-segmented__option--chosen {
+  background: var(--fl-primary, #166534);
+  color: var(--fl-card, #fff);
+}
+
+.fl-segmented--small .fl-segmented__option {
+  padding: 0.45rem 0.7rem;
+}
+
+/* ---- dialog layout -------------------------------------------------------------------------- */
+
+/* Two even columns: Balance | As of, APR | Credit limit; Amount | How often */
+.debt-editor__grid.accounts__grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* A <span> heading a group, styled like the editor's <label>s */
+.accounts__label {
+  font-weight: 600;
+}
+
+/* "From" and "To" side by side under the date-range checkbox */
+.accounts__range {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
 /* A payment row: item | %/$ switch with its value | remove */
 .debt-editor__allocation.accounts__payment {
-  grid-template-columns: minmax(0, 1fr) 13rem auto;
+  grid-template-columns: minmax(0, 1fr) 15rem auto;
+}
 
-  .p-selectbutton .p-button {
-    padding: 0.5rem 0.75rem;
+.accounts__share {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+
+  .p-inputnumber {
+    flex: 1;
+    min-width: 0;
   }
 }
 
@@ -61,6 +137,11 @@
 }
 
 @media (max-width: 575.98px) {
+  .debt-editor__grid.accounts__grid,
+  .accounts__range {
+    grid-template-columns: 1fr;
+  }
+
   .debt-editor__allocation.accounts__payment {
     grid-template-columns: minmax(0, 1fr) auto;
 
