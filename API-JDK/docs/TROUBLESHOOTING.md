@@ -145,6 +145,25 @@ Forces Maven to check for updated snapshot dependencies.
 
 ---
 
-**Last Updated:** June 30, 2026  
+## Common Runtime Issues
+
+### ❌ `Schema-validation: missing table [fpfl.credit_accounts]` (or a missing column) at startup
+
+**Cause:** Hibernate runs with `ddl-auto: validate`, so it checks the entities against the database instead of creating tables. The database the API points at doesn't have the V3 tables yet — usually `DB_URL` still names `FPFL-V2`, or the scripts were never run.
+
+**Fix:**
+1. Point `DB_URL` (in `.env`, `.env.docker`, or the `api-db-secret` Kubernetes secret) at `FPFL-V3`.
+2. If that database is new, run API-NET's `db/001_debt_paydown.sql` and `db/002_credit_accounts.sql` against it (pgAdmin's Query Tool → Open File, or `psql -f`).
+3. Don't switch `HIBERNATE_DDL_AUTO` to `update`: the schema is shared with API-NET, and its scripts own it.
+
+### ❌ `400 Invalid characters in string` from `/display/ledger`
+
+**Cause:** the output sanitizer's strict rule rejected a ledger field — for example a `Card/Loan Payment` row, or an item name with `&` or `()`.
+
+**Fix:** mark the field `@LenientText` (as `ItemDto` does for `itemType`, `period` and `name`) and add a case to `ItemDtoSanitizerTest`.
+
+---
+
+**Last Updated:** November 8, 2026  
 **Status:** All issues resolved ✅
 

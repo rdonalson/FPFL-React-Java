@@ -12,7 +12,7 @@ A clean, enterprise‑grade, multi‑module Java platform built with **Java 25**
 ## Overview
 
 **Purpose**
-Provide a modular backend API that stores, manages, and projects user financial planning items (recurring payments, incomes, and scheduled events). The **module-api** module exposes REST endpoints and is the single runnable entrypoint; authentication, domain logic, projections, and persistence live in separate bounded contexts.
+Provide a modular backend API that stores, manages, and projects user financial planning items (recurring payments, incomes, and scheduled events), plus the user's credit cards and loans with their purchases and payments. The **module-api** module exposes REST endpoints and is the single runnable entrypoint; authentication, domain logic, projections, and persistence live in separate bounded contexts.
 
 **Key technologies**
 Java 25 · Spring Boot 4.0.6 · Spring Security · Spring Data JPA · springdoc‑openapi · JJWT · Lombok · Maven · PostgreSQL 16+
@@ -64,7 +64,9 @@ Reactor build order: `module-common-bc` → `module-items-bc` → `module-displa
 - Owns Spring Boot application bootstrap, datasource, JPA, and Actuator configuration
 - Centralizes error translation in `GlobalExceptionHandler`: domain exceptions, validation failures, malformed JSON, bad path values, unknown routes and wrong methods all answer 4xx in the `ApiResponse` envelope, never 500
 
-**Controllers:** `AuthController`, `UserRolesController`, `ItemController`, `ItemTypeController`, `TimePeriodController`, `InitialAmountController`, `DisplayController`, `DebtController`, `ClientLogController`
+**Controllers:** `AuthController`, `UserRolesController`, `ItemController`, `ItemTypeController`, `TimePeriodController`, `InitialAmountController`, `DisplayController`, `AccountController`, `DebtController`, `ClientLogController`
+
+Swagger groups each controller under a readable tag (for example **Credit Cards / Loans** for `AccountController`, matching API-NET), and the Swagger UI (5.34, pinned through the `org.webjars:swagger-ui` dependency and `springdoc.swagger-ui.version`) has a light/dark switch.
 
 ### **module-auth**
 
@@ -79,6 +81,7 @@ Reactor build order: `module-common-bc` → `module-items-bc` → `module-displa
 - Owns the write‑side domain model for financial items
 - Handles CRUD operations and domain invariants for `Item`, `ItemType`, and `TimePeriod`
 - Implements repositories through a ports‑and‑adapters split: domain `*Repository` interfaces, `*RepositoryImpl` adapters, and Spring Data `Jpa*Repository` interfaces (plus `JpaItemRepositoryCustom` for hand‑written queries)
+- Cards & Loans: `CreditAccount` (kind `CreditCard` / `Loan`), `AccountPurchase` and `AccountPayment` entities, `CreditAccountService` and the pure `CreditAccountRules` / `PurchaseRules` (only your own items pay an account; a credit sends a fixed amount or a percentage, at most 100% across all accounts; a debit pays its whole amount; purchases are one time, daily or weekly)
 - Debt Paydown: `Debt` / `DebtAllocation` entities, `DebtService` and `DebtRules` (only your own debits and credits; a credit can be at most 100% allocated across all of your debts)
 
 ### **module-display-bc**
@@ -87,6 +90,7 @@ Reactor build order: `module-common-bc` → `module-items-bc` → `module-displa
 - Expands each item's recurrence metadata into concrete dated occurrences — one expander per pattern (one‑time, daily, weekly, bi‑weekly, monthly, bi‑monthly, quarterly, semi‑annual, annual, nth‑weekday). `Weekdays` accepts Sunday as 0 (what the UI saves) or 7 and skips out‑of‑range values instead of failing the whole forecast
 - `LedgerReadoutService` composes occurrences with the user's initial amount into a running‑balance ledger
 - `PaydownCalculator` (pure, unit‑tested) projects each tracked debt day by day — the debit's own payment, the allocated share of each credit, monthly interest (APR ÷ 12 at month end) — up to 30 years out for the payoff date. Allocations appear on the main ledger as extra `Debt Paydown` debits
+- `AccountLedgerCalculator` (pure, unit‑tested) does the same for each credit card or loan — purchases raise the balance, payments lower it, monthly interest — and finds the payoff date (up to 30 years out). Payments appear on the main ledger as `Card/Loan Payment` debits (period e.g. `50% of Paycheck`); `ItemDto` marks those text fields `@LenientText` so names with `/`, `&` or `()` pass the sanitizer
 - Depends on `module-items-bc` for the item model; keeps read concerns separate from write models
 
 ### **module-common-bc**
@@ -128,7 +132,7 @@ module-api  ──► module-auth ──► module-common-bc
 The API module connects to a PostgreSQL database that stores financial planning items, their types, their recurrence periods, and the authentication tables backing `module-auth`.
 Below is a summary of the schema represented in the ER diagram.
 
-Schema management runs through Hibernate (`ddl-auto: update`) against the configured default schema.
+The live database is **FPFL-V3**, shared with API-NET. Its tables are created by API-NET's SQL scripts (`db/001_debt_paydown.sql`, `db/002_credit_accounts.sql` in [FPFL-Angular-NET-V3](https://github.com/rdonalson/FPFL-Angular-NET-V3)). Hibernate only **validates** the entity mapping against them at startup (`ddl-auto: validate`, from `HIBERNATE_DDL_AUTO`; Docker Compose and the Kubernetes deployment set it explicitly), so the API never changes a schema another application owns. A mismatch stops the API at startup with the table and column named.
 
 ---
 
@@ -269,7 +273,42 @@ Tracks refresh tokens for session management and revocation.
 - `debt_allocations.fk_debt` → `debts.id` (`ON DELETE CASCADE`)
 - `debt_allocations.fk_credit_item` → `items.id` (the credit; `ON DELETE CASCADE`)
 
+### credit_accounts (1) ────< (many) account_purchases
+
+- `account_purchases.fk_account` → `credit_accounts.id` (`ON DELETE CASCADE`)
+- `account_purchases.fk_time_period` → `time_periods.id` (1 One Time, 2 Daily or 3 Weekly only)
+
+### credit_accounts (1) ────< (many) account_payments >──── (1) items
+
+- `account_payments.fk_account` → `credit_accounts.id` (`ON DELETE CASCADE`)
+- `account_payments.fk_credit_item` → `items.id` (the credit or debit paying it; `ON DELETE CASCADE`)
+
 ---
+
+## 💳 Cards & Loans
+
+Each credit card or loan is its own account, with purchases on it and payments from the user's own credits and debits.
+
+| Table | Columns |
+| ----- | ------- |
+| **credit_accounts** | `id`, `user_id` (owner), `name` (unique per user), `kind` (`CreditCard` / `Loan`), `opening_balance` numeric(14,2), `balance_date`, `apr` numeric(6,3), `credit_limit` numeric(14,2) (cards only, optional), `created_at` |
+| **account_purchases** | `id`, `fk_account`, `name`, `amount` numeric(14,2), `fk_time_period` (1–3), `begin_date`, `end_date`, `weekly_dow` (0–6), `date_range_req`, `created_at` |
+| **account_payments** | `id`, `fk_account`, `fk_credit_item` (any of the user's items), `amount` **or** `percent` (exactly one for a credit; a debit pays its whole amount); unique (`fk_account`, `fk_credit_item`) |
+
+| Method | Path | Notes |
+| ------ | ---- | ----- |
+| `GET` | `/accounts` | The caller's cards and loans, each with its purchases and payments |
+| `GET` | `/accounts/{id}` | One account (someone else's answers 404 unless admin) |
+| `POST` | `/accounts` | `{ name, kind?: "creditCard" \| "loan", openingBalance, balanceDate?, apr?, creditLimit?, payments: [{ itemId, amount?, percent? }] }` |
+| `PUT` | `/accounts/{id}` | Same body; replaces the payments |
+| `DELETE` | `/accounts/{id}` | Deletes the account with its purchases and payments |
+| `GET` | `/accounts/{id}/purchases` | The account's purchases |
+| `POST` | `/accounts/{id}/purchases` | `{ name, amount, fkPeriod: 1\|2\|3, beginDate?, endDate?, weeklyDow?, dateRangeReq? }` |
+| `PUT` | `/accounts/{id}/purchases/{purchaseId}` | Same body |
+| `DELETE` | `/accounts/{id}/purchases/{purchaseId}` | Removes one purchase |
+| `POST` | `/display/accounts` | Same body as `/display/ledger`: per‑account daily balances, events (purchase, payment, interest), totals, credit used, payoff date |
+
+All require a JWT and the owner always comes from the token. `/display/ledger` includes the payments as `Card/Loan Payment` debits.
 
 ## 💳 Debt Paydown
 
@@ -280,7 +319,7 @@ Track paying down a debit (e.g. a credit card payment) by sending a percentage o
 | **debts** | `id`, `user_id` (owner), `fk_item` (the debit), `balance` numeric(14,2), `apr` numeric(6,3), `balance_date`, `created_at` |
 | **debt_allocations** | `id`, `fk_debt`, `fk_credit_item`, `percent` numeric(5,2); unique (`fk_debt`, `fk_credit_item`) |
 
-Hibernate (`ddl-auto: update`) creates both tables; they match API-NET's `db/001_debt_paydown.sql`, so the two APIs share them.
+Both tables come from API-NET's `db/001_debt_paydown.sql`, so the two APIs share them. Cards & Loans covers the same ground (and adds purchases); Debt Paydown stays for existing users.
 
 | Method | Path | Notes |
 | ------ | ---- | ----- |
@@ -295,9 +334,9 @@ All require a JWT; the owner always comes from the token, and only an admin may 
 
 ---
 
-![Entity Relationship Diagram](docs/FPFL-JDK-API-ER.png)
+![Entity Relationship Diagram (FPFL-V3)](docs/FPFL-ER-V3.png)
 
-The API module exposes endpoints that operate on these tables through the domain logic in the `module-items-bc` and `module-auth` bounded contexts.
+The API module exposes endpoints that operate on these tables through the domain logic in the `module-items-bc`, `module-display-bc` and `module-auth` bounded contexts.
 
 ---
 
@@ -316,7 +355,7 @@ The API module exposes endpoints that operate on these tables through the domain
 Runtime configuration lives in [`module-api/src/main/resources/application.yaml`](module-api/src/main/resources/application.yaml), which reads its datasource values from environment variables. **spring-dotenv** loads them from a `.env` file at the `API-JDK` root, so local setup is a matter of creating one:
 
 ```dotenv
-DB_URL=jdbc:postgresql://localhost:5432/FPFL-V2
+DB_URL=jdbc:postgresql://localhost:5432/FPFL-V3
 DB_USERNAME=postgres
 DB_PASSWORD=your-password
 ```
@@ -341,7 +380,8 @@ A missing or too-short secret stops the API at startup rather than signing weak 
 
 | Setting | Value |
 | ------- | ----- |
-| `spring.jpa.hibernate.ddl-auto` | `update` |
+| `spring.jpa.hibernate.ddl-auto` | `${HIBERNATE_DDL_AUTO:validate}` — never `update` against the shared database |
+| `springdoc.swagger-ui.version` | `5.34.0` (matches the pinned webjar) |
 | Hibernate dialect | `PostgreSQLDialect` |
 | Actuator endpoints exposed | `health`, `info` (with full details and components) |
 | `security.jwt.access-token-expiration-ms` | `900000` (15 minutes) |
@@ -432,15 +472,15 @@ mvn test -pl module-display-bc -am          # one module (plus what it depends o
 mvn test -Dtest=PaydownCalculatorTest -Dsurefire.failIfNoSpecifiedTests=false
 ```
 
-Current suites (JUnit 5 + Mockito, no database; the web tests use MockMvc and the security test boots only `SecurityConfig` — the whole run takes a few seconds). About 250 tests:
+Current suites (JUnit 6 + Mockito, no database; the web tests use MockMvc and the security test boots only `SecurityConfig` — the whole run takes a few seconds). About 260 tests:
 
 | Module | What's covered |
 | ------ | -------------- |
 | module-common-bc | `SanitizerImpl` (strict / lenient / URI rules through POJOs, records, collections, maps, arrays, cycles), `BooleanToBitConverter`, `ErrorLogger`, the domain exceptions |
 | module-auth | `AuthServiceImpl` (register, login, change password with BCrypt), `UserServiceImpl`, `RoleServiceImpl`, `UserRolesServiceImpl`, `RefreshTokenServiceImpl` (expiry, uniqueness), the repository adapters and the batched role replacement, `PasswordEncoderConfig`, `TokenProperties` |
-| module-items-bc | `ItemServiceImpl`, `ItemTypeServiceImpl`, `TimePeriodServiceImpl`, the repository adapters' error translation (409 / 404 / 500), `ItemEntityMapper`, the criteria queries; Debt Paydown's `DebtRules` and `DebtServiceImpl` |
-| module-display-bc | Every recurrence pattern (`RecurrenceExpandersTest`, month-end and leap-day clamping, time frames, Sunday as 0 or 7), `RecurrenceRange`, the ledger build (initial amount, credits, debits, running total), every-two-weeks anchoring; Debt Paydown's `PaydownCalculator` and ledger deductions |
-| module-api | Every controller over HTTP (status codes, JSON, `Location` headers, validation errors), `GlobalExceptionHandler`, `ApiResponseFactory`, request-record and Bean Validation rules, the mappers, `JwtServiceImpl`, `JwtAuthFilter`, `SecurityConfig` (public vs. protected vs. admin-only paths, CORS), each user limited to their own items, initial amount, forecast and password, `ItemDraftTranslator` |
+| module-items-bc | `ItemServiceImpl`, `ItemTypeServiceImpl`, `TimePeriodServiceImpl`, the repository adapters' error translation (409 / 404 / 500), `ItemEntityMapper`, the criteria queries; Cards & Loans' `CreditAccountRules` / `PurchaseRules`; Debt Paydown's `DebtRules` and `DebtServiceImpl` |
+| module-display-bc | Every recurrence pattern (`RecurrenceExpandersTest`, month-end and leap-day clamping, time frames, Sunday as 0 or 7), `RecurrenceRange`, the ledger build (initial amount, credits, debits, running total), every-two-weeks anchoring; Cards & Loans' `AccountLedgerCalculator` (purchases, payments, interest, payoff); Debt Paydown's `PaydownCalculator` and ledger deductions; `ItemDtoSanitizerTest` (ledger names like "Card/Loan Payment" survive the sanitizer) |
+| module-api | Every controller over HTTP (status codes, JSON, `Location` headers, validation errors), `GlobalExceptionHandler`, `ApiResponseFactory`, request-record and Bean Validation rules, the mappers, `JwtServiceImpl`, `JwtAuthFilter`, `SecurityConfig` (public vs. protected vs. admin-only paths, CORS), each user limited to their own items, initial amount, forecast and password, `DisplayController`'s paydown and accounts endpoints, `ItemDraftTranslator` |
 
 The Docker build packages with `-DskipTests`, so run `mvn test` before pushing.
 
@@ -467,7 +507,7 @@ Each module produces a JAR under its own `target/`:
 | `/auth/login`, `/auth/register`, `/auth/refresh`, `/actuator/health`, `/client-logs`, Swagger | Public |
 | `GET /item-types/**`, `GET /time-periods/**` | Public |
 | Changing `/item-types/**`, `/time-periods/**`; all of `/users/**` (roles) | `ROLE_ADMIN` |
-| `/auth/change-password`, `/items/**`, `/initial-amount/**`, `/display/**`, `/debts/**` | Signed in |
+| `/auth/change-password`, `/items/**`, `/initial-amount/**`, `/display/**`, `/accounts/**`, `/debts/**` | Signed in |
 
 Signed-in users only reach their own data; `CallerAccess` makes the check in each controller and admins may act on anyone's. Another user's item answers 404 (so ids can't be probed), another user's initial amount, forecast or password answers 403, and `GET /items` (every user's items) is admin-only.
 

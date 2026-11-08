@@ -1,6 +1,6 @@
 # **FPFL‑React‑Java — Financial Planner / Forecasted Ledger**
 
-A full‑stack financial planning system built with a **React 19 / TypeScript UI**, a **Java 25 / Spring Boot 4 API**, and a **PostgreSQL** database — containerized with Docker, deployed to **Azure Kubernetes Service** through **GitHub Actions**.
+A full‑stack financial planning system — forecast a bank balance day by day, with credit cards and loans tracked alongside — built with a **React 19 / TypeScript UI**, a **Java 25 / Spring Boot 4 API**, and a **PostgreSQL** database — containerized with Docker, deployed to **Azure Kubernetes Service** through **GitHub Actions**.
 
 The project is organized into two top‑level applications plus shared infrastructure:
 
@@ -62,7 +62,8 @@ The FPFL system is designed as a **modular, maintainable, enterprise‑grade ful
 - JWT session handling with refresh‑token rotation, expiry warning dialog, and role‑aware routing
 - Organized by feature with a command/query split:
   - `features/catalog-command` — items, initial amount, and admin maintenance (item types, time periods)
-  - `features/catalog-query` — forecasted ledger, date range selection, charting, Debt Paydown chart and ledger tabs, Excel export
+  - `features/catalog-query` — forecasted ledger, date range selection, charting, Cards & Loans and Debt Paydown chart and ledger tabs, Excel export
+  - `features/accounts` — Cards & Loans: credit cards and loans with their own purchases, paid down by your credits and debits
   - `features/debt-paydown` — track a debt and send a percentage of income items to it
   - `app/` — layout (Sakai‑style sidebar/top menu), routing and guards, auth, providers, state
 
@@ -74,8 +75,8 @@ The FPFL system is designed as a **modular, maintainable, enterprise‑grade ful
 | Module | Role |
 | ------ | ---- |
 | `module-api` | REST controllers, DTOs, mappers, security filters, OpenAPI, global exception handling |
-| `module-items-bc` | Write‑side domain logic & persistence for items, item types, time periods, debts and allocations |
-| `module-display-bc` | Read‑side projections — recurrence expansion into the forecasted ledger, debt payoff projections |
+| `module-items-bc` | Write‑side domain logic & persistence for items, item types, time periods, credit cards / loans and their purchases and payments, debts and allocations |
+| `module-display-bc` | Read‑side projections — recurrence expansion into the forecasted ledger, card / loan balance ledgers, debt payoff projections |
 | `module-auth` | Users, roles, authentication, refresh tokens |
 | `module-common-bc` | Shared converters, exceptions, sanitization, error logging |
 
@@ -99,11 +100,11 @@ For full backend details, see the API README:
 | Who | Can reach |
 | --- | --------- |
 | Anyone | Sign in / register / refresh, health, reading item types and time periods |
-| Signed‑in user | **Only their own** items, initial amount, forecast, debts and password |
+| Signed‑in user | **Only their own** items, initial amount, forecast, cards and loans, debts and password |
 | `ROLE_ADMIN` | Everything above for any user, plus item type / time period maintenance, role management and the `/status` page |
 
 - **Data ownership** is checked in every controller through `CallerAccess`; another user's record answers 404, so ids can't be probed
-- **Input and output hygiene** — Bean Validation and record invariants on every request; `SanitizerImpl` cleans text on the way out
+- **Input and output hygiene** — Bean Validation and record invariants on every request; `SanitizerImpl` cleans text on the way out (strict by default; fields such as ledger item names that legitimately hold `/`, `&` or `()` — "Card/Loan Payment", "AT&T Visa (personal)" — are marked `@LenientText`)
 - **Consistent errors** — `GlobalExceptionHandler` maps every failure to the right status (400 / 401 / 403 / 404 / 405 / 409) in one `ApiResponse` envelope with a correlation id, and logs it; malformed requests and bad tokens never surface as 500s
 - CORS limited to the UI's own origins
 
@@ -118,6 +119,10 @@ The backend uses a PostgreSQL schema (`fpfl`) centered around **items**, their *
 - `Item` — user‑defined financial items with amount, date bounds, and recurrence metadata
 - `ItemType` — categories/types of items (credit / debit classification)
 - `TimePeriod` — recurrence periods (daily, weekly, bi‑weekly, monthly, quarterly, annual, etc.)
+- `CreditAccount` — a credit card or loan (`AccountKind`): opening balance as of a date, APR, optional credit limit
+- `AccountPurchase` — a purchase on a card (one time, daily or weekly, optionally within a date range)
+- `AccountPayment` — one of the user's items paying an account: a credit's fixed amount or percentage, or a debit's whole amount
+- `Debt` / `DebtAllocation` — Debt Paydown: a tracked debit and the shares of credits sent to it
 
 ### **Auth Entities**
 
@@ -125,7 +130,7 @@ The backend uses a PostgreSQL schema (`fpfl`) centered around **items**, their *
 - `Role` / `UserRoles` — role assignments (composite key via `UserRolesId`)
 - `RefreshToken` — persisted refresh tokens for session renewal
 
-Schema management runs through Hibernate (`ddl-auto=update`) with the default schema set to `fpfl`.
+The live database is **FPFL-V3** (shared with the Angular/.NET version). Its tables are created by SQL scripts kept with the .NET API (`db/001_debt_paydown.sql`, `db/002_credit_accounts.sql` in [FPFL-Angular-NET-V3](https://github.com/rdonalson/FPFL-Angular-NET-V3)); Hibernate only **validates** the mapping on startup (`ddl-auto: validate`, overridable with `HIBERNATE_DDL_AUTO`), so the API never alters a schema it shares. The default schema is `fpfl`.
 
 A full database breakdown is included in the API README.
 
@@ -148,7 +153,11 @@ The `module-display-bc` context turns stored items into a date‑ranged, running
 | `AnnualRecurrenceExpander` | Yearly |
 | `NthWeekdayRecurrenceExpander` | "Nth weekday of the month" patterns |
 
-`LedgerReadoutService` composes the expanded occurrences with the user's initial amount and returns the ledger the UI renders as both a table and a chart, and can export to a formatted Excel workbook (Ledger and Debt Paydown sheets).
+`LedgerReadoutService` composes the expanded occurrences with the user's initial amount and returns the ledger the UI renders as both a table and a chart, and can export to a formatted Excel workbook (Ledger, Cards & Loans and Debt Paydown sheets).
+
+### **💳 Cards & Loans**
+
+Each credit card or loan is its own account: an opening balance as of a date, an APR, and (for a card) an optional credit limit. Purchases on the card — one time, daily or weekly — raise the balance; the user's own items pay it down, a credit by a fixed amount or a percentage of each occurrence and a debit (such as the card's monthly payment) by its whole amount. `CreditAccountRules` and `PurchaseRules` keep the inputs valid and each credit at or under 100% across all accounts. `AccountLedgerCalculator` projects every account day by day — purchases, payments, monthly interest — to a payoff date (up to 30 years out), and the main forecast shows the payments as `Card/Loan Payment` debits. The UI adds **Cards & Loans Chart** and **Cards & Loans Ledger** tabs to the Display page and a **Cards & Loans** sheet to the Excel export.
 
 ### **💳 Debt Paydown**
 
@@ -160,11 +169,11 @@ A user picks a debit (say, a credit card payment), enters what's owed (as of a d
 
 | App | Tests | Stack | Run |
 | --- | ----- | ----- | --- |
-| UI-TSX | ≈360 | Vitest, Testing Library, jsdom | `cd UI-TSX && npm test` |
-| API-JDK | ≈250 | JUnit 6, Mockito, MockMvc | `cd API-JDK && mvn clean test` |
+| UI-TSX | ≈385 | Vitest, Testing Library, jsdom | `cd UI-TSX && npm test` |
+| API-JDK | ≈260 | JUnit 6, Mockito, MockMvc | `cd API-JDK && mvn clean test` |
 
-- **UI** — the API layer, session and auth, layout and routing guards, admin tables, every credit/debit period form and page, the Display page, Excel export and Debt Paydown. Tests mock the API modules (never the network) through shared helpers in `src/test/`.
-- **API** — every module: the sanitizer and exceptions; auth services and refresh tokens; item and debt services, rules and repository adapters; every recurrence pattern (month‑end and leap‑day clamping), the ledger build and payoff math; and every controller over HTTP, including the security rules (public vs. signed‑in vs. admin, and that no one can reach another user's data).
+- **UI** — the API layer, session and auth, layout and routing guards, admin tables, every credit/debit period form and page, the Display page, Excel export, Cards & Loans and Debt Paydown. Tests mock the API modules (never the network) through shared helpers in `src/test/`.
+- **API** — every module: the sanitizer and exceptions; auth services and refresh tokens; item, card / loan and debt services, rules and repository adapters; every recurrence pattern (month‑end and leap‑day clamping), the ledger build, card / loan balances and payoff math, and the sanitizer over ledger output; and every controller over HTTP, including the security rules (public vs. signed‑in vs. admin, and that no one can reach another user's data).
 - Neither suite needs a database, and each runs in seconds. The Docker builds skip tests, so run both before pushing.
 
 ---
@@ -182,6 +191,8 @@ A guided tour of the codebase. All links are relative to the repository root. Th
 | [LedgerReadoutServiceImpl](API-JDK/module-display-bc/src/main/java/com/financialplanner/moduledisplaybc/service/LedgerReadoutServiceImpl.java) | The forecast engine: expands every item's recurrence into dated occurrences and folds them into a running-balance ledger |
 | [NthWeekdayRecurrenceExpander](API-JDK/module-display-bc/src/main/java/com/financialplanner/moduledisplaybc/recurrence/NthWeekdayRecurrenceExpander.java) · [BiWeeklyRecurrenceExpander](API-JDK/module-display-bc/src/main/java/com/financialplanner/moduledisplaybc/recurrence/BiWeeklyRecurrenceExpander.java) | Calendar edge cases: "3rd Friday", "last Monday", every-other-week anchoring, one strategy class per pattern |
 | [PaydownCalculator](API-JDK/module-display-bc/src/main/java/com/financialplanner/moduledisplaybc/paydown/PaydownCalculator.java) | Pure, side-effect-free payoff projection, day by day: the debt's own payment, its share of each paycheck or other credit, monthly APR interest, and the payoff date (up to 30 years out) |
+| [AccountLedgerCalculator](API-JDK/module-display-bc/src/main/java/com/financialplanner/moduledisplaybc/accounts/AccountLedgerCalculator.java) | Cards & Loans: each card or loan day by day — purchases, payments from your credits and debits, monthly interest — to a payoff date |
+| [CreditAccountRules](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/domain/account/CreditAccountRules.java) · [PurchaseRules](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/domain/account/PurchaseRules.java) | Validation as pure functions: only your own items pay an account, a credit's share stays at or under 100% across all accounts, purchase schedules are complete |
 | [DebtRules](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/domain/debt/DebtRules.java) · [DebtServiceImpl](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/application/service/DebtServiceImpl.java) | Domain invariants kept out of controllers: only your own items, and no credit allocated past 100% |
 | [ItemRepositoryImpl](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/adapter/ItemRepositoryImpl.java) | Ports-and-adapters persistence: domain interface, Spring Data underneath, database errors translated into domain exceptions |
 | [SanitizerImpl](API-JDK/module-common-bc/src/main/java/com/financialplanner/modulecommonbc/sanitizer/SanitizerImpl.java) | Reflection-based output sanitizing driven by `@StrictText` / `@LenientText` / `@NoSanitize` annotations, safe for records, collections and cycles |
@@ -195,12 +206,13 @@ A guided tour of the codebase. All links are relative to the repository root. Th
 | [CallerAccess](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/security/CallerAccess.java) · [ItemController](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/controllers/ItemController.java) | Per-user data ownership: users only reach their own data, and another user's record answers 404 so ids can't be probed |
 | [JwtServiceImpl](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/security/JwtServiceImpl.java) · [JwtAuthFilter](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/security/JwtAuthFilter.java) | Signing key and lifetime from configuration (Kubernetes secret in production); fails fast on a weak key; forged or expired tokens are rejected cleanly |
 
-### Back end — tests (≈250, JUnit 6 + Mockito)
+### Back end — tests (≈260, JUnit 6 + Mockito)
 
 | File | What it shows |
 | ---- | ------------- |
 | [SecurityConfigTest](API-JDK/module-api/src/test/java/com/financialplanner/moduleapi/security/SecurityConfigTest.java) | Boots the real filter chain and proves who gets in where, including forged tokens and admin-only paths |
 | [ItemAndInitialAmountControllersTest](API-JDK/module-api/src/test/java/com/financialplanner/moduleapi/controllers/ItemAndInitialAmountControllersTest.java) · [ApiTestSupport](API-JDK/module-api/src/test/java/com/financialplanner/moduleapi/support/ApiTestSupport.java) | Controllers tested over HTTP (MockMvc) with the real error handler: status codes, validation messages, "can't touch someone else's data" |
+| [AccountLedgerCalculatorTest](API-JDK/module-display-bc/src/test/java/com/financialplanner/moduledisplaybc/accounts/AccountLedgerCalculatorTest.java) · [ItemDtoSanitizerTest](API-JDK/module-display-bc/src/test/java/com/financialplanner/moduledisplaybc/model/ItemDtoSanitizerTest.java) | Card / loan balances and payoff, and that ledger names such as "Card/Loan Payment" survive the sanitizer |
 | [PaydownCalculatorTest](API-JDK/module-display-bc/src/test/java/com/financialplanner/moduledisplaybc/paydown/PaydownCalculatorTest.java) · [RecurrenceExpandersTest](API-JDK/module-display-bc/src/test/java/com/financialplanner/moduledisplaybc/recurrence/RecurrenceExpandersTest.java) | Financial math and calendar rules pinned down: interest, payoff dates, month-end and leap-day clamping |
 
 ### Front end — React 19 / TypeScript
@@ -211,8 +223,9 @@ A guided tour of the codebase. All links are relative to the repository root. Th
 | [useTokenWatcher](UI-TSX/src/app/auth/hooks/useTokenWatcher.ts) · [SessionExpireDialog](UI-TSX/src/app/auth/components/SessionExpireDialog.tsx) | Reads the token's expiry and offers to extend the session before it lapses |
 | [AdminRouteGuard](UI-TSX/src/app/router/AdminRouteGuard.tsx) · [filterMenu](UI-TSX/src/app/layout/model/filterMenu.ts) | Role-aware routing and menus (the API enforces the same rules) |
 | [DebtPaydownPage](UI-TSX/src/features/debt-paydown/components/DebtPaydownPage.tsx) · [paydown.ts](UI-TSX/src/features/catalog-query/paydown/paydown.ts) · [PaydownChartPanel](UI-TSX/src/features/catalog-query/paydown/PaydownChartPanel.tsx) | A full feature end to end: form with validation, server state with TanStack Query, payoff chart |
-| [ledgerExport.ts](UI-TSX/src/features/catalog-query/export/ledgerExport.ts) | Export to Excel: a styled workbook built in the browser (summary, frozen headers, accounting formats, collapsible day groups, a Debt Paydown sheet), with the 1 MB library loaded only on demand |
-| [render.tsx](UI-TSX/src/test/render.tsx) · [DebtPaydownPage.test.tsx](UI-TSX/src/features/debt-paydown/components/DebtPaydownPage.test.tsx) | Test harness (router + React Query) and a component test that drives the page like a user (≈360 tests, Vitest + Testing Library) |
+| [AccountsPage](UI-TSX/src/features/accounts/components/AccountsPage.tsx) · [AccountDetailPage](UI-TSX/src/features/accounts/components/AccountDetailPage.tsx) · [Account.ts](UI-TSX/src/features/accounts/types/Account.ts) | Cards & Loans: dialogs with client-side rules that mirror the API's, purchases per card |
+| [ledgerExport.ts](UI-TSX/src/features/catalog-query/export/ledgerExport.ts) | Export to Excel: a styled workbook built in the browser (summary, frozen headers, accounting formats, collapsible day groups, Cards & Loans and Debt Paydown sheets), with the 1 MB library loaded only on demand |
+| [render.tsx](UI-TSX/src/test/render.tsx) · [DebtPaydownPage.test.tsx](UI-TSX/src/features/debt-paydown/components/DebtPaydownPage.test.tsx) | Test harness (router + React Query) and a component test that drives the page like a user (≈385 tests, Vitest + Testing Library) |
 
 ### DevOps
 
@@ -251,14 +264,19 @@ A guided tour of the codebase. All links are relative to the repository root. Th
 ### API Layer
 
 - [client.ts](UI-TSX/src/api/client.ts) — Axios instance; interceptors add the token and normalize errors
-- [generated clients](UI-TSX/src/api/generated) — [AuthClient](UI-TSX/src/api/generated/AuthClient.ts) · [ItemClient](UI-TSX/src/api/generated/ItemClient.ts) · [DisplayClient](UI-TSX/src/api/generated/DisplayClient.ts) · [DebtClient](UI-TSX/src/api/generated/DebtClient.ts)
+- [generated clients](UI-TSX/src/api/generated) — [AuthClient](UI-TSX/src/api/generated/AuthClient.ts) · [ItemClient](UI-TSX/src/api/generated/ItemClient.ts) · [DisplayClient](UI-TSX/src/api/generated/DisplayClient.ts) · [AccountClient](UI-TSX/src/api/generated/AccountClient.ts) · [DebtClient](UI-TSX/src/api/generated/DebtClient.ts)
 - [appConfig](UI-TSX/src/config/appConfig.ts) · [healthApi](UI-TSX/src/api/status/healthApi.ts)
 
 ### Feature — Forecasted Ledger (query side)
 
 - [DisplayPage](UI-TSX/src/features/catalog-query/display/DisplayPage.tsx) · [LedgerPanel](UI-TSX/src/features/catalog-query/ledger/LedgerPanel.tsx) · [ChartPanel](UI-TSX/src/features/catalog-query/chart/ChartPanel.tsx) · [DateRangePanel](UI-TSX/src/features/catalog-query/range/DateRangePanel.tsx)
 - **Excel export** — [ledgerExport.ts](UI-TSX/src/features/catalog-query/export/ledgerExport.ts) · [ledgerExport.test.ts](UI-TSX/src/features/catalog-query/export/ledgerExport.test.ts)
+- **Cards & Loans tabs** — [AccountsChartPanel](UI-TSX/src/features/catalog-query/accounts/AccountsChartPanel.tsx) · [AccountsLedgerPanel](UI-TSX/src/features/catalog-query/accounts/AccountsLedgerPanel.tsx) · [accountLedger.ts](UI-TSX/src/features/catalog-query/accounts/accountLedger.ts)
 - **Paydown tabs** — [PaydownChartPanel](UI-TSX/src/features/catalog-query/paydown/PaydownChartPanel.tsx) · [PaydownLedgerPanel](UI-TSX/src/features/catalog-query/paydown/PaydownLedgerPanel.tsx) · [paydown.ts](UI-TSX/src/features/catalog-query/paydown/paydown.ts)
+
+### Feature — Cards & Loans
+
+- [AccountsPage](UI-TSX/src/features/accounts/components/AccountsPage.tsx) · [AccountDetailPage](UI-TSX/src/features/accounts/components/AccountDetailPage.tsx) (purchases) · [Segmented](UI-TSX/src/features/accounts/components/Segmented.tsx) · [accountApi](UI-TSX/src/features/accounts/api/accountApi.ts) · [Account types and rules](UI-TSX/src/features/accounts/types/Account.ts)
 
 ### Feature — Debt Paydown
 
@@ -280,7 +298,7 @@ A guided tour of the codebase. All links are relative to the repository root. Th
 - **Harness** — [setup.ts](UI-TSX/src/test/setup.ts) · [render.tsx](UI-TSX/src/test/render.tsx) · [session.ts](UI-TSX/src/test/session.ts)
 - **API & session** — [client.test.ts](UI-TSX/src/api/client.test.ts) · [sessionStore.test.ts](UI-TSX/src/app/state/sessionStore.test.ts) · [hooks.test.tsx](UI-TSX/src/app/auth/hooks/hooks.test.tsx)
 - **Routing** — [guards.test.tsx](UI-TSX/src/app/router/guards.test.tsx) · [menu.test.ts](UI-TSX/src/app/layout/model/menu.test.ts)
-- **Features** — [occurrenceForms.test.tsx](UI-TSX/src/features/catalog-command/transactions/components/items/occurrence/occurrenceForms.test.tsx) · [display.test.tsx](UI-TSX/src/features/catalog-query/display.test.tsx) · [DebtPaydownPage.test.tsx](UI-TSX/src/features/debt-paydown/components/DebtPaydownPage.test.tsx) · [paydown.test.ts](UI-TSX/src/features/catalog-query/paydown/paydown.test.ts)
+- **Features** — [occurrenceForms.test.tsx](UI-TSX/src/features/catalog-command/transactions/components/items/occurrence/occurrenceForms.test.tsx) · [display.test.tsx](UI-TSX/src/features/catalog-query/display.test.tsx) · [AccountsPage.test.tsx](UI-TSX/src/features/accounts/components/AccountsPage.test.tsx) · [AccountDetailPage.test.tsx](UI-TSX/src/features/accounts/components/AccountDetailPage.test.tsx) · [accountLedger.test.ts](UI-TSX/src/features/catalog-query/accounts/accountLedger.test.ts) · [DebtPaydownPage.test.tsx](UI-TSX/src/features/debt-paydown/components/DebtPaydownPage.test.tsx) · [paydown.test.ts](UI-TSX/src/features/catalog-query/paydown/paydown.test.ts)
 
 ---
 
@@ -292,28 +310,29 @@ A guided tour of the codebase. All links are relative to the repository root. Th
 ### module-api
 
 - [ModuleApiApplication](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/ModuleApiApplication.java)
-- **Controllers** — [AuthController](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/controllers/AuthController.java) · [ItemController](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/controllers/ItemController.java) · [InitialAmountController](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/controllers/InitialAmountController.java) · [DisplayController](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/controllers/DisplayController.java) · [DebtController](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/controllers/DebtController.java) · [ItemTypeController](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/controllers/ItemTypeController.java) · [TimePeriodController](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/controllers/TimePeriodController.java) · [UserRolesController](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/controllers/UserRolesController.java) · [ClientLogController](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/controllers/ClientLogController.java)
+- **Controllers** — [AuthController](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/controllers/AuthController.java) · [ItemController](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/controllers/ItemController.java) · [InitialAmountController](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/controllers/InitialAmountController.java) · [DisplayController](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/controllers/DisplayController.java) · [AccountController](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/controllers/AccountController.java) · [DebtController](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/controllers/DebtController.java) · [ItemTypeController](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/controllers/ItemTypeController.java) · [TimePeriodController](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/controllers/TimePeriodController.java) · [UserRolesController](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/controllers/UserRolesController.java) · [ClientLogController](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/controllers/ClientLogController.java)
 - **Security** — [SecurityConfig](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/security/SecurityConfig.java) · [JwtAuthFilter](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/security/JwtAuthFilter.java) · [JwtServiceImpl](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/security/JwtServiceImpl.java) · [CallerAccess](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/security/CallerAccess.java) · [CustomUserDetails](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/security/CustomUserDetails.java)
-- **DTOs with validation** — [ItemRequest](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/dtos/item/ItemRequest.java) · [DebtRequest](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/dtos/debt/DebtRequest.java) · [RegisterRequest](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/dtos/auth/RegisterRequest.java) · [ChangePasswordRequest](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/dtos/auth/ChangePasswordRequest.java) · [all DTOs](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/dtos)
-- **Mappers** — [ItemMapper](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/mappers/ItemMapper.java) · [DebtMapper](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/mappers/DebtMapper.java) · [ItemDraftTranslator](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/mappers/ItemDraftTranslator.java)
+- **DTOs with validation** — [ItemRequest](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/dtos/item/ItemRequest.java) · [AccountRequest](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/dtos/account/AccountRequest.java) · [PurchaseRequest](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/dtos/account/PurchaseRequest.java) · [DebtRequest](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/dtos/debt/DebtRequest.java) · [RegisterRequest](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/dtos/auth/RegisterRequest.java) · [ChangePasswordRequest](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/dtos/auth/ChangePasswordRequest.java) · [all DTOs](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/dtos)
+- **Mappers** — [ItemMapper](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/mappers/ItemMapper.java) · [AccountMapper](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/mappers/AccountMapper.java) · [DebtMapper](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/mappers/DebtMapper.java) · [ItemDraftTranslator](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/mappers/ItemDraftTranslator.java)
 - **Responses, config & errors** — [ApiResponse](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/response/ApiResponse.java) · [ApiResponseFactory](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/response/ApiResponseFactory.java) · [GlobalExceptionHandler](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/exception/GlobalExceptionHandler.java) · [OpenApiConfig](API-JDK/module-api/src/main/java/com/financialplanner/moduleapi/config/OpenApiConfig.java) · [application.yaml](API-JDK/module-api/src/main/resources/application.yaml)
 - **Tests** — [SecurityConfigTest](API-JDK/module-api/src/test/java/com/financialplanner/moduleapi/security/SecurityConfigTest.java) · [JwtServiceImplTest](API-JDK/module-api/src/test/java/com/financialplanner/moduleapi/security/JwtServiceImplTest.java) · [JwtAuthFilterTest](API-JDK/module-api/src/test/java/com/financialplanner/moduleapi/security/JwtAuthFilterTest.java) · [ItemAndInitialAmountControllersTest](API-JDK/module-api/src/test/java/com/financialplanner/moduleapi/controllers/ItemAndInitialAmountControllersTest.java) · [AuthControllerTest](API-JDK/module-api/src/test/java/com/financialplanner/moduleapi/controllers/AuthControllerTest.java) · [GlobalExceptionHandlerTest](API-JDK/module-api/src/test/java/com/financialplanner/moduleapi/exception/GlobalExceptionHandlerTest.java) · [ApiTestSupport](API-JDK/module-api/src/test/java/com/financialplanner/moduleapi/support/ApiTestSupport.java)
 
 ### module-items-bc
 
-- **Domain contracts** — [ItemService](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/domain/service/ItemService.java) · [DebtService](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/domain/service/DebtService.java) · [ItemRepository](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/domain/repository/ItemRepository.java) · [DebtRepository](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/domain/repository/DebtRepository.java)
-- **Domain rules** — [DebtRules](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/domain/debt/DebtRules.java) · [DebtDraft](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/domain/debt/DebtDraft.java)
-- **Application services** — [ItemServiceImpl](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/application/service/ItemServiceImpl.java) · [DebtServiceImpl](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/application/service/DebtServiceImpl.java) · [ItemTypeServiceImpl](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/application/service/ItemTypeServiceImpl.java) · [TimePeriodServiceImpl](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/application/service/TimePeriodServiceImpl.java)
-- **Persistence** — [ItemRepositoryImpl](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/adapter/ItemRepositoryImpl.java) · [DebtRepositoryImpl](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/adapter/DebtRepositoryImpl.java) · [JpaItemRepositoryCustomImpl](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/repository/custom/JpaItemRepositoryCustomImpl.java) (Criteria API) · [ItemEntityMapper](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/mapper/ItemEntityMapper.java)
-- **Entities** — [Item](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/entity/Item.java) · [Debt](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/entity/Debt.java) · [DebtAllocation](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/entity/DebtAllocation.java) · [ItemType](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/entity/ItemType.java) · [TimePeriod](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/entity/TimePeriod.java)
-- **Tests** — [DebtRulesTest](API-JDK/module-items-bc/src/test/java/com/financialplanner/moduleitemsbc/domain/debt/DebtRulesTest.java) · [DebtServiceImplTest](API-JDK/module-items-bc/src/test/java/com/financialplanner/moduleitemsbc/application/service/DebtServiceImplTest.java) · [ItemServiceImplTest](API-JDK/module-items-bc/src/test/java/com/financialplanner/moduleitemsbc/application/service/ItemServiceImplTest.java) · [RepositoryAdaptersTest](API-JDK/module-items-bc/src/test/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/adapter/RepositoryAdaptersTest.java)
+- **Domain contracts** — [ItemService](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/domain/service/ItemService.java) · [CreditAccountService](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/domain/service/CreditAccountService.java) · [DebtService](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/domain/service/DebtService.java) · [ItemRepository](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/domain/repository/ItemRepository.java) · [CreditAccountRepository](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/domain/repository/CreditAccountRepository.java) · [DebtRepository](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/domain/repository/DebtRepository.java)
+- **Domain rules** — [CreditAccountRules](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/domain/account/CreditAccountRules.java) · [PurchaseRules](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/domain/account/PurchaseRules.java) · [CreditAccountDraft](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/domain/account/CreditAccountDraft.java) · [DebtRules](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/domain/debt/DebtRules.java) · [DebtDraft](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/domain/debt/DebtDraft.java)
+- **Application services** — [ItemServiceImpl](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/application/service/ItemServiceImpl.java) · [CreditAccountServiceImpl](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/application/service/CreditAccountServiceImpl.java) · [DebtServiceImpl](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/application/service/DebtServiceImpl.java) · [ItemTypeServiceImpl](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/application/service/ItemTypeServiceImpl.java) · [TimePeriodServiceImpl](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/application/service/TimePeriodServiceImpl.java)
+- **Persistence** — [ItemRepositoryImpl](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/adapter/ItemRepositoryImpl.java) · [CreditAccountRepositoryImpl](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/adapter/CreditAccountRepositoryImpl.java) · [DebtRepositoryImpl](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/adapter/DebtRepositoryImpl.java) · [JpaItemRepositoryCustomImpl](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/repository/custom/JpaItemRepositoryCustomImpl.java) (Criteria API) · [ItemEntityMapper](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/mapper/ItemEntityMapper.java)
+- **Entities** — [Item](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/entity/Item.java) · [CreditAccount](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/entity/CreditAccount.java) · [AccountPurchase](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/entity/AccountPurchase.java) · [AccountPayment](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/entity/AccountPayment.java) · [Debt](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/entity/Debt.java) · [DebtAllocation](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/entity/DebtAllocation.java) · [ItemType](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/entity/ItemType.java) · [TimePeriod](API-JDK/module-items-bc/src/main/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/entity/TimePeriod.java)
+- **Tests** — [CreditAccountRulesTest](API-JDK/module-items-bc/src/test/java/com/financialplanner/moduleitemsbc/domain/account/CreditAccountRulesTest.java) · [DebtRulesTest](API-JDK/module-items-bc/src/test/java/com/financialplanner/moduleitemsbc/domain/debt/DebtRulesTest.java) · [DebtServiceImplTest](API-JDK/module-items-bc/src/test/java/com/financialplanner/moduleitemsbc/application/service/DebtServiceImplTest.java) · [ItemServiceImplTest](API-JDK/module-items-bc/src/test/java/com/financialplanner/moduleitemsbc/application/service/ItemServiceImplTest.java) · [RepositoryAdaptersTest](API-JDK/module-items-bc/src/test/java/com/financialplanner/moduleitemsbc/infrastructure/persistence/adapter/RepositoryAdaptersTest.java)
 
 ### module-display-bc
 
 - **Ledger** — [LedgerReadoutService](API-JDK/module-display-bc/src/main/java/com/financialplanner/moduledisplaybc/service/LedgerReadoutService.java) · [LedgerReadoutServiceImpl](API-JDK/module-display-bc/src/main/java/com/financialplanner/moduledisplaybc/service/LedgerReadoutServiceImpl.java) · [RecurrenceRange](API-JDK/module-display-bc/src/main/java/com/financialplanner/moduledisplaybc/utility/RecurrenceRange.java) · [LedgerDto](API-JDK/module-display-bc/src/main/java/com/financialplanner/moduledisplaybc/model/LedgerDto.java)
 - **Recurrence expanders** — [all ten](API-JDK/module-display-bc/src/main/java/com/financialplanner/moduledisplaybc/recurrence) · [WeeklyRecurrenceExpander](API-JDK/module-display-bc/src/main/java/com/financialplanner/moduledisplaybc/recurrence/WeeklyRecurrenceExpander.java) · [BiWeeklyRecurrenceExpander](API-JDK/module-display-bc/src/main/java/com/financialplanner/moduledisplaybc/recurrence/BiWeeklyRecurrenceExpander.java) · [MonthlyRecurrenceExpander](API-JDK/module-display-bc/src/main/java/com/financialplanner/moduledisplaybc/recurrence/MonthlyRecurrenceExpander.java) · [NthWeekdayRecurrenceExpander](API-JDK/module-display-bc/src/main/java/com/financialplanner/moduledisplaybc/recurrence/NthWeekdayRecurrenceExpander.java) · [Weekdays](API-JDK/module-display-bc/src/main/java/com/financialplanner/moduledisplaybc/recurrence/Weekdays.java)
+- **Cards & Loans** — [AccountLedgerCalculator](API-JDK/module-display-bc/src/main/java/com/financialplanner/moduledisplaybc/accounts/AccountLedgerCalculator.java) · [AccountLedgerModels](API-JDK/module-display-bc/src/main/java/com/financialplanner/moduledisplaybc/accounts/AccountLedgerModels.java)
 - **Debt Paydown** — [PaydownCalculator](API-JDK/module-display-bc/src/main/java/com/financialplanner/moduledisplaybc/paydown/PaydownCalculator.java) · [PaydownModels](API-JDK/module-display-bc/src/main/java/com/financialplanner/moduledisplaybc/paydown/PaydownModels.java)
-- **Tests** — [RecurrenceExpandersTest](API-JDK/module-display-bc/src/test/java/com/financialplanner/moduledisplaybc/recurrence/RecurrenceExpandersTest.java) · [LedgerBuildTest](API-JDK/module-display-bc/src/test/java/com/financialplanner/moduledisplaybc/service/LedgerBuildTest.java) · [PaydownCalculatorTest](API-JDK/module-display-bc/src/test/java/com/financialplanner/moduledisplaybc/paydown/PaydownCalculatorTest.java)
+- **Tests** — [RecurrenceExpandersTest](API-JDK/module-display-bc/src/test/java/com/financialplanner/moduledisplaybc/recurrence/RecurrenceExpandersTest.java) · [LedgerBuildTest](API-JDK/module-display-bc/src/test/java/com/financialplanner/moduledisplaybc/service/LedgerBuildTest.java) · [PaydownCalculatorTest](API-JDK/module-display-bc/src/test/java/com/financialplanner/moduledisplaybc/paydown/PaydownCalculatorTest.java) · [AccountLedgerCalculatorTest](API-JDK/module-display-bc/src/test/java/com/financialplanner/moduledisplaybc/accounts/AccountLedgerCalculatorTest.java) · [ItemDtoSanitizerTest](API-JDK/module-display-bc/src/test/java/com/financialplanner/moduledisplaybc/model/ItemDtoSanitizerTest.java)
 
 ### module-auth
 
